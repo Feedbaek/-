@@ -6,16 +6,20 @@
 
 ## 목차
 1. [요구사항 정의서](#요구사항-정의서)
-2. [화면 설계서](#화면-설계서)
-3. [테이블 정의서](#테이블-정의서)
-4. [물리 ERD](#물리-ERD)
-5. [통합테스트 시나리오](#통합테스트-시나리오)
+2. [아키텍처 설계서](#아키텍처-설계서)
+3. [화면 설계서](#화면-설계서)
+4. [테이블 정의서](#테이블-정의서)
+5. [물리 ERD](#물리-ERD)
+6. [통합테스트 시나리오](#통합테스트-시나리오)
 
 
 ---
 
 ## 요구사항 정의서
 <img src="https://github.com/Feedbaek/CarDriveTestSystem/assets/71076926/d8f22e7e-cb00-4dcb-9a69-d18b31cd8da1" width="75%" height="75%"/>
+
+## 아키텍처 설계서
+<img src="https://github.com/Feedbaek/CarDriveTestSystem/assets/71076926/1f8fbba4-036f-424f-a4a2-6906bfa6e0e6" width="70%" height="70%"/>
 
 ## 화면 설계서
 <img src="https://github.com/Feedbaek/CarDriveTestSystem/assets/71076926/0b612744-3c76-4c6d-a09a-7b2a4448a55f" width="85%" height="85%"/>
