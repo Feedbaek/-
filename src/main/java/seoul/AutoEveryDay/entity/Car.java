@@ -1,4 +1,4 @@
-package seoul.AutoEveryDay.carManage.entity;
+package seoul.AutoEveryDay.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,4 +17,10 @@ public class Car {
 
     @Column(name = "number", nullable = false)
     private String number;
+
+    @Column(name = "type", nullable = false)
+    private String type;
+
+    @Column(name = "status")
+    private String status;
 }
