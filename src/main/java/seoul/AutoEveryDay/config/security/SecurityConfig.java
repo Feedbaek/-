@@ -41,7 +41,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/login/process") // 로그인 Form Action Url
                         .usernameParameter("username") // 아이디 파라미터명 설정, default: username
                         .passwordParameter("password") // 패스워드 파라미터명 설정, default: password
-                        .defaultSuccessUrl("/home") // 로그인 성공 후 이동 페이지
+                        .successForwardUrl("/home") // 로그인 성공 후 이동 페이지
                         .permitAll()
                 )
                 // 로그아웃

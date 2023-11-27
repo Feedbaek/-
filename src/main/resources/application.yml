@@ -24,3 +24,9 @@ spring:
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
+
+#브라우저 요청에 대해 서버 오류시 기본으로 노출할 페이지를 사용할지 여부
+server:
+  error:
+    whitelabel:
+      enabled: false
