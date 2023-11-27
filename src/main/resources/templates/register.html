@@ -1,17 +1,34 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default_layout}">
 <head>
     <meta charset="UTF-8">
     <title>회원가입</title>
 </head>
-<body>
-    <div th:if="${param.error}">
-        Invalid username and password.
+<!-- Content -->
+<div layout:fragment="content">
+    <div class="container">
+        <div th:if="${param.error}">
+            잘못된 아이디 또는 비밀번호입니다.
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4 mt-5">
+                <h2 class="text-center">새로운 유저 등록</h2>
+                <form action="/register" method="post">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">회원 가입</button>
+                </form>
+            </div>
+        </div>
     </div>
-    <form th:action="@{/register}" method="post">
-        <div><label> User Name : <input type="text" name="name"/> </label></div>
-        <div><label> Password: <input type="password" name="password"/> </label></div>
-        <div><input type="submit" value="Sign Up"/></div>
-    </form>
-</body>
+</div>
 </html>

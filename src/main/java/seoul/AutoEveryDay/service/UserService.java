@@ -20,7 +20,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     public void validateDuplicateUser(User user) {
-        userRepository.findByName(user.getName())
+        userRepository.findByUsername(user.getUsername())
             .ifPresent(m -> {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 회원입니다.");
             });
@@ -35,16 +35,16 @@ public class UserService implements UserDetailsService {
     }
 
     public User findByName(String name) {
-        return userRepository.findByName(name)
+        return userRepository.findByUsername(name)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."));
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByName(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
         return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getName())
+                .username(user.getUsername())
                 .password(passwordEncoder.encode(user.getPassword()))
                 .roles("USER") // todo: 권한 설정
                 .build();

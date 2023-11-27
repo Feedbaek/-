@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class RegisterReq {
-    private String name;
+    private String username;
     private String password;
 }

@@ -24,7 +24,7 @@ public class RegisterController {
     @PostMapping("")
     public String register(RegisterReq registerReq) {
         User user = User.builder()
-                .name(registerReq.getName())
+                .username(registerReq.getUsername())
                 .password(registerReq.getPassword())
                 .build();
         userService.save(user);
