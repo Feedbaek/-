@@ -4,10 +4,10 @@ spring:
       enabled: true
 
   datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: SA
-    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/AUTOEVER?serverTimezone=Asia/Seoul
+    username: root
+    password: 1234
 
   # 설정들은 spring.io에서 doc에서 찾아서 공부해야한다.
   # jpa설정
@@ -19,6 +19,7 @@ spring:
     properties: # property 사용 설정
       hibernate: # hibernate property 설정
         format_sql: true
+        show_sql: true
 
 
   thymeleaf:

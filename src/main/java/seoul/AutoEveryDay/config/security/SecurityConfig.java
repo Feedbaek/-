@@ -3,12 +3,15 @@ package seoul.AutoEveryDay.config.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -28,24 +31,36 @@ public class SecurityConfig {
             "/login",
             "/login/process",
             // logout
+            "/logout",
     };
+
+    private final String[] ADMIN_LIST = {
+            "/admin",
+    };
+
+    private final String[] ADVANCED_USER_LIST = {
+            "/advanced_user",
+    };
+
     @Bean
     protected SecurityFilterChain myConfig(HttpSecurity http) throws Exception {
         /* 허용 페이지 등록 */
         http.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(WHITE_LIST).permitAll()  // 모든 사용자 허용 경로
-                        .anyRequest().authenticated())  // 그 외 나머지 경로는 전부 인증 필요
+                        .requestMatchers(ADMIN_LIST).hasRole("ADMIN")  // ADMIN 권한만 허용 경로
+                        .requestMatchers(ADVANCED_USER_LIST).hasAnyAuthority("WRITE_PRIVILEGE", "DELETE_PRIVILEGE")  // ADVANCED_USER 권한만 허용 경로
+                        .anyRequest().hasAuthority("READ_PRIVILEGE"))  // 그 외 나머지 경로는 전부 인증 필요
                 // 로그인
                 .formLogin(form -> form
                         .loginPage("/login") // 로그인 페이지
                         .loginProcessingUrl("/login/process") // 로그인 Form Action Url
                         .usernameParameter("username") // 아이디 파라미터명 설정, default: username
                         .passwordParameter("password") // 패스워드 파라미터명 설정, default: password
-                        .successForwardUrl("/home") // 로그인 성공 후 이동 페이지
+                        .defaultSuccessUrl("/home") // 로그인 성공 후 이동 페이지
                         .permitAll()
                 )
                 // 로그아웃
-                .logout(withDefaults())
+                .logout(withDefaults()) // '/logout' 으로 로그아웃
                 .csrf(AbstractHttpConfigurer::disable); // csrf 비활성화
 
         return http.build();
@@ -53,5 +68,19 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        String hierarchy = "ROLE_ADMIN > ROLE_ADVANCED_USER \n ROLE_ADVANCED_USER > ROLE_USER";
+        roleHierarchy.setHierarchy(hierarchy);
+        return roleHierarchy;
+    }
+    @Bean
+    public DefaultWebSecurityExpressionHandler customWebSecurityExpressionHandler() {
+        DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
+        expressionHandler.setRoleHierarchy(roleHierarchy());
+        return expressionHandler;
     }
 }

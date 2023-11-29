@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import seoul.AutoEveryDay.dto.RegisterReq;
-import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.UserService;
 
 @Controller
@@ -23,11 +22,7 @@ public class RegisterController {
     }
     @PostMapping("")
     public String register(RegisterReq registerReq) {
-        User user = User.builder()
-                .username(registerReq.getUsername())
-                .password(registerReq.getPassword())
-                .build();
-        userService.save(user);
+        userService.register(registerReq);
         return "login";
     }
 }

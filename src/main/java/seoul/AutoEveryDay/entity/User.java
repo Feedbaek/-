@@ -3,8 +3,10 @@ package seoul.AutoEveryDay.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Collection;
+
 @Entity
-@Table(name = "test_user")
+@Table(name = "users")
 @Builder
 @Getter
 @Setter
@@ -16,11 +18,18 @@ public class User {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    // todo: 권한 설정
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+        name = "users_roles",
+        joinColumns = @JoinColumn(
+                name = "user_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(
+                name = "role_id", referencedColumnName = "id"))
+    private Collection<Role> roles;
 }
