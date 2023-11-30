@@ -3,23 +3,18 @@ package seoul.AutoEveryDay.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Collection;
-
 @Entity
-@Table(name = "privilege")
+@Table(name = "charge_spot")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Privilege {
+public class ChargeSpot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique=true)
-    private String name;
-
-    @ManyToMany(mappedBy = "privileges")
-    private Collection<Role> roles;
+    @Column(name = "name", nullable = false)
+    String name;
 }

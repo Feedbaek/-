@@ -23,4 +23,7 @@ public class Car {
 
     @Column(name = "status")
     private String status;
+
+    @Column(name = "comment", columnDefinition = "TEXT")
+    private String comment;
 }

@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static seoul.AutoEveryDay.enums.RoleEnum.ROLE_USER;
+
 @Service
 @Slf4j(topic = "UserService")
 @Transactional
@@ -75,7 +77,7 @@ public class UserService implements UserDetailsService {
         List<String> privileges = new ArrayList<>();
         List<Privilege> collection = new ArrayList<>();
         for (Role role : roles) {
-            privileges.add(role.getName());
+//            privileges.add(role.getName());  // 이거는 role 이름을 권한으로 인식하는데 왜 하는지 모름
             collection.addAll(role.getPrivileges());
         }
         for (Privilege item : collection) {
@@ -94,7 +96,7 @@ public class UserService implements UserDetailsService {
 
     // 기본 유저로 회원가입
     public void register(RegisterReq registerReq) {
-        Role role = roleRepository.findByName("ROLE_USER")
+        Role role = roleRepository.findByName(ROLE_USER.getValue())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입에 실패했습니다."));
         User user = User.builder()
                 .username(registerReq.getUsername())

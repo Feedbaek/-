@@ -18,6 +18,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static seoul.AutoEveryDay.enums.PrivilegeEnum.*;
+import static seoul.AutoEveryDay.enums.RoleEnum.*;
+
 @Component
 @RequiredArgsConstructor
 public class SetupDataLoader implements
@@ -32,26 +35,25 @@ public class SetupDataLoader implements
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        System.out.println("SetupDataLoader.onApplicationEvent");
         if (alreadySetup)
             return;
         Privilege readPrivilege
-                = createPrivilegeIfNotFound("READ_PRIVILEGE");
+                = createPrivilegeIfNotFound(READ_PRIVILEGE.getValue());
         Privilege writePrivilege
-                = createPrivilegeIfNotFound("WRITE_PRIVILEGE");
+                = createPrivilegeIfNotFound(WRITE_PRIVILEGE.getValue());
         Privilege deletePrivilege
-                = createPrivilegeIfNotFound("DELETE_PRIVILEGE");
-        Privilege managePrivilege
-                = createPrivilegeIfNotFound("MANAGE_PRIVILEGE");
+                = createPrivilegeIfNotFound(DELETE_PRIVILEGE.getValue());
+        Privilege adminPrivilege
+                = createPrivilegeIfNotFound(ADMIN_PRIVILEGE.getValue());
 
         List<Privilege> adminPrivileges = Arrays.asList(
-                readPrivilege, writePrivilege, deletePrivilege, managePrivilege);
+                readPrivilege, writePrivilege, deletePrivilege, adminPrivilege);
         List<Privilege> advancedUserPrivileges = Arrays.asList(
                 readPrivilege, writePrivilege, deletePrivilege);
 
-        Role adminRole = createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
-        createRoleIfNotFound("ROLE_USER", Collections.singletonList(readPrivilege));
-        createRoleIfNotFound("ROLE_ADVANCED_USER", advancedUserPrivileges);
+        Role adminRole = createRoleIfNotFound(ROLE_ADMIN.getValue(), adminPrivileges);
+        createRoleIfNotFound(ROLE_USER.getValue(), Collections.singletonList(readPrivilege));
+        createRoleIfNotFound(ROLE_ADVANCED_USER.getValue(), advancedUserPrivileges);
 
         User user = new User();
         user.setUsername("admin");

@@ -24,6 +24,10 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "group_id")
+    private Group group;
+
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
         name = "users_roles",

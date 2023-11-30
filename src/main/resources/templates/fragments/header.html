@@ -3,8 +3,11 @@
 <div th:fragment="headerFragment">
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="/home">Home</a>
-    <div class="ml-auto" sec:authorize="isAuthenticated()">
-      <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post">
+    <div class="ml-auto">
+      <form style="float: left; padding:10px;" sec:authorize="hasAuthority('ADMIN')" class="form-inline my-2 my-lg-0" th:action="@{/admin}" method="get">
+        <button class="btn btn-primary my-2 my-sm-0" type="submit">관리자 페이지</button>
+      </form>
+      <form style="float: left; padding:10px;" sec:authorize="isAuthenticated()" class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post">
         <button class="btn btn-danger my-2 my-sm-0" type="submit">로그아웃</button>
       </form>
     </div>

@@ -6,20 +6,20 @@ import lombok.*;
 import java.util.Collection;
 
 @Entity
-@Table(name = "privilege")
+@Table(name = "group")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Privilege {
+public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
 
-    @Column(name = "name", nullable = false, unique=true)
-    private String name;
+    @Column(name = "name", nullable = false)
+    String name;
 
-    @ManyToMany(mappedBy = "privileges")
-    private Collection<Role> roles;
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
+    Collection<User> users;
 }

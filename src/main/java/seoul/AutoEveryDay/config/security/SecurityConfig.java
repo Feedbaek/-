@@ -14,6 +14,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 
 import static org.springframework.security.config.Customizer.withDefaults;
+import static seoul.AutoEveryDay.enums.PrivilegeEnum.*;
+import static seoul.AutoEveryDay.enums.RoleEnum.*;
 
 // spring security 설정 파일 입니다.
 @Configuration
@@ -25,6 +27,8 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-resources/**",
+            // index
+            "/",
             // register
             "/register",
             // login
@@ -35,7 +39,7 @@ public class SecurityConfig {
     };
 
     private final String[] ADMIN_LIST = {
-            "/admin",
+            "/admin/**",
     };
 
     private final String[] ADVANCED_USER_LIST = {
@@ -47,9 +51,9 @@ public class SecurityConfig {
         /* 허용 페이지 등록 */
         http.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(WHITE_LIST).permitAll()  // 모든 사용자 허용 경로
-                        .requestMatchers(ADMIN_LIST).hasRole("ADMIN")  // ADMIN 권한만 허용 경로
-                        .requestMatchers(ADVANCED_USER_LIST).hasAnyAuthority("WRITE_PRIVILEGE", "DELETE_PRIVILEGE")  // ADVANCED_USER 권한만 허용 경로
-                        .anyRequest().hasAuthority("READ_PRIVILEGE"))  // 그 외 나머지 경로는 전부 인증 필요
+//                        .requestMatchers(ADMIN_LIST).hasRole(ROLE_ADMIN.getValue())  // ADMIN 권한만 허용 경로
+//                        .requestMatchers(ADVANCED_USER_LIST).hasAuthority(WRITE_PRIVILEGE.getValue()) // ADVANCED_USER 권한만 허용 경로
+                        .anyRequest().hasAuthority(READ_PRIVILEGE.getValue()))  // 그 외 나머지 경로는 전부 인증된 사용자만 허용
                 // 로그인
                 .formLogin(form -> form
                         .loginPage("/login") // 로그인 페이지
@@ -70,17 +74,19 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public RoleHierarchy roleHierarchy() {
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        String hierarchy = "ROLE_ADMIN > ROLE_ADVANCED_USER \n ROLE_ADVANCED_USER > ROLE_USER";
-        roleHierarchy.setHierarchy(hierarchy);
-        return roleHierarchy;
-    }
-    @Bean
-    public DefaultWebSecurityExpressionHandler customWebSecurityExpressionHandler() {
-        DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
-        expressionHandler.setRoleHierarchy(roleHierarchy());
-        return expressionHandler;
-    }
+    /** 아래는 역할별로 계층 구조를 설정해주는 기능. 하지만 당장 Role 말고 Authority를 사용중 */
+//    @Bean
+//    public RoleHierarchy roleHierarchy() {
+//        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+//        String hierarchy = ROLE_ADMIN.name() + " > " + ROLE_ADVANCED_USER.name() + "\n"
+//                + ROLE_ADVANCED_USER.name() + " > " + ROLE_USER.name();
+//        roleHierarchy.setHierarchy(hierarchy);
+//        return roleHierarchy;
+//    }
+//    @Bean
+//    public DefaultWebSecurityExpressionHandler customWebSecurityExpressionHandler() {
+//        DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
+//        expressionHandler.setRoleHierarchy(roleHierarchy());
+//        return expressionHandler;
+//    }
 }
