@@ -9,23 +9,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ResponseStatusException;
 import seoul.AutoEveryDay.dto.RegisterReq;
-import seoul.AutoEveryDay.service.UserService;
+import seoul.AutoEveryDay.service.LoginService;
+
+import static seoul.AutoEveryDay.service.LoginService.isAuthenticated;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/register")
 @Slf4j(topic = "registerController")
 public class RegisterController {
-    private final UserService userService;
-
-    private boolean isAuthenticated() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-            return false;
-        }
-        return authentication.isAuthenticated();
-    }
+    private final LoginService loginService;
 
     @GetMapping("")
     public String register() {
@@ -36,7 +31,12 @@ public class RegisterController {
         if (isAuthenticated()) {
             return "redirect:/home";
         }
-        userService.register(registerReq);
+        try {
+            loginService.register(registerReq);
+        } catch (ResponseStatusException e) {
+            log.error("회원가입 실패", e);
+            return "redirect:/register?error";
+        }
         return "login";
     }
 }

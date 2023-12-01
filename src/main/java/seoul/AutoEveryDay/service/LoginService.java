@@ -3,8 +3,11 @@ package seoul.AutoEveryDay.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,10 +33,19 @@ import static seoul.AutoEveryDay.enums.RoleEnum.ROLE_USER;
 @Slf4j(topic = "UserService")
 @Transactional
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService {
+public class LoginService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+
+    // 로그인 여부 확인, 로그인 되어있으면 true, 아니면 false
+    public static boolean isAuthenticated() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return false;
+        }
+        return authentication.isAuthenticated();
+    }
 
     public void validateDuplicateUser(User user) {
         userRepository.findByUsername(user.getUsername())
@@ -55,6 +67,23 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."));
     }
 
+    // 기본 유저로 회원가입
+    public void register(RegisterReq registerReq) {
+        Role role = roleRepository.findByName(ROLE_USER.getValue())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입에 실패했습니다."));
+        User user = User.builder()
+                .username(registerReq.getUsername())
+                .password(passwordEncoder.encode(registerReq.getPassword()))
+                .roles(Collections.singletonList(role))
+                .build();
+        save(user);
+    }
+
+
+    /** ====================================================
+     * <아래는 UserDetailsService 구현부>
+     * =====================================================*/
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
@@ -72,6 +101,14 @@ public class UserService implements UserDetailsService {
         return getGrantedAuthorities(getPrivileges(roles));
     }
 
+    private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (String privilege : privileges) {
+            authorities.add(new SimpleGrantedAuthority(privilege));
+        }
+        return authorities;
+    }
+
     private List<String> getPrivileges(Collection<Role> roles) {
 
         List<String> privileges = new ArrayList<>();
@@ -84,25 +121,5 @@ public class UserService implements UserDetailsService {
             privileges.add(item.getName());
         }
         return privileges;
-    }
-
-    private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        for (String privilege : privileges) {
-            authorities.add(new SimpleGrantedAuthority(privilege));
-        }
-        return authorities;
-    }
-
-    // 기본 유저로 회원가입
-    public void register(RegisterReq registerReq) {
-        Role role = roleRepository.findByName(ROLE_USER.getValue())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입에 실패했습니다."));
-        User user = User.builder()
-                .username(registerReq.getUsername())
-                .password(passwordEncoder.encode(registerReq.getPassword()))
-                .roles(Collections.singletonList(role))
-                .build();
-        save(user);
     }
 }

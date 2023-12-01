@@ -2,19 +2,17 @@ package seoul.AutoEveryDay.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "rental_manage")
+@Table(name = "rental_history")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RentalManage {
+public class RentalHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,11 +25,9 @@ public class RentalManage {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @CreationTimestamp // INSERT 시 자동으로 값을 채워줌
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @Column(name = "pickup_date")
+    private LocalDateTime pickupDate;
 
-    @Column(name = "updated_at")
-    @UpdateTimestamp // UPDATE 시 자동으로 값을 채워줌
-    private LocalDateTime updatedAt;
+    @Column(name = "return_date")
+    private LocalDateTime returnDate;
 }

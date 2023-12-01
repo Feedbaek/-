@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,12 +24,13 @@ import static seoul.AutoEveryDay.enums.RoleEnum.*;
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
+@EnableMethodSecurity() // prePostEnabled 어노테이션 활성화
 public class SecurityConfig {
     private final String[] WHITE_LIST = {
             // swagger
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-resources/**",
+//            "/v3/api-docs/**",
+//            "/swagger-ui/**",
+//            "/swagger-resources/**",
             // index
             "/",
             // register
@@ -38,22 +42,12 @@ public class SecurityConfig {
             "/logout",
     };
 
-    private final String[] ADMIN_LIST = {
-            "/admin/**",
-    };
-
-    private final String[] ADVANCED_USER_LIST = {
-            "/advanced_user",
-    };
-
     @Bean
     protected SecurityFilterChain myConfig(HttpSecurity http) throws Exception {
         /* 허용 페이지 등록 */
         http.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(WHITE_LIST).permitAll()  // 모든 사용자 허용 경로
-//                        .requestMatchers(ADMIN_LIST).hasRole(ROLE_ADMIN.getValue())  // ADMIN 권한만 허용 경로
-//                        .requestMatchers(ADVANCED_USER_LIST).hasAuthority(WRITE_PRIVILEGE.getValue()) // ADVANCED_USER 권한만 허용 경로
-                        .anyRequest().hasAuthority(READ_PRIVILEGE.getValue()))  // 그 외 나머지 경로는 전부 인증된 사용자만 허용
+                        .anyRequest().hasAuthority(READ_PRIVILEGE.getValue()))  // 그 외 나머지 경로는 전부 읽기 권한 필요
                 // 로그인
                 .formLogin(form -> form
                         .loginPage("/login") // 로그인 페이지
