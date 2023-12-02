@@ -3,6 +3,8 @@ package seoul.AutoEveryDay.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "car")
 @Getter
@@ -21,12 +23,12 @@ public class Car {
     @Column(name = "type", nullable = false)
     private String type;
 
-    @Column(name = "available", nullable = false)
-    private boolean available;
-
     @Column(name = "status")
     private String status;
 
     @Column(name = "comment", columnDefinition = "TEXT")
     private String comment;
+
+    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<RentalHistory> rentalHistories;
 }

@@ -3,7 +3,7 @@ package seoul.AutoEveryDay.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "rental_history")
@@ -26,8 +26,8 @@ public class RentalHistory {
     private User user;
 
     @Column(name = "pickup_date")
-    private LocalDateTime pickupDate;
+    private LocalDate pickupDate;
 
     @Column(name = "return_date")
-    private LocalDateTime returnDate;
+    private LocalDate returnDate;
 }

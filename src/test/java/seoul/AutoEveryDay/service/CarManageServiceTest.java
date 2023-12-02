@@ -1,6 +1,5 @@
 package seoul.AutoEveryDay.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,11 +9,15 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import seoul.AutoEveryDay.dto.CarInfo;
+import seoul.AutoEveryDay.dto.EditCarReq;
 import seoul.AutoEveryDay.dto.NewCarReq;
 import seoul.AutoEveryDay.entity.Car;
 import seoul.AutoEveryDay.repository.CarRepository;
+
+import java.util.Objects;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -45,7 +48,7 @@ public class CarManageServiceTest {
         given(carRepository.existsByNumber(newCarReq.getNumber())).willReturn(false);
         given(carRepository.save(Mockito.any(Car.class))).willReturn(Mockito.any(Car.class));
         // when
-        ResponseEntity<String> res = carManageService.createCar(newCarReq);
+        ResponseEntity<String> res = ResponseEntity.ok(carManageService.createCar(newCarReq));
         // then
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -61,5 +64,110 @@ public class CarManageServiceTest {
         // then
         assertThat(thrown).isInstanceOf(ResponseStatusException.class)
                 .hasMessage("400 BAD_REQUEST \"이미 존재하는 차량 번호입니다.\"");
+    }
+
+    @Test
+    @DisplayName("차량 정보 조회 성공 테스트")
+    public void getCarSuccess() {
+        // given
+        String number = "12가1234";
+        given(carRepository.findByNumber(number)).willReturn(
+                java.util.Optional.of(Car.builder()
+                        .number(number)
+                        .available(true)
+                        .status("정상")
+                        .comment("테스트")
+                        .build()));
+        // when
+        ResponseEntity<CarInfo> res = ResponseEntity.ok(carManageService.getCar(number));
+        // then
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(res.getBody()).getNumber()).isEqualTo(number);
+    }
+
+    @Test
+    @DisplayName("차량 정보 조회 실패 테스트")
+    public void getCarFail() {
+        // given
+        String number = "12가1234";
+        given(carRepository.findByNumber(number)).willReturn(
+                Optional.empty());
+        // when
+        Throwable thrown = catchThrowable(() -> carManageService.getCar(number));
+        // then
+        assertThat(thrown).isInstanceOf(ResponseStatusException.class)
+                .hasMessage("400 BAD_REQUEST \"존재하지 않는 차량 번호입니다.\"");
+    }
+
+    @Test
+    @DisplayName("차량 정보 수정 성공 테스트")
+    public void updateCarSuccess() {
+        // given
+        String number = "12가1234";
+        EditCarReq editCarReq = EditCarReq.builder()
+                .number(number)
+                .status("정상")
+                .comment("테스트")
+                .build();
+        given(carRepository.findByNumber(number)).willReturn(Optional.of(Car.builder()
+                .number(number)
+                .available(true)
+                .status("비정상")
+                .comment("테스트 전")
+                .build()));
+        // when
+        ResponseEntity<String> res = ResponseEntity.ok(carManageService.updateCar(editCarReq));
+        // then
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(res.getBody()).isEqualTo("차량 정보 수정 성공");
+    }
+
+    @Test
+    @DisplayName("차량 정보 수정 실패 테스트")
+    public void updateCarFail() {
+        // given
+        String number = "12가1234";
+        EditCarReq editCarReq = EditCarReq.builder()
+                .number(number)
+                .status("정상")
+                .comment("테스트")
+                .build();
+        given(carRepository.findByNumber(number)).willReturn(Optional.empty());
+        // when
+        Throwable thrown = catchThrowable(() -> carManageService.updateCar(editCarReq));
+        // then
+        assertThat(thrown).isInstanceOf(ResponseStatusException.class)
+                .hasMessage("400 BAD_REQUEST \"존재하지 않는 차량 번호입니다.\"");
+    }
+
+    @Test
+    @DisplayName("차량 삭제 성공 테스트")
+    public void deleteCarSuccess() {
+        // given
+        String number = "12가1234";
+        given(carRepository.findByNumber(number)).willReturn(Optional.of(Car.builder()
+                .number(number)
+                .available(true)
+                .status("정상")
+                .comment("테스트")
+                .build()));
+        // when
+        ResponseEntity<String> res = ResponseEntity.ok(carManageService.deleteCar(number));
+        // then
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(res.getBody()).isEqualTo("차량 삭제 성공");
+    }
+
+    @Test
+    @DisplayName("차량 삭제 실패 테스트")
+    public void deleteCarFail() {
+        // given
+        String number = "12가1234";
+        given(carRepository.findByNumber(number)).willReturn(Optional.empty());
+        // when
+        Throwable thrown = catchThrowable(() -> carManageService.deleteCar(number));
+        // then
+        assertThat(thrown).isInstanceOf(ResponseStatusException.class)
+                .hasMessage("400 BAD_REQUEST \"존재하지 않는 차량 번호입니다.\"");
     }
 }

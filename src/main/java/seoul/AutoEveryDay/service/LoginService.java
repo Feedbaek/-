@@ -47,6 +47,15 @@ public class LoginService implements UserDetailsService {
         return authentication.isAuthenticated();
     }
 
+    // 로그인 되어있는 유저 이름 반환
+    public static String getAuthenticatedUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+        }
+        return authentication.getName();
+    }
+
     public void validateDuplicateUser(User user) {
         userRepository.findByUsername(user.getUsername())
             .ifPresent(m -> {

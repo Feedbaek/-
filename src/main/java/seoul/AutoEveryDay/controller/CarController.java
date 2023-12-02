@@ -4,51 +4,58 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import seoul.AutoEveryDay.dto.CarInfo;
+import seoul.AutoEveryDay.dto.EditCarReq;
 import seoul.AutoEveryDay.dto.NewCarReq;
+import seoul.AutoEveryDay.dto.RentCarReq;
+import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.CarManageService;
+import seoul.AutoEveryDay.service.CarRentalService;
+import seoul.AutoEveryDay.service.LoginService;
 
 @Controller
 @RequestMapping("/car")
 @RequiredArgsConstructor
 public class CarController {
+    private final LoginService userService;
     private final CarManageService carManageService;
-    /* 차량 대여 관련 기능 */
+    private final CarRentalService carRentalService;
+    @ResponseBody
+    @GetMapping
+    public ResponseEntity<CarInfo> getCar(@RequestParam String number) {
+        return ResponseEntity.ok(carManageService.getCar(number));
+    }
+    @PreAuthorize("hasAuthority('CAR_MANAGE')")
+    @ResponseBody
+    @PostMapping
+    public ResponseEntity<String> newCar(NewCarReq newCarReq) {
+        return ResponseEntity.ok(carManageService.createCar(newCarReq));
+    }
+    @PreAuthorize("hasAuthority('CAR_MANAGE')")
+    @ResponseBody
+    @PutMapping
+    public ResponseEntity<String> editCar(EditCarReq editCarReq) {
+        return ResponseEntity.ok(carManageService.updateCar(editCarReq));
+    }
+    @PreAuthorize("hasAuthority('CAR_MANAGE')")
+    @ResponseBody
+    @DeleteMapping
+    public ResponseEntity<String> deleteCar(@RequestParam String number) {
+        return ResponseEntity.ok(carManageService.deleteCar(number));
+    }
     @GetMapping("/rental")
-    public String rental() {
+    public String rentalGet(Model model) {
+        model.addAttribute("carList", carManageService.getAllCar());
         return "carRental";
     }
-
     @PreAuthorize("hasAuthority('CAR_RENTAL')")
-    @PostMapping("/rental/submit")
+    @PostMapping("/rental")
     @ResponseBody
-    public String rentalPost() {
-        return "success";
+    public ResponseEntity<String> rentalPost(RentCarReq rentCarReq) {
+        User user = userService.findByName(LoginService.getAuthenticatedUsername());
+        carRentalService.rentCar(rentCarReq, user);
+        return ResponseEntity.ok("success");
     }
-
-    @GetMapping("/rental/return")
-    public String returnCar() {
-        return "carReturn";
-    }
-
-    /* 차량 관리 기능*/
-    @GetMapping("/manage")
-    public String manage() {
-        return "carManage";
-    }
-
-    @ResponseBody
-    @PostMapping("/manage/new")
-    public ResponseEntity<String> addCar(NewCarReq newCarReq) {
-        try {
-            return carManageService.createCar(newCarReq);
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
 }

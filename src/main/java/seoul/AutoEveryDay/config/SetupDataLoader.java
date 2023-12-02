@@ -1,4 +1,4 @@
-package seoul.AutoEveryDay.config.security;
+package seoul.AutoEveryDay.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
