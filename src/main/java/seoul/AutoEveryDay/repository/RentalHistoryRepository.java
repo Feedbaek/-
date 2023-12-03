@@ -10,5 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface RentalHistoryRepository extends JpaRepository<RentalHistory, Long> {
-    Optional<RentalHistory>findByReturnDateGreaterThanAndPickupDateLessThan(LocalDate pickUpDate, LocalDate returnDate);
+    List<RentalHistory>findByCarIdAndReturnDateGreaterThanAndPickupDateLessThan(Long carId, LocalDate pickUpDate, LocalDate returnDate);
+    List<RentalHistory>findByCarIdAndReturnDateGreaterThan(Long carId, LocalDate pickUpDate);
+    Optional<RentalHistory> findByCarIdAndPickupDateAndReturnDate(Long carId, LocalDate pickUpDate, LocalDate returnDate);
 }

@@ -8,7 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CarInfo {
-    private Long id;
     private String number;
     private String type;
     private String status;

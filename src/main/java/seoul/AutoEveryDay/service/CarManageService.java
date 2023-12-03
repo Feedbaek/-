@@ -66,7 +66,6 @@ public class CarManageService {
 
         carList.forEach(car -> {
             carInfoList.add(CarInfo.builder()
-                    .id(car.getId())
                     .number(car.getNumber())
                     .type(car.getType())
                     .status(car.getStatus())

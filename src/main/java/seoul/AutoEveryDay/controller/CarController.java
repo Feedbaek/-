@@ -10,10 +10,14 @@ import seoul.AutoEveryDay.dto.CarInfo;
 import seoul.AutoEveryDay.dto.EditCarReq;
 import seoul.AutoEveryDay.dto.NewCarReq;
 import seoul.AutoEveryDay.dto.RentCarReq;
+import seoul.AutoEveryDay.entity.RentalHistory;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.CarManageService;
 import seoul.AutoEveryDay.service.CarRentalService;
 import seoul.AutoEveryDay.service.LoginService;
+
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/car")
@@ -22,32 +26,36 @@ public class CarController {
     private final LoginService userService;
     private final CarManageService carManageService;
     private final CarRentalService carRentalService;
-    @ResponseBody
-    @GetMapping
-    public ResponseEntity<CarInfo> getCar(@RequestParam String number) {
-        return ResponseEntity.ok(carManageService.getCar(number));
+    @GetMapping("")
+    public String getCar(Model model) {
+        List<CarInfo> allCar = carManageService.getAllCar();
+        model.addAttribute("carList", allCar);
+        return "carManage";
     }
     @PreAuthorize("hasAuthority('CAR_MANAGE')")
     @ResponseBody
-    @PostMapping
+    @PostMapping("")
     public ResponseEntity<String> newCar(NewCarReq newCarReq) {
         return ResponseEntity.ok(carManageService.createCar(newCarReq));
     }
     @PreAuthorize("hasAuthority('CAR_MANAGE')")
     @ResponseBody
-    @PutMapping
+    @PutMapping("")
     public ResponseEntity<String> editCar(EditCarReq editCarReq) {
         return ResponseEntity.ok(carManageService.updateCar(editCarReq));
     }
     @PreAuthorize("hasAuthority('CAR_MANAGE')")
     @ResponseBody
-    @DeleteMapping
+    @DeleteMapping("")
     public ResponseEntity<String> deleteCar(@RequestParam String number) {
         return ResponseEntity.ok(carManageService.deleteCar(number));
     }
     @GetMapping("/rental")
     public String rentalGet(Model model) {
-        model.addAttribute("carList", carManageService.getAllCar());
+        List<CarInfo> carInfoList = carManageService.getAllCar();
+        model.addAttribute("carList", carInfoList);
+        Map<String, List<RentalHistory>> rentalHistoryMap = carRentalService.getRentalHistory(carInfoList);
+        model.addAttribute("rentalListMap", rentalHistoryMap);
         return "carRental";
     }
     @PreAuthorize("hasAuthority('CAR_RENTAL')")
