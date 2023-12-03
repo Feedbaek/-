@@ -89,20 +89,14 @@
                 event.preventDefault(); // 폼의 기본 제출 동작을 방지
 
                 const formData = new FormData(this);
-                const modalElement = this.closest('.modal'); // 현재 폼이 속한 모달 요소
 
                 fetch(this.action, {
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.json()) // 서버 응답을 JSON으로 변환
+                .then(response => response.json())
                 .then(data => {
-                    console.log('Success:', data)
-                    if (data.status === 200) {
-                        alert(data.message); // 서버 응답 메시지를 알림으로 표시
-                    } else {
-                        alert(data.status + ': ' + data.error); // 서버 응답 메시지를 알림으로 표시
-                    }
+                    alert(data.message); // 서버 응답 메시지를 알림으로 표시
                 })
                 .catch(error => {
                     console.error('Error:', error);

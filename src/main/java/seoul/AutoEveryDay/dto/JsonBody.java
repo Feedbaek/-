@@ -8,7 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JsonBody {
-    private int status;
     private String message;
     private Object data;
 }

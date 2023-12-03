@@ -55,7 +55,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form class="carForm" th:action="@{/car/manage}" method="post">
+                <form id="carForm" th:action="@{/car/manage}" method="post">
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="carNumber">Car Number</label>
@@ -92,7 +92,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form class="carForm" th:action="@{/car/manage/edit}" method="post">
+                <form th:id="'carForm-' + ${car.getNumber()}" th:action="@{/car/manage/edit}" method="post">
                     <div class="modal-body">
                         <input type="hidden" th:name="'number'" th:value="${car.getNumber()}"/>
 
@@ -106,7 +106,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Add Car</button>
+                        <button type="submit" class="btn btn-primary">Edit Car</button>
                     </div>
                 </form>
             </div>
@@ -130,8 +130,8 @@
             }
         }
 
-        $(document).ready(function() {
-            $('.carForm').on('submit', function(event) {
+        document.querySelectorAll("[id^='carForm']").forEach((element) =>
+            element.addEventListener('submit', function(event) {
                 event.preventDefault(); // 폼의 기본 제출 동작 방지
 
                 const formData = new FormData(this);
@@ -142,6 +142,7 @@
                 })
                     .then(response => response.json())
                     .then(data => {
+                        console.log('Success:', data);
                         alert(data.message); // 서버 응답 메시지를 알림으로 표시
                     })
                     .catch(error => {
@@ -152,8 +153,9 @@
                         // 페이지 새로고침
                         location.reload();
                     });
-            });
-        });
+            })
+        );
+
     </script>
 
 </main>

@@ -34,7 +34,6 @@ public class CarController {
     @PostMapping("/manage") // 새로운 차량 등록
     public JsonBody newCar(NewCarReq newCarReq) {
         return JsonBody.builder()
-                .status(200)
                 .message("차량 등록 성공")
                 .data(carManageService.createCar(newCarReq)).build();
     }
@@ -43,7 +42,6 @@ public class CarController {
     @PostMapping("/manage/edit")  // 차량 정보 수정
     public JsonBody editCar(EditCarReq editCarReq) {
         return JsonBody.builder()
-                .status(200)
                 .message("차량 정보 수정 성공")
                 .data(carManageService.updateCar(editCarReq)).build();
     }
@@ -52,7 +50,6 @@ public class CarController {
     @DeleteMapping("/manage")   // 차량 삭제
     public JsonBody deleteCar(@RequestParam String number) {
         return JsonBody.builder()
-                .status(200)
                 .message("차량 삭제 성공")
                 .data(carManageService.deleteCar(number)).build();
     }
@@ -70,7 +67,6 @@ public class CarController {
     public JsonBody rentalPost(RentCarReq rentCarReq) {
         User user = userService.findByName(LoginService.getAuthenticatedUsername());
         return JsonBody.builder()
-                .status(200)
                 .message("차량 대여 성공")
                 .data(carRentalService.rentCar(rentCarReq, user)).build();
     }

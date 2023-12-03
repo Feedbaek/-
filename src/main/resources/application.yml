@@ -31,3 +31,4 @@ server:
   error:
     whitelabel:
       enabled: false
+    include-message: always
