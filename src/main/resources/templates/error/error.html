@@ -13,14 +13,8 @@
         <h1 class="display-4 text-center mb-4">This is Error Page!</h1>
         <div class="alert alert-danger" role="alert">
             <h4 class="alert-heading">Error!</h4>
-            <p th:text="${'path: ' + path}"></p>
-            <p th:text="${'status: ' + status}"></p>
-            <p th:text="${'timestamp: ' + timestamp}"></p>
-            <p th:text="${'error: ' + error}"></p>
-            <p th:text="${'errors: ' + errors}"></p>
-            <p th:text="${'exception: ' + exception}"></p>
-            <p th:text="${'message: ' + message}"></p>
-            <p th:text="${'trace: ' + trace}"></p>
+            <span th:text="${status}"></span>
+            <span th:text="${error}"></span>
         </div>
     </div>
 </div>

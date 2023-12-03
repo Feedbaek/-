@@ -95,15 +95,21 @@
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.text()) // 서버 응답을 JSON으로 변환
+                .then(response => response.json()) // 서버 응답을 JSON으로 변환
                 .then(data => {
-                    alert('Server Response: ' + data); // 서버 응답 메시지를 알림으로 표시
-                    window.location.reload(); // 페이지 새로고침
+                    console.log('Success:', data)
+                    if (data.status === 200) {
+                        alert(data.message); // 서버 응답 메시지를 알림으로 표시
+                    } else {
+                        alert(data.status + ': ' + data.error); // 서버 응답 메시지를 알림으로 표시
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     alert('An error occurred'); // 오류 발생 시 알림
-                    modalElement.modal('hide'); // 모달 닫기
+                })
+                .finally(() => {
+                    location.reload(); // 페이지 새로고침
                 });
             })
         );

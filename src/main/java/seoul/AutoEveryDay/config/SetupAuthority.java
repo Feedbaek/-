@@ -24,7 +24,7 @@ import static seoul.AutoEveryDay.enums.RoleEnum.*;
 
 @Component
 @RequiredArgsConstructor
-public class SetupDataLoader implements
+public class SetupAuthority implements
         ApplicationListener<ContextRefreshedEvent> {
 
     private boolean alreadySetup = false;

@@ -8,7 +8,7 @@ import seoul.AutoEveryDay.repository.CarRepository;
 
 @Component
 @RequiredArgsConstructor
-public class SetupDummy {
+public class SetupDummyData {
     private final CarRepository carRepository;
 
     @PostConstruct
@@ -52,7 +52,7 @@ public class SetupDummy {
         // 제네시스 10대
         for (int i = 0; i < 10; i++) {
             carRepository.save(Car.builder()
-                    .number("33가_333" + i)
+                    .number("33가_111" + i)
                     .type("제네시스")
                     .status("정상")
                     .comment("코멘트" + i)

@@ -32,7 +32,7 @@ public class CarRentalService {
      * 차량 번호가 존재하지 않으면, 이미 대여된 차량이면, 대여일이 오늘 이전이면,
      * 반납일이 대여일보다 빠르거나 같으면, 대여일로부터 7일 이후 반납이면 ResponseStatusException 발생
      */
-    public void rentCar(RentCarReq rentCarReq, User user) {
+    public String rentCar(RentCarReq rentCarReq, User user) {
         Car car = carRepository.findByNumber(rentCarReq.getNumber()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
         if (LocalDate.now().isAfter(rentCarReq.getPickUpDate())) {
@@ -59,6 +59,7 @@ public class CarRentalService {
                 .returnDate(rentCarReq.getReturnDate())
                 .build();
         rentalHistoryRepository.save(rentalHistory);
+        return "차량 대여 성공";
     }
 
     /**
