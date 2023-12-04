@@ -23,6 +23,10 @@ public class CarController {
     private final LoginService userService;
     private final CarManageService carManageService;
     private final CarRentalService carRentalService;
+
+    /* 차량 관리 */
+
+    @PreAuthorize("hasAuthority('CAR_MANAGE')")
     @GetMapping("/manage")  // 차량 관리 페이지
     public String getCar(Model model) {
         List<CarInfo> allCar = carManageService.getAllCar();
@@ -39,7 +43,7 @@ public class CarController {
     }
     @ResponseBody
     @PreAuthorize("hasAuthority('CAR_MANAGE')")
-    @PostMapping("/manage/edit")  // 차량 정보 수정
+    @PutMapping("/manage")  // 차량 정보 수정
     public JsonBody editCar(EditCarReq editCarReq) {
         return JsonBody.builder()
                 .message("차량 정보 수정 성공")
@@ -53,6 +57,10 @@ public class CarController {
                 .message("차량 삭제 성공")
                 .data(carManageService.deleteCar(number)).build();
     }
+
+    /* 차량 대여 */
+
+    @PreAuthorize("hasAuthority('CAR_RENTAL')")
     @GetMapping("/rental")  // 차량 대여 페이지
     public String rentalGet(Model model) {
         List<CarInfo> carInfoList = carManageService.getAllCar();

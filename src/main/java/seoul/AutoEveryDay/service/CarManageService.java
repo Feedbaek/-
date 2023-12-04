@@ -30,6 +30,9 @@ public class CarManageService {
     /** <h3>차량 등록.</h3>
      * 이미 존재하는 차량 번호면 ResponseStatusException 발생 */
     public String createCar(NewCarReq newCarReq) {
+        // todo: 차량 번호 정규식 검사
+        // todo: 차량 종류 검사
+        // todo: 차량 상태 검사
         if (carRepository.existsByNumber(newCarReq.getNumber())) {
             log.error("이미 존재하는 차량 번호입니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 차량 번호입니다.");

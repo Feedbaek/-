@@ -17,4 +17,6 @@ public class TestCenter {
 
     @Column(name = "name", nullable = false)
     String name;
+    @Column(name = "address", nullable = false)
+    String address;
 }

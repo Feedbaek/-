@@ -74,7 +74,6 @@ public class CarManageServiceTest {
         given(carRepository.findByNumber(number)).willReturn(
                 java.util.Optional.of(Car.builder()
                         .number(number)
-                        .available(true)
                         .status("정상")
                         .comment("테스트")
                         .build()));
@@ -111,7 +110,6 @@ public class CarManageServiceTest {
                 .build();
         given(carRepository.findByNumber(number)).willReturn(Optional.of(Car.builder()
                 .number(number)
-                .available(true)
                 .status("비정상")
                 .comment("테스트 전")
                 .build()));
@@ -147,7 +145,6 @@ public class CarManageServiceTest {
         String number = "12가1234";
         given(carRepository.findByNumber(number)).willReturn(Optional.of(Car.builder()
                 .number(number)
-                .available(true)
                 .status("정상")
                 .comment("테스트")
                 .build()));

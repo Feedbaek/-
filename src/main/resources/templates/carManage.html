@@ -92,7 +92,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form th:id="'carForm-' + ${car.getNumber()}" th:action="@{/car/manage/edit}" method="post">
+                <form th:id="'carForm-' + ${car.getNumber()}" th:action="@{/car/manage}" method="put">
                     <div class="modal-body">
                         <input type="hidden" th:name="'number'" th:value="${car.getNumber()}"/>
 
@@ -137,7 +137,7 @@
                 const formData = new FormData(this);
 
                 fetch(this.action, {
-                    method: 'POST',
+                    method: this.method,
                     body: formData
                 })
                     .then(response => response.json())
