@@ -89,7 +89,7 @@ public class SetupAuthority implements
     }
 
     @Transactional
-    public Role createRoleIfNotFound(String name, Collection<Privilege> privileges) {
+    public Role createRoleIfNotFound(String name, List<Privilege> privileges) {
         Role role = roleRepository.findByName(name).orElse(null);
         if (role == null) {
             role = Role.builder()

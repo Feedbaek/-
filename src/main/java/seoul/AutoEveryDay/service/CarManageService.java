@@ -20,7 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CarManageService {
     private final CarRepository carRepository;
-    private final RentalHistoryRepository rentalHistoryRepository;
 
     private Car save(Car car) {
         try {

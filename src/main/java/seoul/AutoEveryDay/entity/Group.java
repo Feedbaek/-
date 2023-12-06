@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "group")
@@ -20,6 +21,6 @@ public class Group {
     @Column(name = "name", nullable = false)
     String name;
 
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
-    Collection<User> users;
+    @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    List<User> users;
 }

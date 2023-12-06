@@ -29,6 +29,6 @@ public class Car {
     @Column(name = "comment", columnDefinition = "TEXT")
     private String comment;
 
-    @OneToMany(mappedBy = "car", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
     private List<RentalHistory> rentalHistories;
 }
