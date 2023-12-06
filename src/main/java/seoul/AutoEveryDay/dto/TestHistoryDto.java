@@ -1,5 +1,6 @@
 package seoul.AutoEveryDay.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -10,7 +11,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TestHistoryDto {
+    @NotBlank
     private String userName;
+    @NotBlank
     private String testCenterName;
     private LocalDate time;
 }

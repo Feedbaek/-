@@ -19,7 +19,7 @@ import java.util.Map;
 @RequestMapping("/car")
 @RequiredArgsConstructor
 public class CarController {
-    private final LoginService userService;
+    private final LoginService loginService;
     private final CarManageService carManageService;
     private final CarRentalService carRentalService;
 
@@ -75,7 +75,7 @@ public class CarController {
     @PreAuthorize("hasAuthority('CAR_RENTAL')")
     @PostMapping("/rental") // 차량 대여 신청
     public JsonBody rentalPost(RentCarReq rentCarReq) {
-        User user = userService.findByName(LoginService.getAuthenticatedUsername());
+        User user = loginService.findByName(LoginService.getAuthenticatedUsername());
         return JsonBody.builder()
                 .message("차량 대여 성공")
                 .data(carRentalService.rentCar(rentCarReq, user))
@@ -86,7 +86,7 @@ public class CarController {
     @PreAuthorize("hasAuthority('CAR_RENTAL')")
     @PutMapping("/rental")  // 차량 반납
     public JsonBody rentalPut(RentCarReq rentCarReq) {
-        User user = userService.findByName(LoginService.getAuthenticatedUsername());
+        User user = loginService.findByName(LoginService.getAuthenticatedUsername());
         return JsonBody.builder()
                 .message("차량 반납 성공")
                 .data(carRentalService.returnCar(rentCarReq, user))
@@ -97,7 +97,7 @@ public class CarController {
     @PreAuthorize("hasAuthority('CAR_RENTAL')")
     @DeleteMapping("/rental")   // 차량 대여 취소
     public JsonBody rentalDelete(RentCarReq rentCarReq) {
-        User user = userService.findByName(LoginService.getAuthenticatedUsername());
+        User user = loginService.findByName(LoginService.getAuthenticatedUsername());
         return JsonBody.builder()
                 .message("차량 대여 취소 성공")
                 .data(carRentalService.deleteRental(rentCarReq, user))

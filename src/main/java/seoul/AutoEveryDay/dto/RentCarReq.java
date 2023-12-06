@@ -1,5 +1,6 @@
 package seoul.AutoEveryDay.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -10,7 +11,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RentCarReq {
+    @NotBlank
     private String number;
+    @NotBlank
     private LocalDate pickupDate;
+    @NotBlank
     private LocalDate returnDate;
 }

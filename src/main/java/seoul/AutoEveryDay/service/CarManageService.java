@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import seoul.AutoEveryDay.dto.CarDto;
-import seoul.AutoEveryDay.dto.EditCarReq;
 import seoul.AutoEveryDay.entity.Car;
 import seoul.AutoEveryDay.repository.CarRepository;
 import seoul.AutoEveryDay.repository.RentalHistoryRepository;
