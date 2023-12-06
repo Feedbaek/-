@@ -3,7 +3,7 @@ package seoul.AutoEveryDay.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "test_history")
@@ -25,9 +25,6 @@ public class TestHistory {
     @JoinColumn(name = "test_center_id", nullable = false)
     private TestCenter testCenter;
 
-    @Column(name = "start_time", nullable = false)
-    private LocalDateTime startTime;
-
-    @Column(name = "end_time", nullable = false)
-    private LocalDateTime endTime;
+    @Column(name = "time", nullable = false)
+    private LocalDate time;
 }

@@ -1,7 +1,6 @@
 package seoul.AutoEveryDay.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,25 +28,27 @@ public class CarController {
     @PreAuthorize("hasAuthority('CAR_MANAGE')")
     @GetMapping("/manage")  // 차량 관리 페이지
     public String getCar(Model model) {
-        List<CarInfo> allCar = carManageService.getAllCar();
+        List<CarDto> allCar = carManageService.getAllCar();
         model.addAttribute("carList", allCar);
         return "carManage";
     }
     @ResponseBody
     @PreAuthorize("hasAuthority('CAR_MANAGE')")
     @PostMapping("/manage") // 새로운 차량 등록
-    public JsonBody newCar(NewCarReq newCarReq) {
+    public JsonBody newCar(CarDto carDto) {
         return JsonBody.builder()
                 .message("차량 등록 성공")
-                .data(carManageService.createCar(newCarReq)).build();
+                .data(carManageService.createCar(carDto))
+                .build();
     }
     @ResponseBody
     @PreAuthorize("hasAuthority('CAR_MANAGE')")
     @PutMapping("/manage")  // 차량 정보 수정
-    public JsonBody editCar(EditCarReq editCarReq) {
+    public JsonBody editCar(CarDto carDto) {
         return JsonBody.builder()
                 .message("차량 정보 수정 성공")
-                .data(carManageService.updateCar(editCarReq)).build();
+                .data(carManageService.updateCar(carDto))
+                .build();
     }
     @ResponseBody
     @PreAuthorize("hasAuthority('CAR_MANAGE')")
@@ -55,7 +56,8 @@ public class CarController {
     public JsonBody deleteCar(@RequestParam String number) {
         return JsonBody.builder()
                 .message("차량 삭제 성공")
-                .data(carManageService.deleteCar(number)).build();
+                .data(carManageService.deleteCar(number))
+                .build();
     }
 
     /* 차량 대여 */
@@ -63,9 +65,9 @@ public class CarController {
     @PreAuthorize("hasAuthority('CAR_RENTAL')")
     @GetMapping("/rental")  // 차량 대여 페이지
     public String rentalGet(Model model) {
-        List<CarInfo> carInfoList = carManageService.getAllCar();
-        model.addAttribute("carList", carInfoList);
-        Map<String, List<RentalHistory>> rentalHistoryMap = carRentalService.getRentalHistory(carInfoList);
+        List<CarDto> carDtoList = carManageService.getAllCar();
+        model.addAttribute("carList", carDtoList);
+        Map<String, List<RentalHistory>> rentalHistoryMap = carRentalService.getRentalHistory(carDtoList);
         model.addAttribute("rentalListMap", rentalHistoryMap);
         return "carRental";
     }
@@ -76,6 +78,29 @@ public class CarController {
         User user = userService.findByName(LoginService.getAuthenticatedUsername());
         return JsonBody.builder()
                 .message("차량 대여 성공")
-                .data(carRentalService.rentCar(rentCarReq, user)).build();
+                .data(carRentalService.rentCar(rentCarReq, user))
+                .build();
+    }
+
+    @ResponseBody
+    @PreAuthorize("hasAuthority('CAR_RENTAL')")
+    @PutMapping("/rental")  // 차량 반납
+    public JsonBody rentalPut(RentCarReq rentCarReq) {
+        User user = userService.findByName(LoginService.getAuthenticatedUsername());
+        return JsonBody.builder()
+                .message("차량 반납 성공")
+                .data(carRentalService.returnCar(rentCarReq, user))
+                .build();
+    }
+
+    @ResponseBody
+    @PreAuthorize("hasAuthority('CAR_RENTAL')")
+    @DeleteMapping("/rental")   // 차량 대여 취소
+    public JsonBody rentalDelete(RentCarReq rentCarReq) {
+        User user = userService.findByName(LoginService.getAuthenticatedUsername());
+        return JsonBody.builder()
+                .message("차량 대여 취소 성공")
+                .data(carRentalService.deleteRental(rentCarReq, user))
+                .build();
     }
 }

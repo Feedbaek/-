@@ -13,4 +13,5 @@ public interface RentalHistoryRepository extends JpaRepository<RentalHistory, Lo
     List<RentalHistory>findByCarIdAndReturnDateGreaterThanAndPickupDateLessThan(Long carId, LocalDate pickUpDate, LocalDate returnDate);
     List<RentalHistory>findByCarIdAndReturnDateGreaterThan(Long carId, LocalDate pickUpDate);
     Optional<RentalHistory> findByCarIdAndPickupDateAndReturnDate(Long carId, LocalDate pickUpDate, LocalDate returnDate);
+    Optional<RentalHistory> findByUserIdAndCarIdAndPickupDateAndReturnDate(Long userId, Long carId, LocalDate pickUpDate, LocalDate returnDate);
 }

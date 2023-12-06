@@ -10,9 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
-import seoul.AutoEveryDay.dto.CarInfo;
-import seoul.AutoEveryDay.dto.EditCarReq;
-import seoul.AutoEveryDay.dto.NewCarReq;
+import seoul.AutoEveryDay.dto.CarDto;
 import seoul.AutoEveryDay.entity.Car;
 import seoul.AutoEveryDay.repository.CarRepository;
 
@@ -31,8 +29,8 @@ public class CarManageServiceTest {
     @Mock
     private CarRepository carRepository;
 
-    private NewCarReq makeNewCarReq() {
-        return NewCarReq.builder()
+    private CarDto makeNewCarReq() {
+        return CarDto.builder()
                 .number("12가1234")
                 .type("아반떼")
                 .status("정상")
@@ -44,11 +42,11 @@ public class CarManageServiceTest {
     @DisplayName("차량 등록 성공 테스트")
     public void createCarSuccess() {
         // given
-        NewCarReq newCarReq = makeNewCarReq();
+        CarDto newCarReq = makeNewCarReq();
         given(carRepository.existsByNumber(newCarReq.getNumber())).willReturn(false);
         given(carRepository.save(Mockito.any(Car.class))).willReturn(Mockito.any(Car.class));
         // when
-        ResponseEntity<String> res = ResponseEntity.ok(carManageService.createCar(newCarReq));
+        ResponseEntity<?> res = ResponseEntity.ok(carManageService.createCar(newCarReq));
         // then
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -57,7 +55,7 @@ public class CarManageServiceTest {
     @DisplayName("차량 등록 중복 테스트")
     public void createCarFail() {
         // given
-        NewCarReq newCarReq = makeNewCarReq();
+        CarDto newCarReq = makeNewCarReq();
         given(carRepository.existsByNumber(newCarReq.getNumber())).willReturn(true);
         // when
         Throwable thrown = catchThrowable(() -> carManageService.createCar(newCarReq));
@@ -78,7 +76,7 @@ public class CarManageServiceTest {
                         .comment("테스트")
                         .build()));
         // when
-        ResponseEntity<CarInfo> res = ResponseEntity.ok(carManageService.getCar(number));
+        ResponseEntity<CarDto> res = ResponseEntity.ok(carManageService.getCar(number));
         // then
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(res.getBody()).getNumber()).isEqualTo(number);
@@ -103,7 +101,7 @@ public class CarManageServiceTest {
     public void updateCarSuccess() {
         // given
         String number = "12가1234";
-        EditCarReq editCarReq = EditCarReq.builder()
+        CarDto carDto = CarDto.builder()
                 .number(number)
                 .status("정상")
                 .comment("테스트")
@@ -114,7 +112,7 @@ public class CarManageServiceTest {
                 .comment("테스트 전")
                 .build()));
         // when
-        ResponseEntity<String> res = ResponseEntity.ok(carManageService.updateCar(editCarReq));
+        ResponseEntity<?> res = ResponseEntity.ok(carManageService.updateCar(carDto));
         // then
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(res.getBody()).isEqualTo("차량 정보 수정 성공");
@@ -125,14 +123,14 @@ public class CarManageServiceTest {
     public void updateCarFail() {
         // given
         String number = "12가1234";
-        EditCarReq editCarReq = EditCarReq.builder()
+        CarDto carDto = CarDto.builder()
                 .number(number)
                 .status("정상")
                 .comment("테스트")
                 .build();
         given(carRepository.findByNumber(number)).willReturn(Optional.empty());
         // when
-        Throwable thrown = catchThrowable(() -> carManageService.updateCar(editCarReq));
+        Throwable thrown = catchThrowable(() -> carManageService.updateCar(carDto));
         // then
         assertThat(thrown).isInstanceOf(ResponseStatusException.class)
                 .hasMessage("400 BAD_REQUEST \"존재하지 않는 차량 번호입니다.\"");
@@ -149,7 +147,7 @@ public class CarManageServiceTest {
                 .comment("테스트")
                 .build()));
         // when
-        ResponseEntity<String> res = ResponseEntity.ok(carManageService.deleteCar(number));
+        ResponseEntity<?> res = ResponseEntity.ok(carManageService.deleteCar(number));
         // then
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(res.getBody()).isEqualTo("차량 삭제 성공");

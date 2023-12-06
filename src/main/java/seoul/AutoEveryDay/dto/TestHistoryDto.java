@@ -9,8 +9,8 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RentCarReq {
-    private String number;
-    private LocalDate pickupDate;
-    private LocalDate returnDate;
+public class TestHistoryDto {
+    private String userName;
+    private String testCenterName;
+    private LocalDate time;
 }

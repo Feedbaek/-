@@ -25,9 +25,9 @@ public class RentalHistory {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "pickup_date")
+    @Column(name = "pickup_date", nullable = false)
     private LocalDate pickupDate;
 
-    @Column(name = "return_date")
+    @Column(name = "return_date", nullable = false)
     private LocalDate returnDate;
 }

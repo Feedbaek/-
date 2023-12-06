@@ -10,4 +10,6 @@ import java.util.Optional;
 @Repository
 public interface TestCenterRepository extends JpaRepository<TestCenter, Long> {
     Optional<TestCenter> findByName(String centerName);
+
+    boolean existsByName(String name);
 }

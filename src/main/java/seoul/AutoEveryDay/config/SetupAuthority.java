@@ -62,6 +62,9 @@ public class SetupAuthority implements
         createRoleIfNotFound(ROLE_ADVANCED_USER.getValue(), advancedUserPrivileges);
         createRoleIfNotFound(ROLE_USER.getValue(), userPrivileges);
 
+        // 그룹 생성
+
+
         // admin 계정 생성
         User user = new User();
         user.setUsername("admin");
