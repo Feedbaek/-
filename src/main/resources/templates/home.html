@@ -15,9 +15,13 @@
             <div class="col-md-6 col-lg-4 mt-5">
                 <h2 class="text-center">Home</h2>
                 <!-- carRental 페이지 -->
-                <a href="/car/rental" class="btn btn-primary btn-block">차 빌리기</a>
+                <a sec:authorize="hasAuthority('CAR_RENTAL')" href="/car/rental" class="btn btn-primary btn-block">차 빌리기</a>
                 <!-- carManage 페이지 -->
-                <a sec:authorize="hasAuthority('CAR_MANAGE')" href="/car/manage" class="btn btn-primary btn-block">차 관리하기</a>
+                <a sec:authorize="hasAuthority('ADMIN')" href="/car/manage" class="btn btn-primary btn-block">차 관리하기</a>
+                <!-- centerReserve 페이지 -->
+                <a sec:authorize="hasAuthority('TEST_CENTER')" href="/center/reserve" class="btn btn-primary btn-block">센터 예약하기</a>
+                <!-- centerManage 페이지 -->
+                <a sec:authorize="hasAuthority('ADMIN')" href="/center/manage" class="btn btn-primary btn-block">센터 관리하기</a>
             </div>
         </div>
     </div>

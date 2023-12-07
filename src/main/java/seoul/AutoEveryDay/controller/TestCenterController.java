@@ -14,27 +14,55 @@ import seoul.AutoEveryDay.service.TestCenterService;
 
 @Controller
 @RequiredArgsConstructor
+@PreAuthorize(value = "hasAuthority('TEST_CENTER')")
 @RequestMapping("/center")
 public class TestCenterController { // 테스트 센터 관련 컨트롤러
     private final TestCenterService testCenterService;
     private final LoginService userService;
 
-    @PreAuthorize(value = "hasAuthority('TEST_CENTER')")
-    @GetMapping("")  // 테스트 센터 페이지
+    // 예약 관련 컨트롤러
+    @GetMapping("/reserve")  // 테스트 센터 예약 페이지
+    public String reserveGet(Model model) {
+        model.addAttribute("testCenterList", testCenterService.getAllTestCenter());
+        return "centerReserve";
+    }
+
+    @ResponseBody
+    @PostMapping("/reserve")  // 테스트 센터 예약
+    public JsonBody reservePost(TestHistoryDto testHistoryDto) {
+        User user = userService.findByName(LoginService.getAuthenticatedUsername());
+        return JsonBody.builder()
+                .message("예약 성공")
+                .data(testCenterService.createTestHistory(testHistoryDto, user))
+                .build();
+    }
+    @ResponseBody
+    @DeleteMapping("/reserve")  // 테스트 센터 예약 취소
+    public JsonBody reserveDelete(@RequestParam TestHistoryDto testHistoryDto) {
+        User user = userService.findByName(LoginService.getAuthenticatedUsername());
+        return JsonBody.builder()
+                .message("예약 취소 성공")
+                .data(testCenterService.deleteTestHistory(testHistoryDto, user))
+                .build();
+    }
+
+    // 관리자 관련 컨트롤러
+    @PreAuthorize(value = "hasAuthority('ADMIN')")
+    @GetMapping("/manage")  // 테스트 센터 페이지
     public String allCenterGet(Model model) {
         model.addAttribute("testCenterList", testCenterService.getAllTestCenter());
         return "centerManage";
     }
 
-    @ResponseBody
-    @PreAuthorize(value = "hasAuthority('ADMIN')")
-    @GetMapping("/manage")  // 테스트 센터 상세 조회
-    public JsonBody centerGet(@RequestParam String name) {
-        return JsonBody.builder()
-                .message("테스트 센터 조회 성공")
-                .data(testCenterService.getTestCenter(name))
-                .build();
-    }
+//    @ResponseBody
+//    @PreAuthorize(value = "hasAuthority('ADMIN')")
+//    @GetMapping("/manage")  // 테스트 센터 상세 조회
+//    public JsonBody centerGet(@RequestParam String name) {
+//        return JsonBody.builder()
+//                .message("테스트 센터 조회 성공")
+//                .data(testCenterService.getTestCenter(name))
+//                .build();
+//    }
 
     @ResponseBody
     @PreAuthorize(value = "hasAuthority('ADMIN')")
@@ -63,30 +91,6 @@ public class TestCenterController { // 테스트 센터 관련 컨트롤러
         return JsonBody.builder()
                 .message("테스트 센터 삭제 성공")
                 .data(testCenterService.deleteTestCenter(name))
-                .build();
-    }
-
-
-    // 여기부터 아래는 예약 관련 컨트롤러
-
-    @ResponseBody
-    @PreAuthorize(value = "hasAuthority('TEST_CENTER')")
-    @PostMapping("/reserve")  // 테스트 센터 예약
-    public JsonBody reservePost(TestHistoryDto testHistoryDto) {
-        User user = userService.findByName(LoginService.getAuthenticatedUsername());
-        return JsonBody.builder()
-                .message("예약 성공")
-                .data(testCenterService.createTestHistory(testHistoryDto, user))
-                .build();
-    }
-    @ResponseBody
-    @PreAuthorize(value = "hasAuthority('TEST_CENTER')")
-    @DeleteMapping("/reserve")  // 테스트 센터 예약 취소
-    public JsonBody reserveDelete(@RequestParam TestHistoryDto testHistoryDto) {
-        User user = userService.findByName(LoginService.getAuthenticatedUsername());
-        return JsonBody.builder()
-                .message("예약 취소 성공")
-                .data(testCenterService.deleteTestHistory(testHistoryDto, user))
                 .build();
     }
 }

@@ -56,6 +56,14 @@ public class TestCenterService {
     }
     public TestCenterDto editTestCenter(TestCenterDto testCenterDto) {
         TestCenter testCenter = getTestCenter(testCenterDto.getName());
+        testCenterRepository.findByName(testCenterDto.getName()).ifPresent(
+                (t) -> {
+                    if (!t.getId().equals(testCenter.getId())) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 테스트 센터 이름입니다.");
+                    }
+                }
+        );
+        testCenter.setName(testCenterDto.getName());
         testCenter.setAddress(testCenterDto.getAddress());
         return testCenterDto;
     }

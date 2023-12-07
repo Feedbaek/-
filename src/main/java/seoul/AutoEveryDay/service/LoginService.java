@@ -83,7 +83,7 @@ public class LoginService implements UserDetailsService {
         User user = User.builder()
                 .username(registerReq.getUsername())
                 .password(passwordEncoder.encode(registerReq.getPassword()))
-                .roles(Collections.singletonList(role))
+                .roles(Collections.singleton(role))
                 .build();
         save(user);
     }

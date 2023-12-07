@@ -65,6 +65,7 @@ public class CarManageService {
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
 
         return CarDto.builder()
+                .id(car.getId())
                 .number(car.getNumber())
                 .type(car.getType())
                 .status(car.getStatus())
@@ -79,6 +80,7 @@ public class CarManageService {
 
         carList.forEach(car -> {
             carDtoList.add(CarDto.builder()
+                    .id(car.getId())
                     .number(car.getNumber())
                     .type(car.getType())
                     .status(car.getStatus())
@@ -98,6 +100,7 @@ public class CarManageService {
         car.setComment(carDto.getComment());
 
         return CarDto.builder()
+                .id(car.getId())
                 .number(car.getNumber())
                 .type(car.getType())
                 .status(car.getStatus())
@@ -113,6 +116,7 @@ public class CarManageService {
         delete(car);
 
         return CarDto.builder()
+                .id(car.getId())
                 .number(car.getNumber())
                 .type(car.getType())
                 .status(car.getStatus())

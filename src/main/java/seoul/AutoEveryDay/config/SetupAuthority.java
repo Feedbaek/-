@@ -14,10 +14,7 @@ import seoul.AutoEveryDay.repository.PrivilegeRepository;
 import seoul.AutoEveryDay.repository.RoleRepository;
 import seoul.AutoEveryDay.repository.UserRepository;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static seoul.AutoEveryDay.enums.PrivilegeEnum.*;
 import static seoul.AutoEveryDay.enums.RoleEnum.*;
@@ -49,13 +46,12 @@ public class SetupAuthority implements
                 = createPrivilegeIfNotFound(DELETE_PRIVILEGE.getValue());
 
         // 권한에 따른 역할 생성
-        List<Privilege> allPrivileges = Arrays.stream(PrivilegeEnum.values())
+        Set<Privilege> allPrivileges = Arrays.stream(PrivilegeEnum.values())
                 .map(PrivilegeEnum::getValue)
                 .map(this::createPrivilegeIfNotFound)
-                .toList();
-        List<Privilege> advancedUserPrivileges = Arrays.asList(
-                readPrivilege, writePrivilege, deletePrivilege);
-        List<Privilege> userPrivileges = Collections.singletonList(readPrivilege);
+                .collect(HashSet::new, HashSet::add, HashSet::addAll);
+        Set<Privilege> advancedUserPrivileges = new HashSet<>(Arrays.asList(readPrivilege, writePrivilege, deletePrivilege));
+        Set<Privilege> userPrivileges = Collections.singleton(readPrivilege);
 
         // 역할 생성
         Role adminRole = createRoleIfNotFound(ROLE_ADMIN.getValue(), allPrivileges);
@@ -69,7 +65,7 @@ public class SetupAuthority implements
         User user = new User();
         user.setUsername("admin");
         user.setPassword(passwordEncoder.encode("1234"));
-        user.setRoles(Collections.singletonList(adminRole));
+        user.setRoles(Collections.singleton(adminRole));
         userRepository.save(user);
 
         alreadySetup = true;
@@ -89,7 +85,7 @@ public class SetupAuthority implements
     }
 
     @Transactional
-    public Role createRoleIfNotFound(String name, List<Privilege> privileges) {
+    public Role createRoleIfNotFound(String name, Set<Privilege> privileges) {
         Role role = roleRepository.findByName(name).orElse(null);
         if (role == null) {
             role = Role.builder()

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/default_layout}">
+<head>
+    <title>Center Reserve</title>
+</head>
+<!-- Content -->
+<main layout:fragment="content" class="container mt-4">
+    <h2>Test Center List</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+            <tr>
+                <th>Name</th>
+                <th>Address</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="testCenter : ${testCenterList}">
+                <td th:text="${testCenter.name}">Name</td>
+                <td th:text="${testCenter.address}">Address</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</html>

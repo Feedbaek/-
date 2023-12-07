@@ -9,6 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CarDto {
+    private Long id;
     @NotBlank
     private String number;
     private String type;
