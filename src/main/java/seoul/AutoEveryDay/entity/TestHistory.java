@@ -25,6 +25,6 @@ public class TestHistory {
     @JoinColumn(name = "test_center_id", nullable = false)
     private TestCenter testCenter;
 
-    @Column(name = "time", nullable = false)
-    private LocalDate time;
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
 }

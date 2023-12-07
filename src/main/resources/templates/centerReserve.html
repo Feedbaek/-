@@ -15,15 +15,75 @@
             <tr>
                 <th>Name</th>
                 <th>Address</th>
+                <th>Reserve</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="testCenter : ${testCenterList}">
                 <td th:text="${testCenter.name}">Name</td>
                 <td th:text="${testCenter.address}">Address</td>
+                <td>
+                    <button type="button" class="btn btn-primary btn-sm" th:attr="data-target='#reserveModal-' + ${testCenter.id}" data-toggle="modal">예약 하기</button>
+                </td>
             </tr>
             </tbody>
         </table>
     </div>
+
+    <!-- Reserve Center Modal -->
+    <div th:each="testCenter : ${testCenterList}" class="modal fade" th:id="'reserveModal-' + ${testCenter.id}" tabindex="-1" role="dialog" aria-labelledby="reserveModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" th:text="'Reserve Center ' + ${testCenter.name}"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form th:id="'reserveForm-' + ${testCenter.id}" th:action="@{/center/reserve}" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" th:name="'testCenterName'" th:value="${testCenter.name}"/>
+
+                        <div class="form-group">
+                            <label for="reserveDate">예약 날짜:</label>
+                            <input type="date" class="form-control" id="reserveDate" name="date" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Edit Center</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll("[id^='reserveForm']").forEach((element) =>
+            element.addEventListener('submit', function(event) {
+                event.preventDefault(); // 폼의 기본 제출 동작 방지
+
+                const formData = new FormData(this);
+
+                fetch(this.action, {
+                    method: this.method,
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        alert(data.message); // 서버 응답 메시지를 알림으로 표시
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while processing the request'); // 오류 발생 시 알림
+                    })
+                    .finally(() => {
+                        // 페이지 새로고침
+                        location.reload();
+                    });
+            })
+        );
+    </script>
+
 </main>
 </html>

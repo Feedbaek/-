@@ -71,42 +71,52 @@ public class SetupDummyData {
         testCenterRepository.save(TestCenter.builder()
                 .name("강남 시험장")
                 .address("서울특별시 강남구 강남대로 123")
+                .capacity(30)
                 .build());
         testCenterRepository.save(TestCenter.builder()
                 .name("강북 시험장")
                 .address("서울특별시 강북구 강북대로 123")
+                .capacity(30)
                 .build());
         testCenterRepository.save(TestCenter.builder()
                 .name("강서 시험장")
                 .address("서울특별시 강서구 강서대로 123")
+                .capacity(30)
                 .build());
         testCenterRepository.save(TestCenter.builder()
                 .name("강동 시험장")
                 .address("서울특별시 강동구 강동대로 123")
+                .capacity(30)
                 .build());
         testCenterRepository.save(TestCenter.builder()
                 .name("서초 시험장")
                 .address("서울특별시 서초구 서초대로 123")
+                .capacity(30)
                 .build());
         testCenterRepository.save(TestCenter.builder()
                 .name("성북 시험장")
                 .address("서울특별시 성북구 성북대로 123")
+                .capacity(30)
                 .build());
         testCenterRepository.save(TestCenter.builder()
                 .name("성동 시험장")
                 .address("서울특별시 성동구 성동대로 123")
+                .capacity(30)
                 .build());
         testCenterRepository.save(TestCenter.builder()
                 .name("중랑 시험장")
                 .address("서울특별시 중랑구 중랑대로 123")
+                .capacity(30)
                 .build());
         testCenterRepository.save(TestCenter.builder()
                 .name("노원 시험장")
                 .address("서울특별시 노원구 노원대로 123")
+                .capacity(30)
                 .build());
         testCenterRepository.save(TestCenter.builder()
                 .name("도봉 시험장")
                 .address("서울특별시 도봉구 도봉대로 123")
+                .capacity(30)
                 .build());
     }
 }

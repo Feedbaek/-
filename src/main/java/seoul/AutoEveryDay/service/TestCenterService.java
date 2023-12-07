@@ -32,9 +32,13 @@ public class TestCenterService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "테스트 센터 저장 실패");
         }
     }
-    private void validateTestHistory(TestHistory testHistory) {
-        if (testHistoryRepository.findByTestCenterIdAndTime(testHistory.getTestCenter().getId(), testHistory.getTime()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 예약된 시간입니다.");
+    private void validateTestHistory(TestHistoryDto testHistory, User user) {
+        TestCenter testCenter = getTestCenter(testHistory.getTestCenterName());
+        if (testHistoryRepository.countByTestCenterIdAndDate(testCenter.getId(), testHistory.getDate()) >= testCenter.getCapacity()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 날짜에 예약 가능한 인원이 없습니다.");
+        }
+        if (testHistoryRepository.findByUserIdAndTestCenterIdAndDate(user.getId(), testCenter.getId(), testHistory.getDate()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 예약한 날짜입니다.");
         }
     }
 
@@ -45,6 +49,7 @@ public class TestCenterService {
         TestCenter testCenter = TestCenter.builder()
                 .name(testCenterDto.getName())
                 .address(testCenterDto.getAddress())
+                .capacity(testCenterDto.getCapacity())
                 .build();
         save(testCenter);
         return testCenterDto;
@@ -65,6 +70,7 @@ public class TestCenterService {
         );
         testCenter.setName(testCenterDto.getName());
         testCenter.setAddress(testCenterDto.getAddress());
+        testCenter.setCapacity(testCenterDto.getCapacity());
         return testCenterDto;
     }
     public TestCenterDto deleteTestCenter(String name) {
@@ -73,6 +79,7 @@ public class TestCenterService {
         return TestCenterDto.builder()
                 .name(testCenter.getName())
                 .address(testCenter.getAddress())
+                .capacity(testCenter.getCapacity())
                 .build();
     }
     public List<TestCenter> getAllTestCenter() {
@@ -89,24 +96,24 @@ public class TestCenterService {
         }
     }
 
-    public TestHistory createTestHistory(TestHistoryDto testHistoryDto, User user) {
+    public TestHistoryDto createTestHistory(TestHistoryDto testHistoryDto, User user) {
+        validateTestHistory(testHistoryDto, user);
         TestHistory testHistory = TestHistory.builder()
                 .user(user)
                 .testCenter(getTestCenter(testHistoryDto.getTestCenterName()))
-                .time(testHistoryDto.getTime())
+                .date(testHistoryDto.getDate())
                 .build();
-        validateTestHistory(testHistory);
         save(testHistory);
-        return testHistory;
+        return testHistoryDto;
     }
 
-    public TestHistory deleteTestHistory(TestHistoryDto testHistoryDto, User user) {
+    public TestHistoryDto deleteTestHistory(TestHistoryDto testHistoryDto, User user) {
         TestCenter testCenter = getTestCenter(testHistoryDto.getTestCenterName());
-        TestHistory testHistory = testHistoryRepository.findByUserIdAndTestCenterIdAndTime(user.getId(), testCenter.getId(), testHistoryDto.getTime()).orElseThrow(
+        TestHistory testHistory = testHistoryRepository.findByUserIdAndTestCenterIdAndDate(user.getId(), testCenter.getId(), testHistoryDto.getDate()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "예약을 찾을 수 없습니다.")
         );
         testHistoryRepository.delete(testHistory);
-        return testHistory;
+        return testHistoryDto;
     }
 
 }

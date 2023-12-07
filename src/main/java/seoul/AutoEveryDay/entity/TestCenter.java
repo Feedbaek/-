@@ -19,4 +19,6 @@ public class TestCenter {
     String name;
     @Column(name = "address", nullable = false)
     String address;
+    @Column(name = "capacity", nullable = false)
+    Integer capacity;
 }
