@@ -3,6 +3,8 @@ package seoul.AutoEveryDay.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "charge_spot")
 @Getter
@@ -17,4 +19,7 @@ public class ChargeSpot {
 
     @Column(name = "name", nullable = false)
     String name;
+
+    @OneToMany(mappedBy = "chargeSpot", cascade = CascadeType.ALL)
+    private List<GasStationHistory> gasStationHistories;
 }

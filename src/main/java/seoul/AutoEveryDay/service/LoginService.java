@@ -78,6 +78,9 @@ public class LoginService implements UserDetailsService {
 
     // 기본 유저로 회원가입
     public void register(RegisterReq registerReq) {
+        if (registerReq.getUsername().length() > 20) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "아이디는 20자 이하로 입력해주세요.");
+        }
         Role role = roleRepository.findByName(ROLE_USER.getValue())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입에 실패했습니다."));
         User user = User.builder()

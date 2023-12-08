@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface TestHistoryRepository extends JpaRepository<TestHistory, Long> {
-    List<TestHistory> findByTestCenterIdAndDate(Long testCenterId, LocalDate time);
+    Optional<TestHistory> findByTestCenterIdAndDate(Long testCenterId, LocalDate time);
 
     Optional<TestHistory> findByUserIdAndTestCenterIdAndDate(Long userId, Long testCenterId, LocalDate time);
 

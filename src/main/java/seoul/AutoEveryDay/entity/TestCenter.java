@@ -3,6 +3,8 @@ package seoul.AutoEveryDay.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "test_center")
 @Getter
@@ -19,6 +21,6 @@ public class TestCenter {
     String name;
     @Column(name = "address", nullable = false)
     String address;
-    @Column(name = "capacity", nullable = false)
-    Integer capacity;
+    @OneToMany(mappedBy = "testCenter", cascade = CascadeType.ALL)
+    private List<TestHistory> testHistories;
 }

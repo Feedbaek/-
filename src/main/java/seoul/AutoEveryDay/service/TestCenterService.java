@@ -37,11 +37,7 @@ public class TestCenterService {
         if (testHistory.getDate().isBefore(LocalDate.now())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약은 오늘 이후로만 가능합니다.");
         }
-        TestCenter testCenter = getTestCenter(testHistory.getTestCenterName());
-        if (testHistoryRepository.countByTestCenterIdAndDate(testCenter.getId(), testHistory.getDate()) >= testCenter.getCapacity()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 날짜에 예약 가능한 인원이 없습니다.");
-        }
-        if (testHistoryRepository.findByUserIdAndTestCenterIdAndDate(user.getId(), testCenter.getId(), testHistory.getDate()).isPresent()) {
+        if (testHistoryRepository.findByTestCenterIdAndDate(user.getId(), testHistory.getDate()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 예약한 날짜입니다.");
         }
     }
@@ -53,7 +49,6 @@ public class TestCenterService {
         TestCenter testCenter = TestCenter.builder()
                 .name(testCenterDto.getName())
                 .address(testCenterDto.getAddress())
-                .capacity(testCenterDto.getCapacity())
                 .build();
         save(testCenter);
         return testCenterDto;
@@ -74,7 +69,6 @@ public class TestCenterService {
         );
         testCenter.setName(testCenterDto.getName());
         testCenter.setAddress(testCenterDto.getAddress());
-        testCenter.setCapacity(testCenterDto.getCapacity());
         return testCenterDto;
     }
     public TestCenterDto deleteTestCenter(String name) {
@@ -83,7 +77,6 @@ public class TestCenterService {
         return TestCenterDto.builder()
                 .name(testCenter.getName())
                 .address(testCenter.getAddress())
-                .capacity(testCenter.getCapacity())
                 .build();
     }
     public List<TestCenter> getAllTestCenter() {

@@ -31,4 +31,7 @@ public class Car {
 
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
     private List<RentalHistory> rentalHistories;
+
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    private List<GasStationHistory> gasStationHistories;
 }

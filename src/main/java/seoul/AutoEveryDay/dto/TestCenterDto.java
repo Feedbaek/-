@@ -13,6 +13,4 @@ public class TestCenterDto {
     private String name;
     @NotBlank
     private String address;
-    @NotBlank
-    private Integer capacity;
 }

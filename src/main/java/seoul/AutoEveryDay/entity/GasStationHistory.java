@@ -24,10 +24,6 @@ public class GasStationHistory {
     private Car car;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id", nullable = false)
-    private Group group;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "charge_spot_id", nullable = false)
     private ChargeSpot chargeSpot;
 
