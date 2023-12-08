@@ -21,24 +21,6 @@ import java.util.List;
 public class CarManageService {
     private final CarRepository carRepository;
 
-    private Car save(Car car) {
-        try {
-            return carRepository.save(car);
-        } catch (Exception e) {
-            log.error("차량 저장 실패", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "차량 저장 실패");
-        }
-    }
-
-    private void delete(Car car) {
-        try {
-            carRepository.delete(car);
-        } catch (Exception e) {
-            log.error("차량 삭제 실패", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "차량 삭제 실패");
-        }
-    }
-
     /** <h3>차량 등록.</h3>
      * 이미 존재하는 차량 번호면 ResponseStatusException 발생 */
     public CarDto createCar(CarDto carDto) {
@@ -53,8 +35,12 @@ public class CarManageService {
                 .status(carDto.getStatus())
                 .comment(carDto.getComment())
                 .build();
-        save(car);
-
+        try {
+            carRepository.save(car);
+        } catch (Exception e) {
+            log.error("차량 저장 실패", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "차량 저장 실패");
+        }
         return carDto;
     }
 
@@ -113,7 +99,12 @@ public class CarManageService {
     public CarDto deleteCar(String number) {
         Car car = carRepository.findByNumber(number).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
-        delete(car);
+        try {
+            carRepository.delete(car);
+        } catch (Exception e) {
+            log.error("차량 삭제 실패", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "차량 삭제 실패");
+        }
 
         return CarDto.builder()
                 .id(car.getId())

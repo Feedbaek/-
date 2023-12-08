@@ -62,14 +62,6 @@ public class LoginService implements UserDetailsService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 회원입니다.");
             });
     }
-    public void save(User user) {
-        validateDuplicateUser(user);
-        try {
-            userRepository.save(user);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "회원 저장에 실패했습니다.");
-        }
-    }
 
     public User findByName(String name) {
         return userRepository.findByUsername(name)
@@ -88,7 +80,13 @@ public class LoginService implements UserDetailsService {
                 .password(passwordEncoder.encode(registerReq.getPassword()))
                 .roles(Collections.singleton(role))
                 .build();
-        save(user);
+        validateDuplicateUser(user);
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            log.error("회원가입 실패", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입에 실패했습니다.");
+        }
     }
 
 

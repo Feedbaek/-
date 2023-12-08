@@ -27,24 +27,6 @@ public class CarRentalService {
     private final CarRepository carRepository;
     private final RentalHistoryRepository rentalHistoryRepository;
 
-    private RentalHistory save(RentalHistory rentalHistory) {
-        try {
-            return rentalHistoryRepository.save(rentalHistory);
-        } catch (Exception e) {
-            log.error("대여 기록 저장 실패", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "대여 기록 저장 실패");
-        }
-    }
-
-    private void delete(RentalHistory rentalHistory) {
-        try {
-            rentalHistoryRepository.delete(rentalHistory);
-        } catch (Exception e) {
-            log.error("대여 기록 삭제 실패", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "대여 기록 삭제 실패");
-        }
-    }
-
     private void validatePickUpDateAndReturnDate(RentCarReq rentCarReq) {
         if (LocalDate.now().isAfter(rentCarReq.getPickupDate())) {
             log.error("대여는 오늘부터 가능합니다.");
@@ -81,7 +63,12 @@ public class CarRentalService {
                 .pickupDate(rentCarReq.getPickupDate())
                 .returnDate(rentCarReq.getReturnDate())
                 .build();
-        save(rentalHistory);
+        try {
+            rentalHistoryRepository.save(rentalHistory);
+        } catch (Exception e) {
+            log.error("대여 기록 저장 실패", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "대여 기록 저장 실패");
+        }
         return rentCarReq;
     }
 
@@ -129,7 +116,12 @@ public class CarRentalService {
         RentalHistory rentalHistory = rentalHistoryRepository.findByUserIdAndCarIdAndPickupDateAndReturnDate(user.getId(), car.getId(), rentCarReq.getPickupDate(), rentCarReq.getReturnDate()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "대여 기록이 없습니다."));
 
-        delete(rentalHistory);
+        try {
+            rentalHistoryRepository.delete(rentalHistory);
+        } catch (Exception e) {
+            log.error("대여 기록 삭제 실패", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "대여 기록 삭제 실패");
+        }
         return RentCarReq.builder()
                 .number(car.getNumber())
                 .pickupDate(rentalHistory.getPickupDate())

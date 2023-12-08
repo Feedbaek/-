@@ -25,14 +25,6 @@ public class TestCenterService {
     private final TestCenterRepository testCenterRepository;
     private final TestHistoryRepository testHistoryRepository;
 
-    private TestCenter save(TestCenter testCenter) {
-        try {
-            return testCenterRepository.save(testCenter);
-        } catch (Exception e) {
-            log.error("테스트 센터 저장 실패", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "테스트 센터 저장 실패");
-        }
-    }
     private void validateTestHistory(TestHistoryDto testHistory, User user) {
         if (testHistory.getDate().isBefore(LocalDate.now())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약은 오늘 이후로만 가능합니다.");
@@ -50,7 +42,12 @@ public class TestCenterService {
                 .name(testCenterDto.getName())
                 .address(testCenterDto.getAddress())
                 .build();
-        save(testCenter);
+        try {
+            testCenterRepository.save(testCenter);
+        } catch (Exception e) {
+            log.error("테스트 센터 저장 실패", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "테스트 센터 저장 실패");
+        }
         return testCenterDto;
     }
     public TestCenter getTestCenter(String name) {
@@ -73,7 +70,12 @@ public class TestCenterService {
     }
     public TestCenterDto deleteTestCenter(String name) {
         TestCenter testCenter = getTestCenter(name);
-        testCenterRepository.delete(testCenter);
+        try {
+            testCenterRepository.delete(testCenter);
+        } catch (Exception e) {
+            log.error("테스트 센터 삭제 실패", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "테스트 센터 삭제 실패");
+        }
         return TestCenterDto.builder()
                 .name(testCenter.getName())
                 .address(testCenter.getAddress())
@@ -84,15 +86,6 @@ public class TestCenterService {
     }
 
     // 여기부터 예약 관련
-    public TestHistory save(TestHistory testHistory) {
-        try {
-            return testHistoryRepository.save(testHistory);
-        } catch (Exception e) {
-            log.error("예약 저장 실패", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "예약 저장 실패");
-        }
-    }
-
     public TestHistoryDto createTestHistory(TestHistoryDto testHistoryDto, User user) {
         validateTestHistory(testHistoryDto, user);
         TestHistory testHistory = TestHistory.builder()
@@ -100,7 +93,12 @@ public class TestCenterService {
                 .testCenter(getTestCenter(testHistoryDto.getTestCenterName()))
                 .date(testHistoryDto.getDate())
                 .build();
-        save(testHistory);
+        try {
+            testHistoryRepository.save(testHistory);
+        } catch (Exception e) {
+            log.error("예약 저장 실패", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "예약 저장 실패");
+        }
         return testHistoryDto;
     }
 
@@ -109,7 +107,12 @@ public class TestCenterService {
         TestHistory testHistory = testHistoryRepository.findByUserIdAndTestCenterIdAndDate(user.getId(), testCenter.getId(), testHistoryDto.getDate()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "예약을 찾을 수 없습니다.")
         );
-        testHistoryRepository.delete(testHistory);
+        try {
+            testHistoryRepository.delete(testHistory);
+        } catch (Exception e) {
+            log.error("예약 삭제 실패", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "예약 삭제 실패");
+        }
         return testHistoryDto;
     }
 
