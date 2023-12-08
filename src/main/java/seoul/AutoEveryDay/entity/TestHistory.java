@@ -22,8 +22,8 @@ public class TestHistory {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "test_center_id", nullable = false)
-    private TestCenter testCenter;
+    @JoinColumn(name = "test_track_id", nullable = false)
+    private TestTrack testTrack;
 
     @Column(name = "date", nullable = false)
     private LocalDate date;

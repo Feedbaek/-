@@ -20,8 +20,9 @@ public class Car {
     @Column(name = "number", nullable = false, unique = true)
     private String number;
 
-    @Column(name = "type", nullable = false)
-    private String type;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "car_model_id", nullable = false)
+    private CarModel carModel;
 
     @Column(name = "status")
     private String status;

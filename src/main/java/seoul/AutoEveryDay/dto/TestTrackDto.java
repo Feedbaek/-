@@ -8,9 +8,9 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TestCenterDto {
+public class TestTrackDto {
     @NotBlank
     private String name;
     @NotBlank
-    private String address;
+    private String description;
 }

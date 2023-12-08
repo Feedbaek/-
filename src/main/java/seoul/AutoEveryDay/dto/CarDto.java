@@ -12,7 +12,7 @@ public class CarDto {
     private Long id;
     @NotBlank
     private String number;
-    private String type;
+    private String model;
     private String status;
     private String comment;
 }

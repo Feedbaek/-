@@ -3,24 +3,23 @@ package seoul.AutoEveryDay.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "group")
+@Table(name = "car_model")
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class Group {
+@AllArgsConstructor
+public class CarModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     String name;
 
-    @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    List<User> users;
+    @OneToMany(mappedBy = "carModel", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<Car> cars;
 }

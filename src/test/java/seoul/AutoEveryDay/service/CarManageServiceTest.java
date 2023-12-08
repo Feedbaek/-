@@ -32,7 +32,7 @@ public class CarManageServiceTest {
     private CarDto makeNewCarReq() {
         return CarDto.builder()
                 .number("12가1234")
-                .type("아반떼")
+                .model("아반떼")
                 .status("정상")
                 .comment("테스트")
                 .build();

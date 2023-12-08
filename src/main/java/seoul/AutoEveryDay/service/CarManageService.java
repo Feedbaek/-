@@ -8,8 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import seoul.AutoEveryDay.dto.CarDto;
 import seoul.AutoEveryDay.entity.Car;
+import seoul.AutoEveryDay.entity.CarModel;
+import seoul.AutoEveryDay.repository.CarModelRepository;
 import seoul.AutoEveryDay.repository.CarRepository;
-import seoul.AutoEveryDay.repository.RentalHistoryRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CarManageService {
     private final CarRepository carRepository;
+    private final CarModelRepository carModelRepository;
 
     /** <h3>차량 등록.</h3>
      * 이미 존재하는 차량 번호면 ResponseStatusException 발생 */
@@ -29,9 +31,11 @@ public class CarManageService {
             log.error("이미 존재하는 차량 번호입니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 차량 번호입니다.");
         }
+        CarModel carModel = carModelRepository.findByName(carDto.getModel()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 종류입니다."));
         Car car = Car.builder()
                 .number(carDto.getNumber())
-                .type(carDto.getType())
+                .carModel(carModel)
                 .status(carDto.getStatus())
                 .comment(carDto.getComment())
                 .build();
@@ -53,7 +57,7 @@ public class CarManageService {
         return CarDto.builder()
                 .id(car.getId())
                 .number(car.getNumber())
-                .type(car.getType())
+                .model(car.getCarModel().getName())
                 .status(car.getStatus())
                 .comment(car.getComment())
                 .build();
@@ -68,7 +72,7 @@ public class CarManageService {
             carDtoList.add(CarDto.builder()
                     .id(car.getId())
                     .number(car.getNumber())
-                    .type(car.getType())
+                    .model(car.getCarModel().getName())
                     .status(car.getStatus())
                     .comment(car.getComment())
                     .build());
@@ -88,7 +92,7 @@ public class CarManageService {
         return CarDto.builder()
                 .id(car.getId())
                 .number(car.getNumber())
-                .type(car.getType())
+                .model(car.getCarModel().getName())
                 .status(car.getStatus())
                 .comment(car.getComment())
                 .build();
@@ -109,7 +113,7 @@ public class CarManageService {
         return CarDto.builder()
                 .id(car.getId())
                 .number(car.getNumber())
-                .type(car.getType())
+                .model(car.getCarModel().getName())
                 .status(car.getStatus())
                 .comment(car.getComment())
                 .build();

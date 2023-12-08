@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class TestHistoryDto {
     @NotBlank
-    private String testCenterName;
+    private String testTrackName;
     @NotBlank
     private LocalDate date;
 }

@@ -1,4 +1,4 @@
-package seoul.AutoEveryDay.entity;
+package seoul.AutoEveryDay.dto;
 
 import lombok.*;
 

@@ -6,21 +6,21 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "test_center")
+@Table(name = "test_track")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TestCenter {
+public class TestTrack {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "name", nullable = false, unique = true)
     String name;
-    @Column(name = "address", nullable = false)
-    String address;
-    @OneToMany(mappedBy = "testCenter", cascade = CascadeType.ALL)
+    @Column(name = "description")
+    String description;
+    @OneToMany(mappedBy = "testTrack", cascade = CascadeType.ALL)
     private List<TestHistory> testHistories;
 }

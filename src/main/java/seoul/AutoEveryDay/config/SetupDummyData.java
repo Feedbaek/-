@@ -5,108 +5,119 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import seoul.AutoEveryDay.entity.Car;
-import seoul.AutoEveryDay.entity.TestCenter;
+import seoul.AutoEveryDay.entity.CarModel;
+import seoul.AutoEveryDay.entity.TestTrack;
+import seoul.AutoEveryDay.repository.CarModelRepository;
 import seoul.AutoEveryDay.repository.CarRepository;
-import seoul.AutoEveryDay.repository.TestCenterRepository;
+import seoul.AutoEveryDay.repository.TestTrackRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class SetupDummyData {
     private final CarRepository carRepository;
-    private final TestCenterRepository testCenterRepository;
+    private final CarModelRepository carModelRepository;
+    private final TestTrackRepository testTrackRepository;
 
     @PostConstruct
     @Transactional
     public void setupCarDummy() {  // 차량 더미 데이터 생성
-        // 아반떼 10대
-        for (int i = 0; i < 10; i++) {
-            carRepository.save(Car.builder()
-                    .number("11가_111" + i)
-                    .type("아반떼")
-                    .status("정상")
-                    .comment("코멘트" + i)
-                    .build());
+        { // 아반떼 10대
+            CarModel carModel = CarModel.builder()
+                    .name("아반떼")
+                    .build();
+            List<Car> cars = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                cars.add(Car.builder()
+                        .number("11가_111" + i)
+                        .status("정상")
+                        .carModel(carModel)
+                        .comment("코멘트" + i)
+                        .build());
+            }
+            carModel.setCars(cars);
+            carModelRepository.save(carModel);
         }
-        // 쏘나타 10대
-        for (int i = 0; i < 10; i++) {
-            carRepository.save(Car.builder()
-                    .number("11가_222" + i)
-                    .type("쏘나타")
-                    .status("정상")
-                    .comment("코멘트" + i)
-                    .build());
+
+        { // 쏘나타 10대
+            CarModel carModel = CarModel.builder()
+                    .name("쏘나타")
+                    .build();
+            List<Car> cars = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                cars.add(Car.builder()
+                        .number("11가_222" + i)
+                        .status("정상")
+                        .carModel(carModel)
+                        .comment("코멘트" + i)
+                        .build());
+            }
+            carModel.setCars(cars);
+            carModelRepository.save(carModel);
         }
-        // 스포티지 10대
-        for (int i = 0; i < 10; i++) {
-            carRepository.save(Car.builder()
-                    .number("22가_111" + i)
-                    .type("스포티지")
-                    .status("정상")
-                    .comment("코멘트" + i)
-                    .build());
+
+        { // 스포티지 10대
+            CarModel carModel = CarModel.builder()
+                    .name("스포티지")
+                    .build();
+            List<Car> cars = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                cars.add(Car.builder()
+                        .number("11가_333" + i)
+                        .status("정상")
+                        .carModel(carModel)
+                        .comment("코멘트" + i)
+                        .build());
+            }
+            carModel.setCars(cars);
+            carModelRepository.save(carModel);
         }
-        // 그랜저 10대
-        for (int i = 0; i < 10; i++) {
-            carRepository.save(Car.builder()
-                    .number("22가_222" + i)
-                    .type("그랜저")
-                    .status("정상")
-                    .comment("코멘트" + i)
-                    .build());
+
+        { // 그랜저 10대
+            CarModel carModel = CarModel.builder()
+                    .name("그랜저")
+                    .build();
+            List<Car> cars = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                cars.add(Car.builder()
+                        .number("22가_222" + i)
+                        .status("정상")
+                        .carModel(carModel)
+                        .comment("코멘트" + i)
+                        .build());
+            }
+            carModel.setCars(cars);
+            carModelRepository.save(carModel);
         }
-        // 제네시스 10대
-        for (int i = 0; i < 10; i++) {
-            carRepository.save(Car.builder()
-                    .number("33가_111" + i)
-                    .type("제네시스")
-                    .status("정상")
-                    .comment("코멘트" + i)
-                    .build());
+
+        { // 제네시스 10대
+            CarModel carModel = CarModel.builder()
+                    .name("제네시스")
+                    .build();
+            List<Car> cars = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                cars.add(Car.builder()
+                        .number("33가_111" + i)
+                        .status("정상")
+                        .carModel(carModel)
+                        .comment("코멘트" + i)
+                        .build());
+            }
+            carModel.setCars(cars);
+            carModelRepository.save(carModel);
         }
     }
 
     @PostConstruct
     @Transactional
-    public void setupTestCenter() { // 테스트 센터 더미
-        testCenterRepository.save(TestCenter.builder()
-                .name("강남 시험장")
-                .address("서울특별시 강남구 강남대로 123")
-                .build());
-        testCenterRepository.save(TestCenter.builder()
-                .name("강북 시험장")
-                .address("서울특별시 강북구 강북대로 123")
-                .build());
-        testCenterRepository.save(TestCenter.builder()
-                .name("강서 시험장")
-                .address("서울특별시 강서구 강서대로 123")
-                .build());
-        testCenterRepository.save(TestCenter.builder()
-                .name("강동 시험장")
-                .address("서울특별시 강동구 강동대로 123")
-                .build());
-        testCenterRepository.save(TestCenter.builder()
-                .name("서초 시험장")
-                .address("서울특별시 서초구 서초대로 123")
-                .build());
-        testCenterRepository.save(TestCenter.builder()
-                .name("성북 시험장")
-                .address("서울특별시 성북구 성북대로 123")
-                .build());
-        testCenterRepository.save(TestCenter.builder()
-                .name("성동 시험장")
-                .address("서울특별시 성동구 성동대로 123")
-                .build());
-        testCenterRepository.save(TestCenter.builder()
-                .name("중랑 시험장")
-                .address("서울특별시 중랑구 중랑대로 123")
-                .build());
-        testCenterRepository.save(TestCenter.builder()
-                .name("노원 시험장")
-                .address("서울특별시 노원구 노원대로 123")
-                .build());
-        testCenterRepository.save(TestCenter.builder()
-                .name("도봉 시험장")
-                .address("서울특별시 도봉구 도봉대로 123")
-                .build());
+    public void setupTestTrack() { // 테스트 트랙 더미
+        for (int i = 0; i < 10; i++) {
+            testTrackRepository.save(TestTrack.builder()
+                    .name("테스트 트랙" + i)
+                    .description("테스트 트랙 설명" + i)
+                    .build());
+        }
     }
 }

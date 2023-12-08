@@ -12,6 +12,7 @@ import seoul.AutoEveryDay.service.CarManageService;
 import seoul.AutoEveryDay.service.CarRentalService;
 import seoul.AutoEveryDay.service.LoginService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,8 @@ public class CarController {
         model.addAttribute("carList", carDtoList);
         Map<String, List<RentalHistory>> rentalHistoryMap = carRentalService.getRentalHistory(carDtoList);
         model.addAttribute("rentalListMap", rentalHistoryMap);
+        model.addAttribute("minDay", LocalDate.now());
+        model.addAttribute("MaxDay", LocalDate.now().plusDays(7));
         return "carRental";
     }
     @ResponseBody
