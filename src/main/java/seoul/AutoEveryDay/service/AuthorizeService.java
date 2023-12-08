@@ -13,8 +13,8 @@ import seoul.AutoEveryDay.repository.RoleRepository;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j(topic = "AuthorizationService")
-public class AuthorizationService {
+@Slf4j(topic = "AuthorizeService")
+public class AuthorizeService {
     private final RoleRepository roleRepository;
     private final PrivilegeRepository privilegeRepository;
 

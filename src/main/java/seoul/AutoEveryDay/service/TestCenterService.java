@@ -14,6 +14,7 @@ import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.repository.TestCenterRepository;
 import seoul.AutoEveryDay.repository.TestHistoryRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -33,6 +34,9 @@ public class TestCenterService {
         }
     }
     private void validateTestHistory(TestHistoryDto testHistory, User user) {
+        if (testHistory.getDate().isBefore(LocalDate.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약은 오늘 이후로만 가능합니다.");
+        }
         TestCenter testCenter = getTestCenter(testHistory.getTestCenterName());
         if (testHistoryRepository.countByTestCenterIdAndDate(testCenter.getId(), testHistory.getDate()) >= testCenter.getCapacity()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 날짜에 예약 가능한 인원이 없습니다.");
