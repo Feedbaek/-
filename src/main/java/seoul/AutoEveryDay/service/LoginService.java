@@ -74,6 +74,11 @@ public class LoginService implements UserDetailsService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."));
     }
 
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."));
+    }
+
     // 기본 유저로 회원가입
     public void register(RegisterReq registerReq) {
         if (registerReq.getUsername().length() > 20) {

@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface ChargeSpotRepository extends JpaRepository<ChargeSpot, Long> {
     Optional<ChargeSpot> findByName(String name);
+
+    boolean existsByName(String name);
 }

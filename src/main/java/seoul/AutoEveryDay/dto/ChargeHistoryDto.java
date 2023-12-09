@@ -8,12 +8,12 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChargeDto {
+public class ChargeHistoryDto {
     private Long id;
     @NotBlank
-    private String carNumber;
+    private Long carId;
     @NotBlank
-    private String chargeSpotName;
+    private Long chargeSpotId;
     @NotBlank
     private Long amount;
 }

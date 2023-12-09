@@ -54,6 +54,10 @@ public class CarManageService {
         return carRepository.findByNumber(number).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
     }
+    public Car getCar(Long id) {
+        return carRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
+    }
 
     /** <h3>모든 차량 정보 조회.</h3> */
     public List<CarDto> getAllCar() {

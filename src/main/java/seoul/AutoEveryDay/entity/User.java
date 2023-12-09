@@ -39,7 +39,7 @@ public class User {
     private Set<Role> roles;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<GasStationHistory> gasStationHistories;
+    private List<ChargeHistory> gasStationHistories;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<RentalHistory> rentalHistories;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

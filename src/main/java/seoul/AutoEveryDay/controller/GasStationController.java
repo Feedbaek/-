@@ -3,8 +3,10 @@ package seoul.AutoEveryDay.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import seoul.AutoEveryDay.dto.ChargeDto;
+import seoul.AutoEveryDay.dto.ChargeHistoryDto;
+import seoul.AutoEveryDay.dto.ChargeSpotDto;
 import seoul.AutoEveryDay.dto.JsonBody;
 import seoul.AutoEveryDay.entity.Car;
 import seoul.AutoEveryDay.entity.User;
@@ -27,25 +29,34 @@ public class GasStationController {
 
     @ResponseBody
     @GetMapping("/history")
-    public JsonBody gasStationGet() {
+    public JsonBody gasStationGet(@RequestParam Long id) {
         return JsonBody.builder()
                 .message("주유소 이용 정보 조회 성공")
-//                .data(gasStationService.getGasStation())
+                .data(gasStationService.getChargeHistory(id))
                 .build();
     }
 
     @ResponseBody
     @PostMapping("/history")
-    public JsonBody gasStationPost(ChargeDto chargeDto) {
+    public JsonBody gasStationPost(@Validated ChargeHistoryDto chargeHistoryDto) {
         User user = loginService.getLoginUser();
-        Car car = carManageService.getCar(chargeDto.getCarNumber());
+        Car car = carManageService.getCar(chargeHistoryDto.getCarId());
         return JsonBody.builder()
                 .message("주유소 이용 정보 추가 성공")
-                .data(gasStationService.addChargeHistory(chargeDto, user, car))
+                .data(gasStationService.addChargeHistory(chargeHistoryDto, user, car))
                 .build();
     }
 
-    // 주유소 관리 페이지
+    @ResponseBody
+    @DeleteMapping("/history")
+    public JsonBody gasStationDelete(@RequestParam Long id) {
+        return JsonBody.builder()
+                .message("주유소 이용 정보 삭제 성공")
+                .data(gasStationService.deleteChargeHistory(id))
+                .build();
+    }
+
+    // 이 아래는 주유소 관리 페이지
     @GetMapping("/manage")
     public String gasStationManageGet() {
         return "gasStationManage";
@@ -53,18 +64,20 @@ public class GasStationController {
 
     @ResponseBody
     @PostMapping("/manage")
-    public JsonBody gasStationManagePost() {
+    public JsonBody gasStationManagePost(@Validated ChargeSpotDto chargeSpotDto) {
         return JsonBody.builder()
                 .message("주유구 추가 성공")
+                .data(gasStationService.addChargeSpot(chargeSpotDto))
                 .build();
 
     }
 
     @ResponseBody
     @DeleteMapping("/manage")
-    public JsonBody gasStationManageDelete() {
+    public JsonBody gasStationManageDelete(@RequestParam Long id) {
         return JsonBody.builder()
                 .message("주유구 삭제 성공")
+                .data(gasStationService.deleteChargeSpot(id))
                 .build();
     }
 

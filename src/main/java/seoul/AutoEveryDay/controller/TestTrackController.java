@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import seoul.AutoEveryDay.dto.JsonBody;
 import seoul.AutoEveryDay.dto.TestTrackDto;
@@ -33,7 +34,7 @@ public class TestTrackController { // 테스트 트랙 관련 컨트롤러
 
     @ResponseBody
     @PostMapping("/reserve")  // 테스트 트랙 예약
-    public JsonBody reservePost(TestHistoryDto testHistoryDto) {
+    public JsonBody reservePost(@Validated TestHistoryDto testHistoryDto) {
         User user = userService.getLoginUser();
         return JsonBody.builder()
                 .message("예약 성공")
@@ -42,7 +43,7 @@ public class TestTrackController { // 테스트 트랙 관련 컨트롤러
     }
     @ResponseBody
     @DeleteMapping("/reserve")  // 테스트 트랙 예약 취소
-    public JsonBody reserveDelete(@RequestParam TestHistoryDto testHistoryDto) {
+    public JsonBody reserveDelete(@Validated @RequestParam TestHistoryDto testHistoryDto) {
         User user = userService.getLoginUser();
         return JsonBody.builder()
                 .message("예약 취소 성공")
@@ -71,7 +72,7 @@ public class TestTrackController { // 테스트 트랙 관련 컨트롤러
     @ResponseBody
     @PreAuthorize(value = "hasAuthority('ADMIN')")
     @PostMapping("/manage")  // 테스트 트랙 등록
-    public JsonBody managePost(TestTrackDto testTrackDto) {
+    public JsonBody managePost(@Validated TestTrackDto testTrackDto) {
         return JsonBody.builder()
                 .message("테스트 트랙 등록 성공")
                 .data(testTrackService.createTestTrack(testTrackDto))
@@ -81,7 +82,7 @@ public class TestTrackController { // 테스트 트랙 관련 컨트롤러
     @ResponseBody
     @PreAuthorize(value = "hasAuthority('ADMIN')")
     @PutMapping("/manage")  // 테스트 트랙 수정
-    public JsonBody manageEdit(TestTrackDto testTrackDto) {
+    public JsonBody manageEdit(@Validated TestTrackDto testTrackDto) {
         return JsonBody.builder()
                 .message("테스트 트랙 수정 성공")
                 .data(testTrackService.editTestTrack(testTrackDto))

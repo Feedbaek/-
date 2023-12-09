@@ -3,6 +3,7 @@ package seoul.AutoEveryDay.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import seoul.AutoEveryDay.dto.JsonBody;
 import seoul.AutoEveryDay.dto.RoleChangeReq;
@@ -30,8 +31,8 @@ public class AuthorizeController {
 
     @ResponseBody
     @PostMapping("/user/role")
-    public JsonBody userAdd(RoleChangeReq req) {
-        User user = loginService.findByName(req.getUsername());
+    public JsonBody userAdd(@Validated RoleChangeReq req) {
+        User user = loginService.findById(req.getUserId());
         return JsonBody.builder()
                 .message("역할 변경 성공")
                 .data(authorizeService.grantRole(user, req.getRole()))

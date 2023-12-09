@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 public class RoleChangeReq {
     @NotBlank
-    private String username;
+    private Long userId;
     @NotBlank
     private String role;
 }

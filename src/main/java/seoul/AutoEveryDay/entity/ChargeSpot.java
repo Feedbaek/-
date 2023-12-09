@@ -21,5 +21,5 @@ public class ChargeSpot {
     String name;
 
     @OneToMany(mappedBy = "chargeSpot", cascade = CascadeType.ALL)
-    private List<GasStationHistory> gasStationHistories;
+    private List<ChargeHistory> chargeHistories;
 }

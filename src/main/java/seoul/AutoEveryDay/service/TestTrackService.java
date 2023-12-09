@@ -33,8 +33,13 @@ public class TestTrackService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 예약한 날짜입니다.");
         }
     }
-    private TestTrack getTestTrack(String name) {
+    public TestTrack getTestTrack(String name) {
         return testTrackRepository.findByName(name).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "테스트 센터를 찾을 수 없습니다.")
+        );
+    }
+    public TestTrack getTestTrack(Long id) {
+        return testTrackRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "테스트 센터를 찾을 수 없습니다.")
         );
     }
@@ -93,9 +98,10 @@ public class TestTrackService {
     // 여기부터 예약 관련
     public TestHistoryDto createTestHistory(TestHistoryDto testHistoryDto, User user) {
         validateTestHistory(testHistoryDto, user);
+        TestTrack testTrack = getTestTrack(testHistoryDto.getTestTrackId());
         TestHistory testHistory = TestHistory.builder()
                 .user(user)
-                .testTrack(getTestTrack(testHistoryDto.getTestTrackName()))
+                .testTrack(testTrack)
                 .date(testHistoryDto.getDate())
                 .build();
         try {
@@ -108,7 +114,7 @@ public class TestTrackService {
     }
 
     public TestHistoryDto deleteTestHistory(TestHistoryDto testHistoryDto, User user) {
-        TestTrack testTrack = getTestTrack(testHistoryDto.getTestTrackName());
+        TestTrack testTrack = getTestTrack(testHistoryDto.getTestTrackId());
         TestHistory testHistory = testHistoryRepository.findByUserIdAndTestTrackIdAndDate(user.getId(), testTrack.getId(), testHistoryDto.getDate()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "예약을 찾을 수 없습니다.")
         );

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import seoul.AutoEveryDay.dto.*;
 import seoul.AutoEveryDay.entity.Car;
@@ -40,34 +41,34 @@ public class CarController {
     }
     @ResponseBody
     @PostMapping("/rental") // 차량 대여 신청
-    public JsonBody rentalPost(RentCarReq rentCarReq) {
+    public JsonBody rentalPost(@Validated RentCarDto rentCarDto) {
         User user = loginService.getLoginUser();
-        Car car = carManageService.getCar(rentCarReq.getNumber());
+        Car car = carManageService.getCar(rentCarDto.getCarId());
         return JsonBody.builder()
                 .message("차량 대여 성공")
-                .data(carRentalService.rentCar(rentCarReq, user, car))
+                .data(carRentalService.rentCar(rentCarDto, user, car))
                 .build();
     }
 
     @ResponseBody
     @PutMapping("/rental")  // 차량 반납
-    public JsonBody rentalPut(RentCarReq rentCarReq) {
+    public JsonBody rentalPut(@Validated RentCarDto rentCarDto) {
         User user = loginService.getLoginUser();
-        Car car = carManageService.getCar(rentCarReq.getNumber());
+        Car car = carManageService.getCar(rentCarDto.getCarId());
         return JsonBody.builder()
                 .message("차량 반납 성공")
-                .data(carRentalService.returnCar(rentCarReq, user, car))
+                .data(carRentalService.returnCar(rentCarDto, user, car))
                 .build();
     }
 
     @ResponseBody
     @DeleteMapping("/rental")   // 차량 대여 취소
-    public JsonBody rentalDelete(RentCarReq rentCarReq) {
+    public JsonBody rentalDelete(@Validated RentCarDto rentCarDto) {
         User user = loginService.getLoginUser();
-        Car car = carManageService.getCar(rentCarReq.getNumber());
+        Car car = carManageService.getCar(rentCarDto.getCarId());
         return JsonBody.builder()
                 .message("차량 대여 취소 성공")
-                .data(carRentalService.deleteRental(rentCarReq, user, car))
+                .data(carRentalService.deleteRental(rentCarDto, user, car))
                 .build();
     }
 
@@ -83,7 +84,7 @@ public class CarController {
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/manage") // 새로운 차량 등록
-    public JsonBody newCar(CarDto carDto) {
+    public JsonBody newCar(@Validated CarDto carDto) {
         return JsonBody.builder()
                 .message("차량 등록 성공")
                 .data(carManageService.createCar(carDto))
@@ -92,7 +93,7 @@ public class CarController {
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/manage")  // 차량 정보 수정
-    public JsonBody editCar(CarDto carDto) {
+    public JsonBody editCar(@Validated CarDto carDto) {
         return JsonBody.builder()
                 .message("차량 정보 수정 성공")
                 .data(carManageService.updateCar(carDto))

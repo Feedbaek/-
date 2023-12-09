@@ -10,10 +10,10 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RentCarReq {
+public class RentCarDto {
     private Long id;
     @NotBlank
-    private String number;
+    private Long carId;
     @NotBlank
     private LocalDate pickupDate;
     @NotBlank
