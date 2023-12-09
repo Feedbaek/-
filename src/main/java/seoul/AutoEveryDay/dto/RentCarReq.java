@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RentCarReq {
+    private Long id;
     @NotBlank
     private String number;
     @NotBlank

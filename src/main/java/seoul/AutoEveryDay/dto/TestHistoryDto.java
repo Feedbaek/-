@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TestHistoryDto {
+    private Long id;
     @NotBlank
     private String testTrackName;
     @NotBlank

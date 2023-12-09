@@ -6,15 +6,14 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class CarDto {
+@AllArgsConstructor
+public class ChargeDto {
     private Long id;
     @NotBlank
-    private String number;
+    private String carNumber;
     @NotBlank
-    private String model;
-    private String status;
-    private String comment;
+    private String chargeSpotName;
+    @NotBlank
+    private Long amount;
 }
-

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import seoul.AutoEveryDay.dto.*;
+import seoul.AutoEveryDay.entity.Car;
 import seoul.AutoEveryDay.entity.RentalHistory;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.CarManageService;
@@ -33,36 +34,40 @@ public class CarController {
         Map<String, List<RentalHistory>> rentalHistoryMap = carRentalService.getRentalHistory(carDtoList);
         model.addAttribute("rentalListMap", rentalHistoryMap);
         model.addAttribute("minDay", LocalDate.now());
-        model.addAttribute("MaxDay", LocalDate.now().plusDays(7));
+        model.addAttribute("maxDay", LocalDate.now().plusDays(7));
+        model.addAttribute("returnDay", LocalDate.now().plusDays(14));
         return "carRental";
     }
     @ResponseBody
     @PostMapping("/rental") // 차량 대여 신청
     public JsonBody rentalPost(RentCarReq rentCarReq) {
-        User user = loginService.findByName(LoginService.getAuthenticatedUsername());
+        User user = loginService.getLoginUser();
+        Car car = carManageService.getCar(rentCarReq.getNumber());
         return JsonBody.builder()
                 .message("차량 대여 성공")
-                .data(carRentalService.rentCar(rentCarReq, user))
+                .data(carRentalService.rentCar(rentCarReq, user, car))
                 .build();
     }
 
     @ResponseBody
     @PutMapping("/rental")  // 차량 반납
     public JsonBody rentalPut(RentCarReq rentCarReq) {
-        User user = loginService.findByName(LoginService.getAuthenticatedUsername());
+        User user = loginService.getLoginUser();
+        Car car = carManageService.getCar(rentCarReq.getNumber());
         return JsonBody.builder()
                 .message("차량 반납 성공")
-                .data(carRentalService.returnCar(rentCarReq, user))
+                .data(carRentalService.returnCar(rentCarReq, user, car))
                 .build();
     }
 
     @ResponseBody
     @DeleteMapping("/rental")   // 차량 대여 취소
     public JsonBody rentalDelete(RentCarReq rentCarReq) {
-        User user = loginService.findByName(LoginService.getAuthenticatedUsername());
+        User user = loginService.getLoginUser();
+        Car car = carManageService.getCar(rentCarReq.getNumber());
         return JsonBody.builder()
                 .message("차량 대여 취소 성공")
-                .data(carRentalService.deleteRental(rentCarReq, user))
+                .data(carRentalService.deleteRental(rentCarReq, user, car))
                 .build();
     }
 

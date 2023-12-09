@@ -17,14 +17,14 @@
             <thead class="thead-dark">
             <tr>
                 <th>Name</th>
-                <th>Address</th>
+                <th>Description</th>
                 <th>Actions</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="testTrack : ${testTrackList}">
                 <td th:text="${testTrack.name}">Name</td>
-                <td th:text="${testTrack.address}">Address</td>
+                <td th:text="${testTrack.description}">Description</td>
                 <td>
                     <button type="button" class="btn btn-primary btn-sm" th:attr="data-target='#trackModal-' + ${testTrack.id}" data-toggle="modal">Edit</button>
                     <button th:data-track-name="${testTrack.name}" onclick="deleteTestTrack(this)" class="btn btn-danger btn-sm">Delete</button>
@@ -51,8 +51,8 @@
                             <input type="text" class="form-control" id="trackName" name="name" required>
                         </div>
                         <div class="form-group">
-                            <label for="trackAddress">Car Address</label>
-                            <input type="text" class="form-control" id="trackAddress" name="address" required>
+                            <label for="trackDescription">Car Description</label>
+                            <input type="text" class="form-control" id="trackDescription" name="description" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -82,8 +82,8 @@
                             <input type="text" class="form-control" th:id="'trackName-' + ${testTrack.id}" name="name">
                         </div>
                         <div class="form-group">
-                            <label th:for="'trackAddress-' + ${testTrack.id}">Car Address</label>
-                            <textarea class="form-control" th:id="'trackAddress-' + ${testTrack.id}" name="address"></textarea>
+                            <label th:for="'trackDescription-' + ${testTrack.id}">Car Description</label>
+                            <textarea class="form-control" th:id="'trackDescription-' + ${testTrack.id}" name="description"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">

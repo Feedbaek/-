@@ -24,7 +24,6 @@ import java.util.Map;
 @Transactional
 @RequiredArgsConstructor
 public class CarRentalService {
-    private final CarRepository carRepository;
     private final RentalHistoryRepository rentalHistoryRepository;
 
     private void validatePickUpDateAndReturnDate(RentCarReq rentCarReq) {
@@ -36,7 +35,7 @@ public class CarRentalService {
             log.error("반납일이 대여일보다 빠르거나 같을 수 없습니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "반납일이 대여일보다 빠르거나 같을 수 없습니다.");
         }
-        if (!rentCarReq.getPickupDate().isAfter(rentCarReq.getReturnDate().minusDays(7))) {
+        if (!rentCarReq.getPickupDate().isAfter(rentCarReq.getReturnDate().minusDays(8))) {
             log.error("7일 이내로만 대여할 수 있습니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "7일 이내로만 대여할 수 있습니다.");
         }
@@ -47,9 +46,7 @@ public class CarRentalService {
      * 차량 번호가 존재하지 않으면, 이미 대여된 차량이면, 대여일이 오늘 이전이면,
      * 반납일이 대여일보다 빠르거나 같으면, 대여일로부터 7일 이후 반납이면 ResponseStatusException 발생
      */
-    public RentCarReq rentCar(RentCarReq rentCarReq, User user) {
-        Car car = carRepository.findByNumber(rentCarReq.getNumber()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
+    public RentCarReq rentCar(RentCarReq rentCarReq, User user, Car car) {
         if (!rentalHistoryRepository.findByCarIdAndReturnDateGreaterThanAndPickupDateLessThan(car.getId(), rentCarReq.getPickupDate(), rentCarReq.getReturnDate()).isEmpty()) {
             log.error("이미 대여된 차량입니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 대여된 차량입니다.");
@@ -76,9 +73,7 @@ public class CarRentalService {
      * <h3>차량 반납.</h3>
      * 차량 번호가 존재하지 않으면, 대여 기록이 없으면 ResponseStatusException 발생
      */
-    public RentCarReq returnCar(RentCarReq rentCarReq, User user) {
-        Car car = carRepository.findByNumber(rentCarReq.getNumber()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
+    public RentCarReq returnCar(RentCarReq rentCarReq, User user, Car car) {
         RentalHistory rentalHistory = rentalHistoryRepository
                 .findByUserIdAndCarIdAndPickupDateAndReturnDate(user.getId(), car.getId(), rentCarReq.getPickupDate(), rentCarReq.getReturnDate()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "대여 기록이 없습니다."));
@@ -97,11 +92,12 @@ public class CarRentalService {
     public Map<String, List<RentalHistory>> getRentalHistory(List<CarDto> carDtoList) {
         Map<String, List<RentalHistory>> rentalHistoryMap = new HashMap<>();
 
-        carDtoList.stream().map(CarDto::getNumber).forEach(number -> {
-            Car car = carRepository.findByNumber(number).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
-            rentalHistoryMap.put(car.getNumber(), rentalHistoryRepository.findByCarIdAndReturnDateGreaterThan(car.getId(), LocalDate.now()));
-        });
+        // todo: 이 함수는 역할 분리가 필요함
+//        carDtoList.stream().map(CarDto::getNumber).forEach(number -> {
+//            Car car = carRepository.findByNumber(number).orElseThrow(
+//                    () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
+//            rentalHistoryMap.put(car.getNumber(), rentalHistoryRepository.findByCarIdAndReturnDateGreaterThan(car.getId(), LocalDate.now()));
+//        });
 
         return rentalHistoryMap;
     }
@@ -110,9 +106,7 @@ public class CarRentalService {
      * <h3>차량 대여 취소.</h3>
      * 차량 번호가 존재하지 않으면, 대여 기록이 없으면 ResponseStatusException 발생
      */
-    public RentCarReq deleteRental(RentCarReq rentCarReq, User user) {
-        Car car = carRepository.findByNumber(rentCarReq.getNumber()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
+    public RentCarReq deleteRental(RentCarReq rentCarReq, User user, Car car) {
         RentalHistory rentalHistory = rentalHistoryRepository.findByUserIdAndCarIdAndPickupDateAndReturnDate(user.getId(), car.getId(), rentCarReq.getPickupDate(), rentCarReq.getReturnDate()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "대여 기록이 없습니다."));
 

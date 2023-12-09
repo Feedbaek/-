@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TestTrackDto {
+    private Long id;
     @NotBlank
     private String name;
     @NotBlank

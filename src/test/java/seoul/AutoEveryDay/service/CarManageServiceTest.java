@@ -76,7 +76,7 @@ public class CarManageServiceTest {
                         .comment("테스트")
                         .build()));
         // when
-        ResponseEntity<CarDto> res = ResponseEntity.ok(carManageService.getCar(number));
+        ResponseEntity<Car> res = ResponseEntity.ok(carManageService.getCar(number));
         // then
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(res.getBody()).getNumber()).isEqualTo(number);

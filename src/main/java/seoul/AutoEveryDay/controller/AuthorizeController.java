@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import seoul.AutoEveryDay.dto.JsonBody;
+import seoul.AutoEveryDay.dto.RoleChangeReq;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.AuthorizeService;
 import seoul.AutoEveryDay.service.LoginService;
@@ -29,11 +30,11 @@ public class AuthorizeController {
 
     @ResponseBody
     @PostMapping("/user/role")
-    public JsonBody userAdd(@RequestParam String roleName) {
-        User user = loginService.findByName(LoginService.getAuthenticatedUsername());
+    public JsonBody userAdd(RoleChangeReq req) {
+        User user = loginService.findByName(req.getUsername());
         return JsonBody.builder()
                 .message("역할 변경 성공")
-                .data(authorizeService.grantRole(user, roleName))
+                .data(authorizeService.grantRole(user, req.getRole()))
                 .build();
     }
 

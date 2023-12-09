@@ -56,6 +56,12 @@ public class LoginService implements UserDetailsService {
         return authentication.getName();
     }
 
+    public User getLoginUser() {
+        String username = getAuthenticatedUsername();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "로그인된 사용자를 찾을 수 없습니다."));
+    }
+
     public void validateDuplicateUser(User user) {
         userRepository.findByUsername(user.getUsername())
             .ifPresent(m -> {

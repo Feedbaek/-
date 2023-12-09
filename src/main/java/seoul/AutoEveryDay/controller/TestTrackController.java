@@ -34,7 +34,7 @@ public class TestTrackController { // 테스트 트랙 관련 컨트롤러
     @ResponseBody
     @PostMapping("/reserve")  // 테스트 트랙 예약
     public JsonBody reservePost(TestHistoryDto testHistoryDto) {
-        User user = userService.findByName(LoginService.getAuthenticatedUsername());
+        User user = userService.getLoginUser();
         return JsonBody.builder()
                 .message("예약 성공")
                 .data(testTrackService.createTestHistory(testHistoryDto, user))
@@ -43,7 +43,7 @@ public class TestTrackController { // 테스트 트랙 관련 컨트롤러
     @ResponseBody
     @DeleteMapping("/reserve")  // 테스트 트랙 예약 취소
     public JsonBody reserveDelete(@RequestParam TestHistoryDto testHistoryDto) {
-        User user = userService.findByName(LoginService.getAuthenticatedUsername());
+        User user = userService.getLoginUser();
         return JsonBody.builder()
                 .message("예약 취소 성공")
                 .data(testTrackService.deleteTestHistory(testHistoryDto, user))

@@ -50,17 +50,9 @@ public class CarManageService {
 
     /** <h3>차량 정보 조회.</h3>
      * 차량 번호가 존재하지 않으면 ResponseStatusException 발생 */
-    public CarDto getCar(String number) {
-        Car car = carRepository.findByNumber(number).orElseThrow(
+    public Car getCar(String number) {
+        return carRepository.findByNumber(number).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
-
-        return CarDto.builder()
-                .id(car.getId())
-                .number(car.getNumber())
-                .model(car.getCarModel().getName())
-                .status(car.getStatus())
-                .comment(car.getComment())
-                .build();
     }
 
     /** <h3>모든 차량 정보 조회.</h3> */
