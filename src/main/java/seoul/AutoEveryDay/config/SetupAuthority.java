@@ -9,9 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import seoul.AutoEveryDay.entity.Privilege;
 import seoul.AutoEveryDay.entity.Role;
 import seoul.AutoEveryDay.entity.User;
+import seoul.AutoEveryDay.entity.UserGroup;
 import seoul.AutoEveryDay.enums.PrivilegeEnum;
 import seoul.AutoEveryDay.repository.PrivilegeRepository;
 import seoul.AutoEveryDay.repository.RoleRepository;
+import seoul.AutoEveryDay.repository.UserGroupRepository;
 import seoul.AutoEveryDay.repository.UserRepository;
 
 import java.util.*;
@@ -29,6 +31,7 @@ public class SetupAuthority implements
     private final RoleRepository roleRepository;
     private final PrivilegeRepository privilegeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserGroupRepository userGroupRepository;
 
     @Override
     @Transactional
@@ -55,18 +58,34 @@ public class SetupAuthority implements
 
         // 역할 생성
         Role adminRole = createRoleIfNotFound(ROLE_ADMIN.getValue(), allPrivileges);
-        createRoleIfNotFound(ROLE_ADVANCED_USER.getValue(), advancedUserPrivileges);
-        createRoleIfNotFound(ROLE_USER.getValue(), userPrivileges);
+        Role advancedRole = createRoleIfNotFound(ROLE_ADVANCED_USER.getValue(), advancedUserPrivileges);
+        Role basicRole = createRoleIfNotFound(ROLE_USER.getValue(), userPrivileges);
 
-        // 그룹 생성
+        // 관리자 그룹 생성
+        UserGroup adminGroup = userGroupRepository.save(UserGroup.builder()
+                .name("관리자")
+                .build());
 
+        // 현대오토에버 그룹 생성
+        UserGroup autoEverGroup = userGroupRepository.save(UserGroup.builder()
+                .name("현대오토에버")
+                .build());
 
         // admin 계정 생성
         User user = new User();
         user.setUsername("admin");
         user.setPassword(passwordEncoder.encode("1234"));
         user.setRoles(Collections.singleton(adminRole));
+        user.setUserGroup(adminGroup);
         userRepository.save(user);
+
+        // 현대오토에버 계정 생성
+        User autoEverUser = new User();
+        autoEverUser.setUsername("user");
+        autoEverUser.setPassword(passwordEncoder.encode("1234"));
+        autoEverUser.setRoles(Collections.singleton(basicRole));
+        autoEverUser.setUserGroup(autoEverGroup);
+        userRepository.save(autoEverUser);
 
         alreadySetup = true;
     }

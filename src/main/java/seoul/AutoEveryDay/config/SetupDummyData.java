@@ -120,4 +120,15 @@ public class SetupDummyData {
                     .build());
         }
     }
+
+    @PostConstruct
+    @Transactional
+    public void setupChargeSpot() { // 주유구 더미
+        for (int i = 0; i < 10; i++) {
+            testTrackRepository.save(TestTrack.builder()
+                    .name("주유구" + i)
+                    .description("주유구 설명" + i)
+                    .build());
+        }
+    }
 }
