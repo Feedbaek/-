@@ -15,5 +15,5 @@ public class ChargeHistoryDto {
     @NotBlank
     private Long chargeSpotId;
     @NotBlank
-    private Long amount;
+    private Integer amount;
 }

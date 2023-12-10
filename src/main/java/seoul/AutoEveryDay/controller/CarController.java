@@ -20,7 +20,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/car")
-@PreAuthorize(value = "hasAnyAuthority('ADMIN')")
+@PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
 @RequiredArgsConstructor
 public class CarController {
     private final LoginService loginService;

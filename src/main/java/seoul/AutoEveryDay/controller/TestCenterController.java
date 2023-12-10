@@ -18,13 +18,13 @@ import java.time.LocalDate;
 @Controller
 @RequiredArgsConstructor
 @PreAuthorize(value = "hasAuthority('TEST_TRACK')")
-@RequestMapping("/track")
-public class TestTrackController { // 테스트 트랙 관련 컨트롤러
+@RequestMapping("/center")
+public class TestCenterController { // 테스트 트랙 관련 컨트롤러
     private final TestTrackService testTrackService;
     private final LoginService userService;
 
     // 예약 관련 컨트롤러
-    @GetMapping("/reserve")  // 테스트 트랙 예약 페이지
+    @GetMapping("/track/reserve")  // 테스트 트랙 예약 페이지
     public String reserveGet(Model model) {
         model.addAttribute("testTrackList", testTrackService.getAllTestTrack());
         model.addAttribute("minDay", LocalDate.now());
@@ -33,7 +33,7 @@ public class TestTrackController { // 테스트 트랙 관련 컨트롤러
     }
 
     @ResponseBody
-    @PostMapping("/reserve")  // 테스트 트랙 예약
+    @PostMapping("/track/reserve")  // 테스트 트랙 예약
     public JsonBody reservePost(@Validated TestHistoryDto testHistoryDto) {
         User user = userService.getLoginUser();
         return JsonBody.builder()
@@ -42,7 +42,7 @@ public class TestTrackController { // 테스트 트랙 관련 컨트롤러
                 .build();
     }
     @ResponseBody
-    @DeleteMapping("/reserve")  // 테스트 트랙 예약 취소
+    @DeleteMapping("/track/reserve")  // 테스트 트랙 예약 취소
     public JsonBody reserveDelete(@Validated @RequestParam TestHistoryDto testHistoryDto) {
         User user = userService.getLoginUser();
         return JsonBody.builder()
@@ -53,7 +53,7 @@ public class TestTrackController { // 테스트 트랙 관련 컨트롤러
 
     // 관리자 관련 컨트롤러
     @PreAuthorize(value = "hasAuthority('ADMIN')")
-    @GetMapping("/manage")  // 테스트 트랙 관리 페이지
+    @GetMapping("/track/manage")  // 테스트 트랙 관리 페이지
     public String allTrackGet(Model model) {
         model.addAttribute("testTrackList", testTrackService.getAllTestTrack());
         return "trackManage";
@@ -71,7 +71,7 @@ public class TestTrackController { // 테스트 트랙 관련 컨트롤러
 
     @ResponseBody
     @PreAuthorize(value = "hasAuthority('ADMIN')")
-    @PostMapping("/manage")  // 테스트 트랙 등록
+    @PostMapping("/track/manage")  // 테스트 트랙 등록
     public JsonBody managePost(@Validated TestTrackDto testTrackDto) {
         return JsonBody.builder()
                 .message("테스트 트랙 등록 성공")
@@ -81,7 +81,7 @@ public class TestTrackController { // 테스트 트랙 관련 컨트롤러
 
     @ResponseBody
     @PreAuthorize(value = "hasAuthority('ADMIN')")
-    @PutMapping("/manage")  // 테스트 트랙 수정
+    @PutMapping("/track/manage")  // 테스트 트랙 수정
     public JsonBody manageEdit(@Validated TestTrackDto testTrackDto) {
         return JsonBody.builder()
                 .message("테스트 트랙 수정 성공")
@@ -91,7 +91,7 @@ public class TestTrackController { // 테스트 트랙 관련 컨트롤러
 
     @ResponseBody
     @PreAuthorize(value = "hasAuthority('ADMIN')")
-    @DeleteMapping("/manage")  // 테스트 트랙 삭제
+    @DeleteMapping("/track/manage")  // 테스트 트랙 삭제
     public JsonBody manageDelete(@RequestParam String name) {
         return JsonBody.builder()
                 .message("테스트 트랙 삭제 성공")

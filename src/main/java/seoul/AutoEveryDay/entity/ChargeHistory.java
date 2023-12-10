@@ -28,5 +28,5 @@ public class ChargeHistory {
     private ChargeSpot chargeSpot;
 
     @Column(name = "amount", nullable = false)
-    private Long amount; // 리터 단위
+    private Integer amount; // 리터 단위
 }
