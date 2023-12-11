@@ -76,8 +76,13 @@ public class CarRentalService {
         RentalHistory rentalHistory = rentalHistoryRepository
                 .findByUserIdAndCarIdAndPickupDateAndReturnDate(user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "대여 기록이 없습니다."));
+        if (rentalHistory.getReturnDate().isBefore(LocalDate.now())) {
+            log.error("이미 반납된 차량입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 반납된 차량입니다.");
+        }
         rentalHistory.setReturnDate(LocalDate.now());
         return RentCarDto.builder()
+                .id(rentalHistory.getId())
                 .carId(car.getId())
                 .pickupDate(rentalHistory.getPickupDate())
                 .returnDate(rentalHistory.getReturnDate())
@@ -88,13 +93,12 @@ public class CarRentalService {
      * <h3>차량 대여 내역.</h3>
      * 오늘 이후 날짜로 차량 예약 내역을 반환
      */
-    public Map<String, List<RentalHistory>> getRentalHistory(List<CarDto> carDtoList) {
-        Map<String, List<RentalHistory>> rentalHistoryMap = new HashMap<>();
+    public Map<Long, List<RentalHistory>> getRentalHistory(List<CarDto> carDtoList) {
+        Map<Long, List<RentalHistory>> rentalHistoryMap = new HashMap<>();
 
         carDtoList.forEach(carDto -> {
             Long id = carDto.getId();
-            String number = carDto.getNumber();
-            rentalHistoryMap.put(number, rentalHistoryRepository.findByCarIdAndReturnDateGreaterThan(id, LocalDate.now()));
+            rentalHistoryMap.put(id, rentalHistoryRepository.findByCarIdAndReturnDateGreaterThan(id, LocalDate.now()));
         });
 
         return rentalHistoryMap;
@@ -115,6 +119,7 @@ public class CarRentalService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "대여 기록 삭제 실패");
         }
         return RentCarDto.builder()
+                .id(rentalHistory.getId())
                 .carId(car.getId())
                 .pickupDate(rentalHistory.getPickupDate())
                 .returnDate(rentalHistory.getReturnDate())

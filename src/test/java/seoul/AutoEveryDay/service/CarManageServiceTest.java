@@ -1,8 +1,5 @@
 package seoul.AutoEveryDay.service;
 
-import groovy.util.logging.Slf4j;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,8 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 import seoul.AutoEveryDay.dto.CarDto;
 import seoul.AutoEveryDay.entity.Car;
@@ -21,7 +16,6 @@ import seoul.AutoEveryDay.repository.CarRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,8 +33,9 @@ public class CarManageServiceTest {
     @Mock
     private CarModelRepository carModelRepository;
 
-    private CarDto makeNewCarReq() {
+    public static CarDto makeCarDto() {
         return CarDto.builder()
+                .id(1L)
                 .number("12가1234")
                 .model("아반떼")
                 .status("정상")
@@ -48,13 +43,14 @@ public class CarManageServiceTest {
                 .build();
     }
 
-    private CarModel makeCarModel() {
+    public static CarModel makeCarModel() {
         return CarModel.builder()
+                .id(1L)
                 .name("아반떼")
                 .build();
     }
 
-    private Car makeCar(CarModel carModel) {
+    public static Car makeCar(CarModel carModel) {
         return Car.builder()
                 .id(1L)
                 .number("12가1234")
@@ -64,11 +60,21 @@ public class CarManageServiceTest {
                 .build();
     }
 
+    public static Car makeCar() {
+        return Car.builder()
+                .id(1L)
+                .number("12가1234")
+                .carModel(makeCarModel())
+                .status("정상")
+                .comment("테스트")
+                .build();
+    }
+
     @Test
     @DisplayName("차량 등록 성공")
     public void createCarSuccess() {
         // given
-        CarDto newCarReq = makeNewCarReq();
+        CarDto newCarReq = makeCarDto();
         CarModel carModel = makeCarModel();
         // 차량 번호 중복 검사
         given(carRepository.existsByNumber(newCarReq.getNumber())).willReturn(false); // 차량 번호 중복 없음
@@ -88,10 +94,10 @@ public class CarManageServiceTest {
     }
 
     @Test
-    @DisplayName("차량 등록 실패: 번호 중복")
+    @DisplayName("차량 등록 실패 - 번호 중복")
     public void createCarFail1() {
         // given
-        CarDto newCarReq = makeNewCarReq();
+        CarDto newCarReq = makeCarDto();
         given(carRepository.existsByNumber(newCarReq.getNumber())).willReturn(true);
 
         // when
@@ -103,10 +109,10 @@ public class CarManageServiceTest {
     }
 
     @Test
-    @DisplayName("차량 등록 실패: 차량 종류 없음")
+    @DisplayName("차량 등록 실패 - 차량 종류 없음")
     public void createCarFail2() {
         // given
-        CarDto newCarReq = makeNewCarReq();
+        CarDto newCarReq = makeCarDto();
         given(carRepository.existsByNumber(newCarReq.getNumber())).willReturn(false);
         given(carModelRepository.findByName(newCarReq.getModel())).willReturn(Optional.empty());
 
@@ -119,10 +125,10 @@ public class CarManageServiceTest {
     }
 
     @Test
-    @DisplayName("차량 등록 실패: 차량 저장 실패")
+    @DisplayName("차량 등록 실패 - 차량 저장 실패")
     public void createCarFail3() {
         // given
-        CarDto newCarReq = makeNewCarReq();
+        CarDto newCarReq = makeCarDto();
         given(carRepository.existsByNumber(newCarReq.getNumber())).willReturn(false);
         given(carModelRepository.findByName(newCarReq.getModel())).willReturn(Optional.of(CarModel.builder()
                 .name(newCarReq.getModel())
@@ -160,7 +166,7 @@ public class CarManageServiceTest {
     }
 
     @Test
-    @DisplayName("차량 정보 조회 실패: 존재하지 않는 차량 번호")
+    @DisplayName("차량 정보 조회 실패 - 존재하지 않는 차량 번호")
     public void getCarFail() {
         // given
         Long id = 1L;
@@ -200,7 +206,7 @@ public class CarManageServiceTest {
     }
 
     @Test
-    @DisplayName("모든 차량 정보 조회 성공: 차량 없음")
+    @DisplayName("모든 차량 정보 조회 성공 - 차량 없음")
     public void getAllCarSuccess2() {
         // given
         List<Car> carList = new ArrayList<>();
@@ -218,7 +224,7 @@ public class CarManageServiceTest {
     @DisplayName("차량 정보 수정 성공")
     public void updateCarSuccess() {
         // given
-        CarDto carDto = makeNewCarReq();
+        CarDto carDto = makeCarDto();
         CarModel carModel = makeCarModel();
         Car car = makeCar(carModel);
         given(carRepository.findByNumber(carDto.getNumber())).willReturn(Optional.of(car));
@@ -235,10 +241,10 @@ public class CarManageServiceTest {
     }
 
     @Test
-    @DisplayName("차량 정보 수정 실패: 존재하지 않는 차량 번호")
+    @DisplayName("차량 정보 수정 실패 - 존재하지 않는 차량 번호")
     public void updateCarFail() {
         // given
-        CarDto carDto = makeNewCarReq();
+        CarDto carDto = makeCarDto();
         given(carRepository.findByNumber(carDto.getNumber())).willReturn(Optional.empty());
         // when
         Throwable thrown = catchThrowable(() -> carManageService.updateCar(carDto));
@@ -268,7 +274,7 @@ public class CarManageServiceTest {
     }
 
     @Test
-    @DisplayName("차량 삭제 실패: 존재하지 않는 차량 번호")
+    @DisplayName("차량 삭제 실패 - 존재하지 않는 차량 번호")
     public void deleteCarFail1() {
         // given
         String number = "34나1234";
@@ -283,7 +289,7 @@ public class CarManageServiceTest {
     }
 
     @Test
-    @DisplayName("모든 삭제 실패: 저장 실패")
+    @DisplayName("모든 삭제 실패 - 저장 실패")
     public void deleteCarFail2() {
         // given
         CarModel carModel = makeCarModel();

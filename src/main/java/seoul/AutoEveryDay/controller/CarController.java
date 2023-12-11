@@ -32,7 +32,7 @@ public class CarController {
     public String rentalGet(Model model) {
         List<CarDto> carDtoList = carManageService.getAllCar();
         model.addAttribute("carList", carDtoList);
-        Map<String, List<RentalHistory>> rentalHistoryMap = carRentalService.getRentalHistory(carDtoList);
+        Map<Long, List<RentalHistory>> rentalHistoryMap = carRentalService.getRentalHistory(carDtoList);
         model.addAttribute("rentalListMap", rentalHistoryMap);
         model.addAttribute("minDay", LocalDate.now());
         model.addAttribute("maxDay", LocalDate.now().plusDays(7));
