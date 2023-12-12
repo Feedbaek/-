@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import seoul.AutoEveryDay.entity.Car;
 import seoul.AutoEveryDay.entity.CarModel;
-import seoul.AutoEveryDay.entity.TestTrack;
+import seoul.AutoEveryDay.entity.Track;
 import seoul.AutoEveryDay.repository.CarModelRepository;
 import seoul.AutoEveryDay.repository.CarRepository;
-import seoul.AutoEveryDay.repository.TestTrackRepository;
+import seoul.AutoEveryDay.repository.TrackRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 public class SetupDummyData {
     private final CarRepository carRepository;
     private final CarModelRepository carModelRepository;
-    private final TestTrackRepository testTrackRepository;
+    private final TrackRepository trackRepository;
 
     @PostConstruct
     @Transactional
@@ -114,7 +114,7 @@ public class SetupDummyData {
     @Transactional
     public void setupTestTrack() { // 테스트 트랙 더미
         for (int i = 0; i < 10; i++) {
-            testTrackRepository.save(TestTrack.builder()
+            trackRepository.save(Track.builder()
                     .name("테스트 트랙" + i)
                     .description("테스트 트랙 설명" + i)
                     .build());
@@ -125,7 +125,7 @@ public class SetupDummyData {
     @Transactional
     public void setupChargeSpot() { // 주유구 더미
         for (int i = 0; i < 10; i++) {
-            testTrackRepository.save(TestTrack.builder()
+            trackRepository.save(Track.builder()
                     .name("주유구" + i)
                     .description("주유구 설명" + i)
                     .build());

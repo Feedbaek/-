@@ -6,13 +6,13 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "test_track")
+@Table(name = "track")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TestTrack {
+public class Track {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,6 +21,6 @@ public class TestTrack {
     String name;
     @Column(name = "description")
     String description;
-    @OneToMany(mappedBy = "testTrack", cascade = CascadeType.ALL)
-    private List<TestHistory> testHistories;
+    @OneToMany(mappedBy = "track", cascade = CascadeType.ALL)
+    private List<DriveHistory> driveHistories;
 }

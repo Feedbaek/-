@@ -6,13 +6,13 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "test_history")
+@Table(name = "drive_history")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TestHistory {
+public class DriveHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,8 +22,8 @@ public class TestHistory {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "test_track_id", nullable = false)
-    private TestTrack testTrack;
+    @JoinColumn(name = "track_id", nullable = false)
+    private Track track;
 
     @Column(name = "date", nullable = false)
     private LocalDate date;

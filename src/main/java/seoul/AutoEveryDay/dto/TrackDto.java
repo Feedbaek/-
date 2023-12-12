@@ -3,17 +3,15 @@ package seoul.AutoEveryDay.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-import java.time.LocalDate;
-
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TestHistoryDto {
+public class TrackDto {
     private Long id;
     @NotBlank
-    private Long testTrackId;
+    private String name;
     @NotBlank
-    private LocalDate date;
+    private String description;
 }
