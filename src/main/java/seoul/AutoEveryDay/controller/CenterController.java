@@ -38,7 +38,7 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
         User user = userService.getLoginUser();
         return JsonBody.builder()
                 .message("예약 성공")
-                .data(trackService.createTestHistory(driveHistoryDto, user))
+                .data(trackService.createDriveHistory(driveHistoryDto, user))
                 .build();
     }
     @ResponseBody
@@ -47,7 +47,7 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
         User user = userService.getLoginUser();
         return JsonBody.builder()
                 .message("예약 취소 성공")
-                .data(trackService.deleteTestHistory(driveHistoryDto, user))
+                .data(trackService.deleteDriveHistory(driveHistoryDto, user))
                 .build();
     }
 
@@ -92,10 +92,10 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
     @ResponseBody
     @PreAuthorize(value = "hasAuthority('ADMIN')")
     @DeleteMapping("/track/manage")  // 테스트 트랙 삭제
-    public JsonBody manageDelete(@RequestParam String name) {
+    public JsonBody manageDelete(@RequestParam Long id) {
         return JsonBody.builder()
                 .message("테스트 트랙 삭제 성공")
-                .data(trackService.deleteTestTrack(name))
+                .data(trackService.deleteTestTrack(id))
                 .build();
     }
 }

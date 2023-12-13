@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class DriveHistoryDto {
     private Long id;
+    private Long userId;
     @NotBlank
     private Long trackId;
     @NotBlank

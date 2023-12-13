@@ -12,4 +12,6 @@ public interface DriveHistoryRepository extends JpaRepository<DriveHistory, Long
     Optional<DriveHistory> findByTrackIdAndDate(Long trackId, LocalDate time);
 
     Optional<DriveHistory> findByUserIdAndTrackIdAndDate(Long userId, Long trackId, LocalDate time);
+
+    boolean existsByTrackId(Long trackId);
 }
