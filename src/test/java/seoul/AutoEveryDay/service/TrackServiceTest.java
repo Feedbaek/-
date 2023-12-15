@@ -22,7 +22,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.BDDMockito.given;
-import static seoul.AutoEveryDay.service.CarRentalServiceTest.makeUser;
+import static seoul.AutoEveryDay.service.LoginServiceTest.makeUser;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("TrackService 테스트")

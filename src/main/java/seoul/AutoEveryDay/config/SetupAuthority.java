@@ -11,6 +11,7 @@ import seoul.AutoEveryDay.entity.Role;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.entity.UserGroup;
 import seoul.AutoEveryDay.enums.PrivilegeEnum;
+import seoul.AutoEveryDay.enums.UserGroupEnum;
 import seoul.AutoEveryDay.repository.PrivilegeRepository;
 import seoul.AutoEveryDay.repository.RoleRepository;
 import seoul.AutoEveryDay.repository.UserGroupRepository;
@@ -20,6 +21,8 @@ import java.util.*;
 
 import static seoul.AutoEveryDay.enums.PrivilegeEnum.*;
 import static seoul.AutoEveryDay.enums.RoleEnum.*;
+import static seoul.AutoEveryDay.enums.UserGroupEnum.GROUP_ADMIN;
+import static seoul.AutoEveryDay.enums.UserGroupEnum.GROUP_AUTOEVER;
 
 @Component
 @RequiredArgsConstructor
@@ -61,20 +64,23 @@ public class SetupAuthority implements
         Role advancedRole = createRoleIfNotFound(ROLE_ADVANCED_USER.getValue(), advancedUserPrivileges);
         Role basicRole = createRoleIfNotFound(ROLE_USER.getValue(), userPrivileges);
 
+        // 그룹 생성
+        List<UserGroup> allUserGroups = Arrays.stream(UserGroupEnum.values())
+                .map(UserGroupEnum::getValue)
+                .map(this::createUserGroupIfNotFound)
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
         // 관리자 그룹 생성
-        UserGroup adminGroup = userGroupRepository.save(UserGroup.builder()
-                .name("관리자")
-                .build());
+        UserGroup adminGroup = createUserGroupIfNotFound(GROUP_ADMIN.getValue());
 
         // 현대오토에버 그룹 생성
-        UserGroup autoEverGroup = userGroupRepository.save(UserGroup.builder()
-                .name("현대오토에버")
-                .build());
+        UserGroup autoEverGroup = createUserGroupIfNotFound(GROUP_AUTOEVER.getValue());
 
         // admin 계정 생성
         User user = new User();
         user.setUsername("admin");
         user.setPassword(passwordEncoder.encode("1234"));
+        user.setName("관리자");
         user.setRoles(Collections.singleton(adminRole));
         user.setUserGroup(adminGroup);
         userRepository.save(user);
@@ -83,6 +89,7 @@ public class SetupAuthority implements
         User autoEverUser = new User();
         autoEverUser.setUsername("user");
         autoEverUser.setPassword(passwordEncoder.encode("1234"));
+        autoEverUser.setName("김민석");
         autoEverUser.setRoles(Collections.singleton(basicRole));
         autoEverUser.setUserGroup(autoEverGroup);
         userRepository.save(autoEverUser);
@@ -114,5 +121,17 @@ public class SetupAuthority implements
             roleRepository.save(role);
         }
         return role;
+    }
+
+    @Transactional
+    public UserGroup createUserGroupIfNotFound(String name) {
+        UserGroup userGroup = userGroupRepository.findByName(name).orElse(null);
+        if (userGroup == null) {
+            userGroup = UserGroup.builder()
+                    .name(name)
+                    .build();
+            userGroupRepository.save(userGroup);
+        }
+        return userGroup;
     }
 }

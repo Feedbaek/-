@@ -25,6 +25,9 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "name", nullable = false)
+    private String name;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_group_id")
     private UserGroup userGroup;

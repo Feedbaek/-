@@ -19,7 +19,9 @@ import seoul.AutoEveryDay.dto.RegisterReq;
 import seoul.AutoEveryDay.entity.Privilege;
 import seoul.AutoEveryDay.entity.Role;
 import seoul.AutoEveryDay.entity.User;
+import seoul.AutoEveryDay.entity.UserGroup;
 import seoul.AutoEveryDay.repository.RoleRepository;
+import seoul.AutoEveryDay.repository.UserGroupRepository;
 import seoul.AutoEveryDay.repository.UserRepository;
 
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ import static seoul.AutoEveryDay.enums.RoleEnum.ROLE_USER;
 @RequiredArgsConstructor
 public class LoginService implements UserDetailsService {
     private final UserRepository userRepository;
+    private final UserGroupRepository userGroupRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -62,8 +65,11 @@ public class LoginService implements UserDetailsService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "로그인된 사용자를 찾을 수 없습니다."));
     }
 
-    public void validateDuplicateUser(User user) {
-        userRepository.findByUsername(user.getUsername())
+    public void validateUsername(String username) {
+        if (username.length() > 20) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "아이디는 20자 이하로 입력해주세요.");
+        }
+        userRepository.findByUsername(username)
             .ifPresent(m -> {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 회원입니다.");
             });
@@ -79,21 +85,29 @@ public class LoginService implements UserDetailsService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."));
     }
 
+    public List<String> findAllGroupNames() {
+        return userGroupRepository.findAllNames();
+    }
+
+
     // 기본 유저로 회원가입
-    public void register(RegisterReq registerReq) {
-        if (registerReq.getUsername().length() > 20) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "아이디는 20자 이하로 입력해주세요.");
-        }
+    public User register(RegisterReq registerReq) {
+        validateUsername(registerReq.getUsername());
+        UserGroup userGroup = userGroupRepository.findByName(registerReq.getUserGroup())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "유효한 그룹이 아닙니다."));
         Role role = roleRepository.findByName(ROLE_USER.getValue())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입에 실패했습니다."));
+
         User user = User.builder()
                 .username(registerReq.getUsername())
                 .password(passwordEncoder.encode(registerReq.getPassword()))
+                .name(registerReq.getName())
+                .userGroup(userGroup)
                 .roles(Collections.singleton(role))
                 .build();
-        validateDuplicateUser(user);
         try {
             userRepository.save(user);
+            return user;
         } catch (Exception e) {
             log.error("회원가입 실패", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입에 실패했습니다.");

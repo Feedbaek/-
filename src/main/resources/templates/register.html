@@ -25,6 +25,16 @@
                         <label for="password">Password</label>
                         <input type="password" class="form-control" id="password" name="password" required>
                     </div>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userGroup">User Group</label>
+                        <select class="form-control" id="userGroup" name="userGroup" required>
+                            <option th:each="groupName : ${groupNameList}" th:value="${groupName}" th:text="${groupName}"></option>
+                        </select>
+                    </div>
                     <button type="submit" class="btn btn-primary w-100">회원가입</button>
                 </form>
             </div>

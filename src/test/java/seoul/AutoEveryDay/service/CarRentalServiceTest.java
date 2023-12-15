@@ -22,6 +22,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.mockito.BDDMockito.given;
 import static seoul.AutoEveryDay.service.CarManageServiceTest.*;
+import static seoul.AutoEveryDay.service.LoginServiceTest.makeUser;
+import static seoul.AutoEveryDay.service.LoginServiceTest.makeUserGroup;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("차량 대여 서비스 테스트")
@@ -31,37 +33,12 @@ public class CarRentalServiceTest {
     @Mock
     private RentalHistoryRepository rentalHistoryRepository;
 
-    public static UserGroup makeUserGroup() {
-        return UserGroup.builder()
-                .id(1L)
-                .name("userGroup1")
-                .build();
-    }
-
-    public static User makeUser(UserGroup userGroup) {
-        return User.builder()
-                .id(1L)
-                .username("user1")
-                .password("1234")
-                .userGroup(userGroup)
-                .build();
-    }
-
-    public static User makeUser() {
-        return User.builder()
-                .id(1L)
-                .username("user1")
-                .password("1234")
-                .userGroup(makeUserGroup())
-                .build();
-    }
-
     public static RentCarDto makeRentCarDto(Car car) {
         return RentCarDto.builder()
                 .id(1L)
                 .carId(car.getId())
-                .pickupDate(LocalDate.now().plusDays(1))
-                .returnDate(LocalDate.now().plusDays(8))
+                .pickupDate(LocalDate.now())
+                .returnDate(LocalDate.now().plusDays(7))
                 .build();
     }
 
@@ -69,8 +46,8 @@ public class CarRentalServiceTest {
         return RentCarDto.builder()
                 .id(1L)
                 .carId(1L)
-                .pickupDate(LocalDate.now().plusDays(1))
-                .returnDate(LocalDate.now().plusDays(8))
+                .pickupDate(LocalDate.now())
+                .returnDate(LocalDate.now().plusDays(7))
                 .build();
     }
 
@@ -79,8 +56,8 @@ public class CarRentalServiceTest {
                 .id(1L)
                 .user(user)
                 .car(car)
-                .pickupDate(LocalDate.now().plusDays(1))
-                .returnDate(LocalDate.now().plusDays(8))
+                .pickupDate(LocalDate.now())
+                .returnDate(LocalDate.now().plusDays(7))
                 .build();
     }
 
@@ -89,8 +66,8 @@ public class CarRentalServiceTest {
                 .id(1L)
                 .user(makeUser(makeUserGroup()))
                 .car(makeCar(makeCarModel()))
-                .pickupDate(LocalDate.now().plusDays(1))
-                .returnDate(LocalDate.now().plusDays(8))
+                .pickupDate(LocalDate.now())
+                .returnDate(LocalDate.now().plusDays(7))
                 .build();
     }
 
@@ -247,7 +224,7 @@ public class CarRentalServiceTest {
     }
 
     @Test
-    @DisplayName("차량 반납 실패 - 아직 대여하지 않음")
+    @DisplayName("차량 반납 실패 - 아직 대여일이 되지 않음")
     public void returnCarFail3() {
         // given
         User user = makeUser();
@@ -263,7 +240,7 @@ public class CarRentalServiceTest {
         Throwable thrown = catchThrowable(() -> carRentalService.returnCar(rentCarDto, user, makeCar()));
 
         // then
-        assertThat(thrown).isInstanceOf(ResponseStatusException.class).hasMessage("400 BAD_REQUEST \"아직 대여하지 않은 차량입니다.\"");
+        assertThat(thrown).isInstanceOf(ResponseStatusException.class).hasMessage("400 BAD_REQUEST \"아직 대여일이 되지 않은 차량입니다.\"");
     }
     @Test
     @DisplayName("차량 대여 내역 조회 - 오늘 이후로만 조회")

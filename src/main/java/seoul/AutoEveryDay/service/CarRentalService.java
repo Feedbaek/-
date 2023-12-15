@@ -82,7 +82,7 @@ public class CarRentalService {
         }
         if (rentalHistory.getPickupDate().isAfter(LocalDate.now())) {
             log.error("아직 대여하지 않은 차량입니다.");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "아직 대여하지 않은 차량입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "아직 대여일이 되지 않은 차량입니다.");
         }
 
         rentalHistory.setReturnDate(LocalDate.now());
