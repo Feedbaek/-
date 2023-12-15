@@ -14,15 +14,10 @@ import seoul.AutoEveryDay.service.LoginService;
 @Controller
 @RequiredArgsConstructor
 @PreAuthorize(value = "hasAuthority('ADMIN')")
-@RequestMapping("/admin")
+@RequestMapping("/authorize")
 public class AuthorizeController {
     private final LoginService loginService;
     private final AuthorizeService authorizeService;
-
-    @GetMapping("")
-    public String admin() {
-        return "admin";
-    }
 
     @GetMapping("/user")
     public String user() {

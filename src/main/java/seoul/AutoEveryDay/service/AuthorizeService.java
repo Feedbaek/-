@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import seoul.AutoEveryDay.entity.Privilege;
 import seoul.AutoEveryDay.entity.Role;
@@ -13,6 +14,7 @@ import seoul.AutoEveryDay.repository.RoleRepository;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 @Slf4j(topic = "AuthorizeService")
 public class AuthorizeService {
     private final RoleRepository roleRepository;

@@ -8,7 +8,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterReq {
+public class UserDto {
+    private Long id;
     @NotBlank
     private String username;
     @NotBlank

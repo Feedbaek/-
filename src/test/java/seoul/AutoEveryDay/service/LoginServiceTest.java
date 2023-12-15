@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import seoul.AutoEveryDay.dto.RegisterReq;
+import seoul.AutoEveryDay.dto.UserDto;
 import seoul.AutoEveryDay.entity.Role;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.entity.UserGroup;
@@ -46,8 +46,8 @@ public class LoginServiceTest {
         passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    public RegisterReq makeRegisterReq() {
-        return RegisterReq.builder()
+    public UserDto makeRegisterReq() {
+        return UserDto.builder()
                 .username("test")
                 .password("test")
                 .name("테스터")
@@ -91,11 +91,11 @@ public class LoginServiceTest {
     @DisplayName("회원가입 테스트")
     public void registerTest() {
         // given
-        RegisterReq registerReq = makeRegisterReq();
+        UserDto userDto = makeRegisterReq();
         UserGroup userGroup = makeUserGroup();
         Role role = makeRole();
 
-        given(userGroupRepository.findByName(registerReq.getUserGroup())).willReturn(Optional.of(userGroup));
+        given(userGroupRepository.findByName(userDto.getUserGroup())).willReturn(Optional.of(userGroup));
         given(roleRepository.findByName(ROLE_USER.getValue())).willReturn(Optional.of(role));
         given(userRepository.save(Mockito.any(User.class))).will(invocation -> {
             User user = invocation.getArgument(0);
@@ -104,14 +104,14 @@ public class LoginServiceTest {
         });
 
         // when
-        User user = loginService.register(registerReq);
+        User user = loginService.register(userDto);
 
         // then
         assertThat(user.getId()).isEqualTo(1L);
-        assertThat(user.getUsername()).isEqualTo(registerReq.getUsername());
-        assertThat(user.getPassword()).isEqualTo(passwordEncoder.encode(registerReq.getPassword()));
-        assertThat(user.getName()).isEqualTo(registerReq.getName());
-        assertThat(user.getUserGroup().getName()).isEqualTo(registerReq.getUserGroup());
+        assertThat(user.getUsername()).isEqualTo(userDto.getUsername());
+        assertThat(user.getPassword()).isEqualTo(passwordEncoder.encode(userDto.getPassword()));
+        assertThat(user.getName()).isEqualTo(userDto.getName());
+        assertThat(user.getUserGroup().getName()).isEqualTo(userDto.getUserGroup());
     }
 
     @Test

@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import seoul.AutoEveryDay.dto.RegisterReq;
+import seoul.AutoEveryDay.dto.UserDto;
 import seoul.AutoEveryDay.entity.Privilege;
 import seoul.AutoEveryDay.entity.Role;
 import seoul.AutoEveryDay.entity.User;
@@ -65,6 +65,24 @@ public class LoginService implements UserDetailsService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "로그인된 사용자를 찾을 수 없습니다."));
     }
 
+    public UserDto getLoginUserDto() {
+        User user = getLoginUser();
+        return UserDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .name(user.getName())
+                .userGroup(user.getUserGroup().getName())
+                .build();
+    }
+
+    public List<String> getLoginUserRoles() {
+        User user = getLoginUser();
+        List<String> roles = new ArrayList<>();
+        user.getRoles().forEach(role -> roles.add(role.getName()));
+        return roles;
+    }
+
     public void validateUsername(String username) {
         if (username.length() > 20) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "아이디는 20자 이하로 입력해주세요.");
@@ -91,17 +109,17 @@ public class LoginService implements UserDetailsService {
 
 
     // 기본 유저로 회원가입
-    public User register(RegisterReq registerReq) {
-        validateUsername(registerReq.getUsername());
-        UserGroup userGroup = userGroupRepository.findByName(registerReq.getUserGroup())
+    public User register(UserDto userDto) {
+        validateUsername(userDto.getUsername());
+        UserGroup userGroup = userGroupRepository.findByName(userDto.getUserGroup())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "유효한 그룹이 아닙니다."));
         Role role = roleRepository.findByName(ROLE_USER.getValue())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입에 실패했습니다."));
 
         User user = User.builder()
-                .username(registerReq.getUsername())
-                .password(passwordEncoder.encode(registerReq.getPassword()))
-                .name(registerReq.getName())
+                .username(userDto.getUsername())
+                .password(passwordEncoder.encode(userDto.getPassword()))
+                .name(userDto.getName())
                 .userGroup(userGroup)
                 .roles(Collections.singleton(role))
                 .build();
