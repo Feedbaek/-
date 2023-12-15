@@ -8,12 +8,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
-import seoul.AutoEveryDay.dto.DriveHistoryDto;
+import seoul.AutoEveryDay.dto.ReserveHistoryDto;
 import seoul.AutoEveryDay.dto.TrackDto;
-import seoul.AutoEveryDay.entity.DriveHistory;
+import seoul.AutoEveryDay.entity.ReserveHistory;
 import seoul.AutoEveryDay.entity.Track;
 import seoul.AutoEveryDay.entity.User;
-import seoul.AutoEveryDay.repository.DriveHistoryRepository;
+import seoul.AutoEveryDay.repository.ReserveHistoryRepository;
 import seoul.AutoEveryDay.repository.TrackRepository;
 
 import java.time.LocalDate;
@@ -32,7 +32,7 @@ public class TrackServiceTest {
     @Mock
     private TrackRepository trackRepository;
     @Mock
-    private DriveHistoryRepository driveHistoryRepository;
+    private ReserveHistoryRepository reserveHistoryRepository;
 
     public static TrackDto makeTrackDto() {
         return TrackDto.builder()
@@ -49,8 +49,8 @@ public class TrackServiceTest {
                 .build();
     }
 
-    public static DriveHistoryDto makeDriveHistoryDto() {
-        return DriveHistoryDto.builder()
+    public static ReserveHistoryDto makeDriveHistoryDto() {
+        return ReserveHistoryDto.builder()
                 .id(1L)
                 .userId(1L)
                 .trackId(1L)
@@ -196,7 +196,7 @@ public class TrackServiceTest {
         Track track = makeTrack();
 
         given(trackRepository.findById(trackDto.getId())).willReturn(Optional.of(track));
-        given(driveHistoryRepository.existsByTrackId(track.getId())).willReturn(true);
+        given(reserveHistoryRepository.existsByTrackId(track.getId())).willReturn(true);
 
         // when
         Throwable thrown = catchThrowable(() -> trackService.deleteTestTrack(trackDto.getId()));
@@ -230,25 +230,25 @@ public class TrackServiceTest {
         // given
         Track track = makeTrack();
         TrackDto trackDto = makeTrackDto();
-        DriveHistoryDto driveHistoryDto = makeDriveHistoryDto();
+        ReserveHistoryDto reserveHistoryDto = makeDriveHistoryDto();
         User user = makeUser();
 
-        given(driveHistoryRepository.findByTrackIdAndDate(track.getId(), driveHistoryDto.getDate())).willReturn(Optional.empty());
+        given(reserveHistoryRepository.findByTrackIdAndDate(track.getId(), reserveHistoryDto.getDate())).willReturn(Optional.empty());
         given(trackRepository.findById(track.getId())).willReturn(Optional.of(track));
-        given(driveHistoryRepository.save(Mockito.any(DriveHistory.class))).will((invocation) -> {
-            DriveHistory d = invocation.getArgument(0);
+        given(reserveHistoryRepository.save(Mockito.any(ReserveHistory.class))).will((invocation) -> {
+            ReserveHistory d = invocation.getArgument(0);
             d.setId(1L);
             return d;
         });
 
         // when
-        DriveHistoryDto res = trackService.createDriveHistory(driveHistoryDto, user);
+        ReserveHistoryDto res = trackService.createReserveHistory(reserveHistoryDto, user);
 
         // then
         assertThat(res.getId()).isEqualTo(1L);
         assertThat(res.getUserId()).isEqualTo(user.getId());
         assertThat(res.getTrackId()).isEqualTo(trackDto.getId());
-        assertThat(res.getDate()).isEqualTo(driveHistoryDto.getDate());
+        assertThat(res.getDate()).isEqualTo(reserveHistoryDto.getDate());
     }
 
     @Test
@@ -256,12 +256,12 @@ public class TrackServiceTest {
     void createTestHistoryFail() {
         // given
         Track track = makeTrack();
-        DriveHistoryDto driveHistoryDto = makeDriveHistoryDto();
+        ReserveHistoryDto reserveHistoryDto = makeDriveHistoryDto();
         User user = makeUser();
-        driveHistoryDto.setDate(LocalDate.now().minusDays(1));
+        reserveHistoryDto.setDate(LocalDate.now().minusDays(1));
 
         // when
-        Throwable thrown = catchThrowable(() -> trackService.createDriveHistory(driveHistoryDto, user));
+        Throwable thrown = catchThrowable(() -> trackService.createReserveHistory(reserveHistoryDto, user));
 
         // then
         assertThat(thrown).isInstanceOf(ResponseStatusException.class);
@@ -273,13 +273,13 @@ public class TrackServiceTest {
     void createTestHistoryFail2() {
         // given
         Track track = makeTrack();
-        DriveHistoryDto driveHistoryDto = makeDriveHistoryDto();
+        ReserveHistoryDto reserveHistoryDto = makeDriveHistoryDto();
         User user = makeUser();
 
-        given(driveHistoryRepository.findByTrackIdAndDate(track.getId(), driveHistoryDto.getDate())).willReturn(Optional.of(DriveHistory.builder().build()));
+        given(reserveHistoryRepository.findByTrackIdAndDate(track.getId(), reserveHistoryDto.getDate())).willReturn(Optional.of(ReserveHistory.builder().build()));
 
         // when
-        Throwable thrown = catchThrowable(() -> trackService.createDriveHistory(driveHistoryDto, user));
+        Throwable thrown = catchThrowable(() -> trackService.createReserveHistory(reserveHistoryDto, user));
 
         // then
         assertThat(thrown).isInstanceOf(ResponseStatusException.class);
@@ -291,14 +291,14 @@ public class TrackServiceTest {
     void createTestHistoryFail3() {
         // given
         Track track = makeTrack();
-        DriveHistoryDto driveHistoryDto = makeDriveHistoryDto();
+        ReserveHistoryDto reserveHistoryDto = makeDriveHistoryDto();
         User user = makeUser();
 
-        given(driveHistoryRepository.findByTrackIdAndDate(track.getId(), driveHistoryDto.getDate())).willReturn(Optional.empty());
+        given(reserveHistoryRepository.findByTrackIdAndDate(track.getId(), reserveHistoryDto.getDate())).willReturn(Optional.empty());
         given(trackRepository.findById(track.getId())).willReturn(Optional.empty());
 
         // when
-        Throwable thrown = catchThrowable(() -> trackService.createDriveHistory(driveHistoryDto, user));
+        Throwable thrown = catchThrowable(() -> trackService.createReserveHistory(reserveHistoryDto, user));
 
         // then
         assertThat(thrown).isInstanceOf(ResponseStatusException.class);
@@ -310,33 +310,33 @@ public class TrackServiceTest {
     void deleteTestHistory() {
         // given
         Track track = makeTrack();
-        DriveHistoryDto driveHistoryDto = makeDriveHistoryDto();
+        ReserveHistoryDto reserveHistoryDto = makeDriveHistoryDto();
         User user = makeUser();
 
-        given(trackRepository.findById(driveHistoryDto.getId())).willReturn(Optional.of(track));
-        given(driveHistoryRepository.findByUserIdAndTrackIdAndDate(user.getId(), track.getId(), driveHistoryDto.getDate())).willReturn(Optional.of(DriveHistory.builder().build()));
+        given(trackRepository.findById(reserveHistoryDto.getId())).willReturn(Optional.of(track));
+        given(reserveHistoryRepository.findByUserIdAndTrackIdAndDate(user.getId(), track.getId(), reserveHistoryDto.getDate())).willReturn(Optional.of(ReserveHistory.builder().build()));
 
         // when
-        DriveHistoryDto res = trackService.deleteDriveHistory(driveHistoryDto, user);
+        ReserveHistoryDto res = trackService.deleteReserveHistory(reserveHistoryDto, user);
 
         // then
-        assertThat(res.getId()).isEqualTo(driveHistoryDto.getId());
-        assertThat(res.getUserId()).isEqualTo(driveHistoryDto.getUserId());
-        assertThat(res.getTrackId()).isEqualTo(driveHistoryDto.getTrackId());
-        assertThat(res.getDate()).isEqualTo(driveHistoryDto.getDate());
+        assertThat(res.getId()).isEqualTo(reserveHistoryDto.getId());
+        assertThat(res.getUserId()).isEqualTo(reserveHistoryDto.getUserId());
+        assertThat(res.getTrackId()).isEqualTo(reserveHistoryDto.getTrackId());
+        assertThat(res.getDate()).isEqualTo(reserveHistoryDto.getDate());
     }
 
     @Test
     @DisplayName("예약 삭제 실패 - 찾을 수 없는 트랙")
     void deleteTestHistoryFail() {
         // given
-        DriveHistoryDto driveHistoryDto = makeDriveHistoryDto();
+        ReserveHistoryDto reserveHistoryDto = makeDriveHistoryDto();
         User user = makeUser();
 
-        given(trackRepository.findById(driveHistoryDto.getId())).willReturn(Optional.empty());
+        given(trackRepository.findById(reserveHistoryDto.getId())).willReturn(Optional.empty());
 
         // when
-        Throwable thrown = catchThrowable(() -> trackService.deleteDriveHistory(driveHistoryDto, user));
+        Throwable thrown = catchThrowable(() -> trackService.deleteReserveHistory(reserveHistoryDto, user));
 
         // then
         assertThat(thrown).isInstanceOf(ResponseStatusException.class);
@@ -348,14 +348,14 @@ public class TrackServiceTest {
     void deleteTestHistoryFail2() {
         // given
         Track track = makeTrack();
-        DriveHistoryDto driveHistoryDto = makeDriveHistoryDto();
+        ReserveHistoryDto reserveHistoryDto = makeDriveHistoryDto();
         User user = makeUser();
 
-        given(trackRepository.findById(driveHistoryDto.getId())).willReturn(Optional.of(track));
-        given(driveHistoryRepository.findByUserIdAndTrackIdAndDate(user.getId(), track.getId(), driveHistoryDto.getDate())).willReturn(Optional.empty());
+        given(trackRepository.findById(reserveHistoryDto.getId())).willReturn(Optional.of(track));
+        given(reserveHistoryRepository.findByUserIdAndTrackIdAndDate(user.getId(), track.getId(), reserveHistoryDto.getDate())).willReturn(Optional.empty());
 
         // when
-        Throwable thrown = catchThrowable(() -> trackService.deleteDriveHistory(driveHistoryDto, user));
+        Throwable thrown = catchThrowable(() -> trackService.deleteReserveHistory(reserveHistoryDto, user));
 
         // then
         assertThat(thrown).isInstanceOf(ResponseStatusException.class);

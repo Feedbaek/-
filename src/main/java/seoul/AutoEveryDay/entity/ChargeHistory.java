@@ -2,6 +2,9 @@ package seoul.AutoEveryDay.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "charge_history")
@@ -29,4 +32,8 @@ public class ChargeHistory {
 
     @Column(name = "amount", nullable = false)
     private Integer amount; // 리터 단위
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 }

@@ -6,13 +6,13 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "drive_history")
+@Table(name = "reserve_history")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DriveHistory {
+public class ReserveHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

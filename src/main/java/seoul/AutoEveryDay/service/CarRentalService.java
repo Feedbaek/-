@@ -80,6 +80,11 @@ public class CarRentalService {
             log.error("이미 반납된 차량입니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 반납된 차량입니다.");
         }
+        if (rentalHistory.getPickupDate().isAfter(LocalDate.now())) {
+            log.error("아직 대여하지 않은 차량입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "아직 대여하지 않은 차량입니다.");
+        }
+
         rentalHistory.setReturnDate(LocalDate.now());
         return RentCarDto.builder()
                 .id(rentalHistory.getId())

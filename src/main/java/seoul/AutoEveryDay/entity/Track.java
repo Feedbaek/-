@@ -22,5 +22,5 @@ public class Track {
     @Column(name = "description")
     String description;
     @OneToMany(mappedBy = "track", cascade = CascadeType.ALL)
-    private List<DriveHistory> driveHistories;
+    private List<ReserveHistory> reserveHistories;
 }

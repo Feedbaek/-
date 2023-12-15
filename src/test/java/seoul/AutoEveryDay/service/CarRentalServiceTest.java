@@ -247,6 +247,25 @@ public class CarRentalServiceTest {
     }
 
     @Test
+    @DisplayName("차량 반납 실패 - 아직 대여하지 않음")
+    public void returnCarFail3() {
+        // given
+        User user = makeUser();
+        Car car = makeCar();
+        RentCarDto rentCarDto = makeRentCarDto();
+        RentalHistory rentalHistory = makeRentalHistory();
+        rentalHistory.setPickupDate(LocalDate.now().plusDays(1));
+
+        given(rentalHistoryRepository.findByUserIdAndCarIdAndPickupDateAndReturnDate
+                (user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate())).willReturn(Optional.of(rentalHistory)); // 대여 기록이 있는 상태
+
+        // when
+        Throwable thrown = catchThrowable(() -> carRentalService.returnCar(rentCarDto, user, makeCar()));
+
+        // then
+        assertThat(thrown).isInstanceOf(ResponseStatusException.class).hasMessage("400 BAD_REQUEST \"아직 대여하지 않은 차량입니다.\"");
+    }
+    @Test
     @DisplayName("차량 대여 내역 조회 - 오늘 이후로만 조회")
     public void getRentalHistory() {
         // given

@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import seoul.AutoEveryDay.dto.TrackDto;
-import seoul.AutoEveryDay.dto.DriveHistoryDto;
+import seoul.AutoEveryDay.dto.ReserveHistoryDto;
 import seoul.AutoEveryDay.entity.Track;
-import seoul.AutoEveryDay.entity.DriveHistory;
+import seoul.AutoEveryDay.entity.ReserveHistory;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.repository.TrackRepository;
-import seoul.AutoEveryDay.repository.DriveHistoryRepository;
+import seoul.AutoEveryDay.repository.ReserveHistoryRepository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,13 +23,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TrackService {
     private final TrackRepository trackRepository;
-    private final DriveHistoryRepository driveHistoryRepository;
+    private final ReserveHistoryRepository reserveHistoryRepository;
 
-    private void validateDriveHistory(DriveHistoryDto testHistory, User user) {
+    private void validateReserveHistory(ReserveHistoryDto testHistory, User user) {
         if (testHistory.getDate().isBefore(LocalDate.now())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약은 오늘 이후로만 가능합니다.");
         }
-        if (driveHistoryRepository.findByTrackIdAndDate(user.getId(), testHistory.getDate()).isPresent()) {
+        if (reserveHistoryRepository.findByTrackIdAndDate(user.getId(), testHistory.getDate()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 예약된 날짜입니다.");
         }
     }
@@ -71,7 +71,7 @@ public class TrackService {
     }
     public TrackDto deleteTestTrack(Long id) {
         Track track = getTrack(id);
-        if (driveHistoryRepository.existsByTrackId(track.getId())) {
+        if (reserveHistoryRepository.existsByTrackId(track.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약된 트랙은 삭제할 수 없습니다.");
         }
         try {
@@ -97,37 +97,37 @@ public class TrackService {
     }
 
     // 여기부터 예약 관련
-    public DriveHistoryDto createDriveHistory(DriveHistoryDto driveHistoryDto, User user) {
-        validateDriveHistory(driveHistoryDto, user);
-        Track track = getTrack(driveHistoryDto.getTrackId());
-        DriveHistory driveHistory = DriveHistory.builder()
+    public ReserveHistoryDto createReserveHistory(ReserveHistoryDto reserveHistoryDto, User user) {
+        validateReserveHistory(reserveHistoryDto, user);
+        Track track = getTrack(reserveHistoryDto.getTrackId());
+        ReserveHistory reserveHistory = ReserveHistory.builder()
                 .user(user)
                 .track(track)
-                .date(driveHistoryDto.getDate())
+                .date(reserveHistoryDto.getDate())
                 .build();
         try {
-            driveHistoryRepository.save(driveHistory);
+            reserveHistoryRepository.save(reserveHistory);
         } catch (Exception e) {
             log.error("예약 저장 실패", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "예약 저장 실패");
         }
-        driveHistory.setId(driveHistory.getId());
-        return driveHistoryDto;
+        reserveHistory.setId(reserveHistory.getId());
+        return reserveHistoryDto;
     }
 
-    public DriveHistoryDto deleteDriveHistory(DriveHistoryDto driveHistoryDto, User user) {
-        Track track = getTrack(driveHistoryDto.getTrackId());
-        DriveHistory driveHistory = driveHistoryRepository.findByUserIdAndTrackIdAndDate(user.getId(), track.getId(), driveHistoryDto.getDate()).orElseThrow(
+    public ReserveHistoryDto deleteReserveHistory(ReserveHistoryDto reserveHistoryDto, User user) {
+        Track track = getTrack(reserveHistoryDto.getTrackId());
+        ReserveHistory reserveHistory = reserveHistoryRepository.findByUserIdAndTrackIdAndDate(user.getId(), track.getId(), reserveHistoryDto.getDate()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "예약을 찾을 수 없습니다.")
         );
-        driveHistoryDto.setId(driveHistory.getId());
+        reserveHistoryDto.setId(reserveHistory.getId());
         try {
-            driveHistoryRepository.delete(driveHistory);
+            reserveHistoryRepository.delete(reserveHistory);
         } catch (Exception e) {
             log.error("예약 삭제 실패", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "예약 삭제 실패");
         }
-        return driveHistoryDto;
+        return reserveHistoryDto;
     }
 
 }

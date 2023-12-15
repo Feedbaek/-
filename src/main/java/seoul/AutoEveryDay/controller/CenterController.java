@@ -8,7 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import seoul.AutoEveryDay.dto.JsonBody;
 import seoul.AutoEveryDay.dto.TrackDto;
-import seoul.AutoEveryDay.dto.DriveHistoryDto;
+import seoul.AutoEveryDay.dto.ReserveHistoryDto;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.LoginService;
 import seoul.AutoEveryDay.service.TrackService;
@@ -34,20 +34,20 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
 
     @ResponseBody
     @PostMapping("/track/reserve")  // 테스트 트랙 예약
-    public JsonBody reservePost(@Validated DriveHistoryDto driveHistoryDto) {
+    public JsonBody reservePost(@Validated ReserveHistoryDto reserveHistoryDto) {
         User user = userService.getLoginUser();
         return JsonBody.builder()
                 .message("예약 성공")
-                .data(trackService.createDriveHistory(driveHistoryDto, user))
+                .data(trackService.createReserveHistory(reserveHistoryDto, user))
                 .build();
     }
     @ResponseBody
     @DeleteMapping("/track/reserve")  // 테스트 트랙 예약 취소
-    public JsonBody reserveDelete(@Validated @RequestParam DriveHistoryDto driveHistoryDto) {
+    public JsonBody reserveDelete(@Validated @RequestParam ReserveHistoryDto reserveHistoryDto) {
         User user = userService.getLoginUser();
         return JsonBody.builder()
                 .message("예약 취소 성공")
-                .data(trackService.deleteDriveHistory(driveHistoryDto, user))
+                .data(trackService.deleteReserveHistory(reserveHistoryDto, user))
                 .build();
     }
 
