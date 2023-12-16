@@ -3,6 +3,7 @@ package seoul.AutoEveryDay.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import seoul.AutoEveryDay.dto.JsonBody;
@@ -10,6 +11,8 @@ import seoul.AutoEveryDay.dto.RoleChangeReq;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.AuthorizeService;
 import seoul.AutoEveryDay.service.LoginService;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,8 +22,10 @@ public class AuthorizeController {
     private final LoginService loginService;
     private final AuthorizeService authorizeService;
 
-    @GetMapping("/user")
-    public String user() {
+    @GetMapping("/manage")
+    public String manage(Model model) {
+        List<User> userList = loginService.getAllUser();
+        model.addAttribute("userList", userList);
         return "authorizeManage";
     }
 

@@ -76,6 +76,10 @@ public class LoginService implements UserDetailsService {
                 .build();
     }
 
+    public List<User> getAllUser() {
+        return userRepository.findAll();
+    }
+
     public List<String> getLoginUserRoles() {
         User user = getLoginUser();
         List<String> roles = new ArrayList<>();

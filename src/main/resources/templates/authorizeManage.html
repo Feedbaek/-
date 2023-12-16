@@ -9,87 +9,145 @@
 <!-- Content -->
 <main layout:fragment="content" class="container mt-4">
     <h2>사용자 목록</h2>
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead class="thead-dark">
-            <tr>
-                <th>Name</th>
-                <th>Address</th>
-                <th>Reserve</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="testCenter : ${testCenterList}">
-                <td th:text="${testCenter.name}">Name</td>
-                <td th:text="${testCenter.address}">Address</td>
-                <td>
-                    <button type="button" class="btn btn-primary btn-sm" th:attr="data-target='#reserveModal-' + ${testCenter.id}" data-toggle="modal">예약 하기</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+<!--    <div class="row">-->
+<!--        <ul><li>-->
+<!--            <div class="card bg-light rounded">-->
+<!--                <div class="card-body">-->
+<!--                    <div th:each="user : ${userList}">-->
+<!--                        <div class="col">-->
+<!--                            <div class="text-center">-->
+<!--                                <p th:text="${user.name}"></p>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </li></ul>-->
+<!--    </div>-->
 
+        <div class="container mt-3">
+            <div class="card bg-light rounded">
+                <div class="card-body">
+                    <div class="col">
+                        <h4>Assigned Roles</h4>
+                        <ul id="assignedRoles" class="list-group">
+                            <!-- Dynamically loaded assigned roles will go here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card bg-light rounded">
+                <div class="card-body">
+                    <div class="col">
+                        <h4>Unassigned Roles</h4>
+                        <ul id="unassignedRoles" class="list-group">
+                            <!-- Dynamically loaded unassigned roles will go here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const userList = document.getElementById('userList');
-            const roleUserList = document.getElementById('roleUserList');
-            const roleSelect = document.getElementById('roleSelect');
-            const assignRoleButton = document.getElementById('assignRole');
+        // Example roles
+        const assignedRoles = ['Role 1', 'Role 2'];
+        const unassignedRoles = ['Role 3', 'Role 4'];
 
-            // 사용자 선택 로직 (예시)
-            // 실제 사용자 데이터를 로드하고 userList에 추가하는 로직이 필요합니다.
-
-            // 역할 할당 버튼 이벤트 리스너
-            assignRoleButton.addEventListener('click', function() {
-                const selectedUser = userList.querySelector('li.selected'); // 선택된 사용자
-                const selectedRole = roleSelect.value; // 선택된 역할
-
-                if (selectedUser && selectedRole) {
-                    // 선택된 사용자를 역할별 사용자 리스트에 추가
-                    const userClone = selectedUser.cloneNode(true);
-                    roleUserList.appendChild(userClone);
-                    // 서버에 역할 할당 요청을 보내는 로직이 필요합니다.
-                } else {
-                    alert('Please select a user and a role.');
-                }
+        // Function to initialize the roles in their respective lists
+        function initRoles() {
+            assignedRoles.forEach(role => {
+                $('#assignedRoles').append(`<li class="list-group-item" onclick="toggleRole(this)">${role}</li>`);
             });
+            unassignedRoles.forEach(role => {
+                $('#unassignedRoles').append(`<li class="list-group-item" onclick="toggleRole(this)">${role}</li>`);
+            });
+        }
 
-            // 역할 선택 변경에 따른 사용자 리스트 갱신 로직 (예시)
-            function loadUsers() {
-                fetch('/api/users') // 사용자 데이터를 가져오는 API 경로
-                    .then(response => response.json())
-                    .then(data => {
-                        const userList = document.getElementById('userList');
-                        userList.innerHTML = ''; // 목록 초기화
-                        data.forEach(user => {
-                            const li = document.createElement('li');
-                            li.textContent = user.name; // 사용자 이름 사용
-                            li.setAttribute('data-role', user.role); // 사용자 역할 사용
-                            userList.appendChild(li);
-                        });
-                    })
-                    .catch(error => console.error('Error:', error));
+        // Function to move roles between lists
+        function toggleRole(item) {
+            const parentID = $(item).parent().attr('id');
+            const role = $(item).text();
+
+            if (parentID === 'assignedRoles') {
+                unassignedRoles.push(role);
+                assignedRoles.splice(assignedRoles.indexOf(role), 1);
+            } else {
+                assignedRoles.push(role);
+                unassignedRoles.splice(unassignedRoles.indexOf(role), 1);
             }
 
-            document.addEventListener('DOMContentLoaded', function() {
-                loadUsers(); // 페이지 로드 시 사용자 데이터 로드
-            });
+            // Refresh the lists
+            $('#assignedRoles').empty();
+            $('#unassignedRoles').empty();
+            initRoles();
+        }
 
-            // 선택된 역할에 맞는 사용자들을 roleUserList에 표시하는 로직이 필요합니다.
-            document.getElementById('roleSelect').addEventListener('change', function() {
-                const selectedRole = this.value;
-                const users = document.getElementById('userList').querySelectorAll('li');
-                users.forEach(user => {
-                    if (user.getAttribute('data-role') === selectedRole) {
-                        user.style.display = ''; // 선택된 역할과 일치하면 표시
-                    } else {
-                        user.style.display = 'none'; // 일치하지 않으면 숨김
-                    }
-                });
-            });
-
+        // Initialize roles on document ready
+        $(document).ready(function() {
+            initRoles();
         });
+
+
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     const userList = document.getElementById('userList');
+        //     const roleUserList = document.getElementById('roleUserList');
+        //     const roleSelect = document.getElementById('roleSelect');
+        //     const assignRoleButton = document.getElementById('assignRole');
+        //
+        //     // 사용자 선택 로직 (예시)
+        //     // 실제 사용자 데이터를 로드하고 userList에 추가하는 로직이 필요합니다.
+        //
+        //     // 역할 할당 버튼 이벤트 리스너
+        //     assignRoleButton.addEventListener('click', function() {
+        //         const selectedUser = userList.querySelector('li.selected'); // 선택된 사용자
+        //         const selectedRole = roleSelect.value; // 선택된 역할
+        //
+        //         if (selectedUser && selectedRole) {
+        //             // 선택된 사용자를 역할별 사용자 리스트에 추가
+        //             const userClone = selectedUser.cloneNode(true);
+        //             roleUserList.appendChild(userClone);
+        //             // 서버에 역할 할당 요청을 보내는 로직이 필요합니다.
+        //         } else {
+        //             alert('Please select a user and a role.');
+        //         }
+        //     });
+        //
+        //     // 역할 선택 변경에 따른 사용자 리스트 갱신 로직 (예시)
+        //     function loadUsers() {
+        //         fetch('/api/users') // 사용자 데이터를 가져오는 API 경로
+        //             .then(response => response.json())
+        //             .then(data => {
+        //                 const userList = document.getElementById('userList');
+        //                 userList.innerHTML = ''; // 목록 초기화
+        //                 data.forEach(user => {
+        //                     const li = document.createElement('li');
+        //                     li.textContent = user.name; // 사용자 이름 사용
+        //                     li.setAttribute('data-role', user.role); // 사용자 역할 사용
+        //                     userList.appendChild(li);
+        //                 });
+        //             })
+        //             .catch(error => console.error('Error:', error));
+        //     }
+        //
+        //     document.addEventListener('DOMContentLoaded', function() {
+        //         loadUsers(); // 페이지 로드 시 사용자 데이터 로드
+        //     });
+        //
+        //     // 선택된 역할에 맞는 사용자들을 roleUserList에 표시하는 로직이 필요합니다.
+        //     document.getElementById('roleSelect').addEventListener('change', function() {
+        //         const selectedRole = this.value;
+        //         const users = document.getElementById('userList').querySelectorAll('li');
+        //         users.forEach(user => {
+        //             if (user.getAttribute('data-role') === selectedRole) {
+        //                 user.style.display = ''; // 선택된 역할과 일치하면 표시
+        //             } else {
+        //                 user.style.display = 'none'; // 일치하지 않으면 숨김
+        //             }
+        //         });
+        //     });
+        //
+        // });
     </script>
 
 </main>
