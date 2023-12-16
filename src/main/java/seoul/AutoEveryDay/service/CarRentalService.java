@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import seoul.AutoEveryDay.dto.CarAvailableDate;
 import seoul.AutoEveryDay.dto.CarDto;
 import seoul.AutoEveryDay.dto.RentCarDto;
 import seoul.AutoEveryDay.entity.Car;
@@ -14,6 +15,7 @@ import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.repository.RentalHistoryRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,10 @@ public class CarRentalService {
         if (!rentCarDto.getPickupDate().isBefore(rentCarDto.getReturnDate())) {
             log.error("반납일이 대여일보다 빠르거나 같을 수 없습니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "반납일이 대여일보다 빠르거나 같을 수 없습니다.");
+        }
+        if (rentCarDto.getReturnDate().isAfter(LocalDate.now().plusDays(21))) {
+            log.error("21일 이내로만 신청할 수 있습니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "21 이내로만 신청할 수 있습니다.");
         }
         if (!rentCarDto.getPickupDate().isAfter(rentCarDto.getReturnDate().minusDays(8))) {
             log.error("7일 이내로만 대여할 수 있습니다.");
@@ -129,5 +135,43 @@ public class CarRentalService {
                 .pickupDate(rentalHistory.getPickupDate())
                 .returnDate(rentalHistory.getReturnDate())
                 .build();
+    }
+
+    public List<List<CarAvailableDate>> getAvailableDate(Car car) {
+        List<RentalHistory> unavailableDate = rentalHistoryRepository.findByCarIdAndReturnDateGreaterThan(
+                car.getId(), LocalDate.now());
+        List<List<CarAvailableDate>> availableDate = new ArrayList<>();
+
+        // 3주치 날짜를 미리 만들어놓고, 대여 기록이 있는 날짜는 제거
+        LocalDate now = LocalDate.now();
+        for (int i = 0; i < 5; i++) {
+            availableDate.add(new ArrayList<>());
+            for (int j = 0; j < 7; j++) {
+                LocalDate date = now.plusDays(i * 7 + j);
+
+                CarAvailableDate carAvailableDate = CarAvailableDate.builder()
+                        .day(date.getDayOfMonth())
+                        .available(true)
+                        .build();
+
+                if (i >= 3) {
+                    carAvailableDate.setAvailable(false);
+                    availableDate.get(i).add(carAvailableDate);
+                    continue;
+                }
+
+                // 대여 기록이 있는 날짜를 제거
+                for (RentalHistory rentalHistory : unavailableDate) {
+                    if ((date.isEqual(rentalHistory.getPickupDate()) || date.isAfter(rentalHistory.getPickupDate()))
+                            && date.isBefore(rentalHistory.getReturnDate())) {
+                        carAvailableDate.setAvailable(false);
+                        break;
+                    }
+                }
+                availableDate.get(i).add(carAvailableDate);
+            }
+        }
+
+        return availableDate;
     }
 }

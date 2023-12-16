@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="commonCalendar(dateArr)" class="rounded-lg shadow mt-2"
+     style="overflow: hidden;">
+    <table class="table table-bordered text-center">
+        <thead class="bg-info text-white">
+        <tr>
+            <th>일</th>
+            <th>월</th>
+            <th>화</th>
+            <th>수</th>
+            <th>목</th>
+            <th>금</th>
+            <th>토</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="week : ${dateArr}">
+            <td th:each="date : ${week}" th:text="${date.day}" class="align-middle py-4">
+                <div th:if="${date.available}">
+                    <div th:text="가능"></div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

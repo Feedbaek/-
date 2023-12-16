@@ -41,6 +41,17 @@ public class CarController {
         model.addAttribute("returnDay", LocalDate.now().plusDays(14));
         return "carRental";
     }
+
+    @GetMapping("/rental/{carId}") // 차량 대여 날짜 선택 페이지
+    public String rentalGet(@PathVariable("carId") Long carId, Model model) {
+        Car car = carManageService.getCar(carId);
+        List<List<CarAvailableDate>> dateArr = carRentalService.getAvailableDate(car);
+        model.addAttribute("dateArr", dateArr);
+        model.addAttribute("month", LocalDate.now().getMonthValue());
+        return "carRentalDate";
+    }
+
+
     @ResponseBody
     @PostMapping("/rental") // 차량 대여 신청
     public JsonBody rentalPost(@Validated RentCarDto rentCarDto) {

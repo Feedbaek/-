@@ -16,7 +16,7 @@
         </div>
     </div>
     <!-- 카 테이블 프래그먼트 -->
-    <div th:replace="~{fragments/carTable :: commonTable(${carListTitles}, ${carList}, false, true)}"></div>
+    <div th:replace="~{fragments/carTable :: commonTable(${carListTitles}, ${carList}, 'manage')}"></div>
 
     <!-- Add Car Modal -->
     <div class="modal fade" id="addCarModal" tabindex="-1" role="dialog" aria-labelledby="addCarModalLabel" aria-hidden="true">

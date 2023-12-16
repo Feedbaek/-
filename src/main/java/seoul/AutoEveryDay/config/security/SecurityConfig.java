@@ -33,7 +33,6 @@ public class SecurityConfig {
 //            "/swagger-resources/**",
             // index
             "/",
-            "/home",
             // register
             "/register",
             // login
@@ -48,6 +47,7 @@ public class SecurityConfig {
         /* 허용 페이지 등록 */
         http.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(WHITE_LIST).permitAll()  // 모든 사용자 허용 경로
+                        .requestMatchers("/home").authenticated() // 인증된 사용자만 허용 경로
                         .anyRequest().hasAuthority(READ_PRIVILEGE.getValue()))  // 그 외 나머지 경로는 전부 읽기 권한 필요
                 // 로그인
                 .formLogin(form -> form
