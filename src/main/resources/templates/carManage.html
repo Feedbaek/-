@@ -4,51 +4,26 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/default_layout}">
 <head>
-    <title>Car Management</title>
+    <title>차량 검색</title>
 </head>
-<!-- Content -->
-<main layout:fragment="content" class="container mt-4">
-    <div>
-        <h2>Car Management</h2>
-        <div style="float: right">
-            <!-- Add Car Button -->
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addCarModal">Add New Car</button>
+<main layout:fragment="content" class="container mt-5">
+    <div class="row">
+        <div class="col">
+            <h1 class="display-5">차량 검색하기</h1>
+        </div>
+        <div class="col text-right mt-5">
+            <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#addCarModal">차량 등록</button>
         </div>
     </div>
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead class="thead-dark">
-            <tr>
-                <th>Car Number</th>
-                <th>Car Model</th>
-                <th>Car Status</th>
-                <th>Car Comment</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="car : ${carList}">
-                <td th:text="${car.getNumber()}"></td>
-                <td th:text="${car.getModel()}"></td>
-                <td th:text="${car.getStatus()}"></td>
-                <td th:text="${car.getComment()}"></td>
-                <td>
-                    <!-- Edit Button -->
-                    <button type="button" class="btn btn-primary btn-sm" th:attr="data-target='#editCarModal-' + ${car.getId()}" data-toggle="modal">Edit</button>
-                    <!-- Delete Button -->
-                    <button type="button" class="btn btn-danger btn-sm" th:data-car-number="${car.getNumber()}" onclick="deleteCar(this)">Delete</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+    <!-- 카 테이블 프래그먼트 -->
+    <div th:replace="~{fragments/carTable :: commonTable(${carListTitles}, ${carList}, false, true)}"></div>
 
     <!-- Add Car Modal -->
     <div class="modal fade" id="addCarModal" tabindex="-1" role="dialog" aria-labelledby="addCarModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addCarModalLabel">Add New Car</h5>
+                    <h5 class="modal-title" id="addCarModalLabel">차량 등록</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -56,24 +31,24 @@
                 <form id="carForm" th:action="@{/car/manage}" method="post">
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="carNumber">Car Number</label>
+                            <label for="carNumber">차량번호</label>
                             <input type="text" class="form-control" id="carNumber" name="number" required>
                         </div>
                         <div class="form-group">
-                            <label for="carModel">Car Model</label>
+                            <label for="carModel">차종</label>
                             <input type="text" class="form-control" id="carModel" name="model" required>
                         </div>
                         <div class="form-group">
-                            <label for="carStatus">Car Status</label>
+                            <label for="carStatus">상태</label>
                             <input type="text" class="form-control" id="carStatus" name="status">
                         </div>
                         <div class="form-group">
-                            <label for="carComment">Comment</label>
+                            <label for="carComment">메모</label>
                             <textarea class="form-control" id="carComment" name="comment"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Add Car</button>
+                        <button type="submit" class="btn btn-primary">등록하기</button>
                     </div>
                 </form>
             </div>
@@ -181,6 +156,7 @@
         );
 
     </script>
+
 
 </main>
 </html>

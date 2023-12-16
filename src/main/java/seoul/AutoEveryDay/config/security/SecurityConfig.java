@@ -33,6 +33,7 @@ public class SecurityConfig {
 //            "/swagger-resources/**",
             // index
             "/",
+            "/home",
             // register
             "/register",
             // login

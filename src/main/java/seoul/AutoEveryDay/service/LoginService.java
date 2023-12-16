@@ -80,6 +80,11 @@ public class LoginService implements UserDetailsService {
         return userRepository.findAll();
     }
 
+    public List<Role> findUserRoles(Long id) {
+        User user = findById(id);
+        return user.getRoles().stream().toList();
+    }
+
     public List<String> getLoginUserRoles() {
         User user = getLoginUser();
         List<String> roles = new ArrayList<>();
@@ -107,8 +112,20 @@ public class LoginService implements UserDetailsService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."));
     }
 
+    public List<String> findAllUserNames() {
+        return userRepository.findAllNames();
+    }
+
     public List<String> findAllGroupNames() {
         return userGroupRepository.findAllNames();
+    }
+
+    public List<String> findAllRoleNames() {
+        return roleRepository.findAllNames();
+    }
+
+    public List<Role> findAllRoles() {
+        return roleRepository.findAll();
     }
 
 
@@ -178,5 +195,19 @@ public class LoginService implements UserDetailsService {
             privileges.add(item.getName());
         }
         return privileges;
+    }
+
+    public List<UserDto> getAllUserDto() {
+        List<User> users = userRepository.findAll();
+        List<UserDto> userList = new ArrayList<>();
+        users.forEach(user -> {
+            userList.add(UserDto.builder()
+                    .id(user.getId())
+                    .username(user.getUsername())
+                    .name(user.getName())
+                    .userGroup(user.getUserGroup().getName())
+                    .build());
+        });
+        return userList;
     }
 }

@@ -32,7 +32,7 @@ public class User {
     @JoinColumn(name = "user_group_id")
     private UserGroup userGroup;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(
         name = "users_roles",
         joinColumns = @JoinColumn(

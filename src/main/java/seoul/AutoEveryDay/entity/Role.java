@@ -3,8 +3,6 @@ package seoul.AutoEveryDay.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -23,10 +21,10 @@ public class Role {
     @Column(name = "name", nullable = false, unique=true)
     private String name;
 
-    @ManyToMany(mappedBy = "roles", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(mappedBy = "roles", cascade = CascadeType.MERGE)
     private Set<User> users;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(
         name = "roles_privileges",
         joinColumns = @JoinColumn(
@@ -34,4 +32,11 @@ public class Role {
         inverseJoinColumns = @JoinColumn(
                 name = "privilege_id", referencedColumnName = "id"))
     private Set<Privilege> privileges;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Role )) return false;
+        return id != null && id.equals(((Role) o).getId());
+    }
 }

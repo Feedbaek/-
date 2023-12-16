@@ -31,7 +31,9 @@ public class CarController {
     @GetMapping("/rental")  // 차량 대여 페이지
     public String rentalGet(Model model) {
         List<CarDto> carDtoList = carManageService.getAllCar();
+        String[] carInfo = {"차량 번호", "차종", "상태", "메모", "대여/반납"};
         model.addAttribute("carList", carDtoList);
+        model.addAttribute("carListTitles", carInfo);
         Map<Long, List<RentalHistory>> rentalHistoryMap = carRentalService.getRentalHistory(carDtoList);
         model.addAttribute("rentalListMap", rentalHistoryMap);
         model.addAttribute("minDay", LocalDate.now());
@@ -78,7 +80,9 @@ public class CarController {
     @GetMapping("/manage")  // 차량 관리 페이지
     public String getCar(Model model) {
         List<CarDto> allCar = carManageService.getAllCar();
+        String[] carInfo = {"차량 번호", "차종", "상태", "메모", "수정/삭제"};
         model.addAttribute("carList", allCar);
+        model.addAttribute("carListTitles", carInfo);
         return "carManage";
     }
     @ResponseBody

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="commonTable(headers, dataList, showRentalButton, showManageButton)" class="rounded-lg shadow mt-2"
+     style="overflow: hidden;">
+    <table class="table table-hover table-borderless text-center">
+        <thead class="bg-info text-white">
+        <tr>
+            <th th:each="header : ${headers}" th:text="${header}"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="dataObj : ${dataList}">
+            <td th:text="${dataObj.number}" class="align-middle py-4"></td>
+            <td th:text="${dataObj.model}" class="align-middle py-4"></td>
+            <td th:text="${dataObj.status}" class="align-middle py-4"></td>
+            <td th:text="${dataObj.comment}" class="align-middle py-4"></td>
+            <td class="align-middle">
+                <button th:if="${showManageButton}" type="button" class="btn btn-info btn-sm"
+                        th:attr="data-target='#editCarModal-' + ${dataObj.id}" data-toggle="modal">수정
+                </button>
+                <button th:if="${showManageButton}" type="button" class="btn btn-secondary btn-sm"
+                        th:attr="data-car-number='${dataObj.number}'" onclick="deleteCar(this)">삭제
+                </button>
+                <button th:if="${showRentalButton}" type="button" class="btn btn-info" data-toggle="modal"
+                        th:attr="data-target='#rentCarModal-' + ${dataObj.number}">대여
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

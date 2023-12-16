@@ -1,6 +1,7 @@
 package seoul.AutoEveryDay.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -10,10 +11,10 @@ import lombok.*;
 @AllArgsConstructor
 public class ChargeHistoryDto {
     private Long id;
-    @NotBlank
+    @NotNull
     private Long carId;
-    @NotBlank
+    @NotNull
     private Long chargeSpotId;
-    @NotBlank
+    @NotNull
     private Integer amount;
 }

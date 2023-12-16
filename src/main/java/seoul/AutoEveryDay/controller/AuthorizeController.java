@@ -8,11 +8,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import seoul.AutoEveryDay.dto.JsonBody;
 import seoul.AutoEveryDay.dto.RoleChangeReq;
+import seoul.AutoEveryDay.dto.UserDto;
+import seoul.AutoEveryDay.entity.Role;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.AuthorizeService;
 import seoul.AutoEveryDay.service.LoginService;
+import seoul.AutoEveryDay.utils.DtoConverter;
 
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,21 +24,55 @@ import java.util.List;
 public class AuthorizeController {
     private final LoginService loginService;
     private final AuthorizeService authorizeService;
+    private final DtoConverter dc;
 
     @GetMapping("/manage")
     public String manage(Model model) {
-        List<User> userList = loginService.getAllUser();
+        List<UserDto> userList = loginService.getAllUserDto();
         model.addAttribute("userList", userList);
         return "authorizeManage";
     }
 
     @ResponseBody
+    @GetMapping("/user/role")
+    public JsonBody userRole(@RequestParam("id") Long userId) {
+        List<Object> roleLists = new ArrayList<>();
+        List<Role> assignedRole = loginService.findUserRoles(userId);
+        List<Role> unassignedRole = new ArrayList<>();
+
+        // 전제 role 목록 중에서 assignedRole에 포함된 role 목록을 제외한 목록을 unassignedRole에 추가
+        List<Role> allRoles = loginService.findAllRoles();
+        for (Role role : allRoles) {
+            if (!assignedRole.contains(role)) {
+                unassignedRole.add(role);
+            }
+        }
+
+        roleLists.add(dc.convertToRoleDtoList(assignedRole));
+        roleLists.add(dc.convertToRoleDtoList(unassignedRole));
+        return JsonBody.builder()
+                .message("역할 조회 성공")
+                .data(roleLists)
+                .build();
+    }
+
+    @ResponseBody
     @PostMapping("/user/role")
-    public JsonBody userAdd(@Validated RoleChangeReq req) {
+    public JsonBody userAdd(@Validated @RequestBody RoleChangeReq req) {
         User user = loginService.findById(req.getUserId());
         return JsonBody.builder()
-                .message("역할 변경 성공")
-                .data(authorizeService.grantRole(user, req.getRole()))
+                .message("역할 부여 성공")
+                .data(authorizeService.grantRole(user, req.getRoleName()))
+                .build();
+    }
+
+    @ResponseBody
+    @DeleteMapping("/user/role")
+    public JsonBody userDelete(@Validated @RequestBody RoleChangeReq req) {
+        User user = loginService.findById(req.getUserId());
+        return JsonBody.builder()
+                .message("역할 회수 성공")
+                .data(authorizeService.revokeRole(user, req.getRoleName()))
                 .build();
     }
 

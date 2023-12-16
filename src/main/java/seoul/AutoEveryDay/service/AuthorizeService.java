@@ -11,6 +11,7 @@ import seoul.AutoEveryDay.entity.Role;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.repository.PrivilegeRepository;
 import seoul.AutoEveryDay.repository.RoleRepository;
+import seoul.AutoEveryDay.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -19,21 +20,46 @@ import seoul.AutoEveryDay.repository.RoleRepository;
 public class AuthorizeService {
     private final RoleRepository roleRepository;
     private final PrivilegeRepository privilegeRepository;
+    private final UserRepository userRepository;
 
-    public String grantRole(User user, String roleName) {
+    public String grantRole(User u, String roleName) {
+        log.info("grantRole: " + u.getUsername() + ", " + roleName);
+        User user = userRepository.findById(u.getId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+        );
         Role role = roleRepository.findByName(roleName).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "역할을 찾을 수 없습니다.")
         );
         try {
             role.getUsers().add(user);
+            user.getRoles().add(role);
+            return roleName;
         } catch (Exception e) {
             log.error("역할 부여 실패: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "역할 부여 실패");
         }
-        return null;
+    }
+
+    public String revokeRole(User u, String roleName) {
+        log.info("revokeRole: " + u.getUsername() + ", " + roleName);
+        User user = userRepository.findById(u.getId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
+        );
+        Role role = roleRepository.findByName(roleName).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "역할을 찾을 수 없습니다.")
+        );
+        try {
+            role.getUsers().remove(user);
+            user.getRoles().remove(role);
+            return roleName;
+        } catch (Exception e) {
+            log.error("역할 회수 실패: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "역할 회수 실패");
+        }
     }
 
     public String createRole(String roleName) {
+        log.info("createRole: " + roleName);
         Role role = Role.builder()
                 .name(roleName)
                 .build();
@@ -47,6 +73,7 @@ public class AuthorizeService {
     }
 
     public String deleteRole(String roleName) {
+        log.info("deleteRole: " + roleName);
         Role role = roleRepository.findByName(roleName).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "역할을 찾을 수 없습니다.")
         );
@@ -64,6 +91,7 @@ public class AuthorizeService {
     }
 
     public String grantPrivilege(String roleName, String privilegeName) {
+        log.info("grantPrivilege: " + roleName + ", " + privilegeName);
         Role role = roleRepository.findByName(roleName).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "역할을 찾을 수 없습니다.")
         );
@@ -80,6 +108,7 @@ public class AuthorizeService {
     }
 
     public String revokePrivilege(String roleName, String privilegeName) {
+        log.info("revokePrivilege: " + roleName + ", " + privilegeName);
         Role role = roleRepository.findByName(roleName).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "역할을 찾을 수 없습니다.")
         );
@@ -97,6 +126,7 @@ public class AuthorizeService {
     }
 
     public String createPrivilege(String privilegeName) {
+        log.info("createPrivilege: " + privilegeName);
         Privilege privilege = Privilege.builder()
                 .name(privilegeName)
                 .build();
@@ -110,6 +140,7 @@ public class AuthorizeService {
     }
 
     public String deletePrivilege(String privilegeName) {
+        log.info("deletePrivilege: " + privilegeName);
         Privilege privilege = privilegeRepository.findByName(privilegeName).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "권한을 찾을 수 없습니다.")
         );
