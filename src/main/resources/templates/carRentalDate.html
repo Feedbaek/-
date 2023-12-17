@@ -14,6 +14,68 @@
     <div th:replace="~{fragments/calendar :: commonCalendar(${dateArr})}"></div>
 
     <script>
+        let pickupDay = null;
+        let returnDay = null;
+        let pickupMonth = [[${month}]];
+        let pickupYear = [[${year}]];
+        let returnMonth = [[${month}]];
+        let returnYear = [[${year}]];
+
+        function selectDate(element) {
+            const day = element.getAttribute('data-day');
+            console.log(day);
+            if (pickupDay == null) {
+                pickupDay = day;
+                element.classList.add('bg-dark');
+            } else if (pickupDay === day) {
+                pickupDay = null;
+                element.classList.remove('bg-dark');
+            } else if (returnDay == null) {
+                returnDay = day;
+                element.classList.add('bg-dark');
+            } else {
+                alert('날짜를 다시 선택해주세요.');
+                window.location.reload();
+                return;
+            }
+            if (pickupDay != null && returnDay != null) {
+                if ([[${today}]] > pickupDay) {
+                    pickupMonth = pickupMonth + 1;
+                    if (pickupMonth > 12) {
+                        pickupMonth = 1;
+                        pickupYear = pickupYear + 1;
+                    }
+                }
+                if ([[${today}]] > returnDay) {
+                    returnMonth = returnMonth + 1;
+                    if (returnMonth > 12) {
+                        returnMonth = 1;
+                        returnYear = returnYear + 1;
+                    }
+                }
+                console.log(pickupYear + '-' + pickupMonth + '-' + pickupDay);
+                console.log(returnYear + '-' + returnMonth + '-' + returnDay);
+                fetch('/car/rental', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        carId: [[${carId}]],
+                        pickupDate: pickupYear + '-' + pickupMonth + '-' + pickupDay,
+                        returnDate: returnYear + '-' + returnMonth + '-' + returnDay
+                    })
+                }).then(response => {
+                    if (response.ok) {
+                        alert('차량 대여 신청이 완료되었습니다.');
+                        window.location.href = '/car/rental';
+                    } else {
+                        alert('차량 대여 신청에 실패하였습니다.');
+                        window.location.reload();
+                    }
+                });
+            }
+        }
     </script>
 </main>
 </html>

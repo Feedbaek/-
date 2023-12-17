@@ -1,5 +1,13 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .custom-hover:hover {
+            background-color: #f8f9fa; /* Light grey background */
+            cursor: pointer; /* Change cursor to indicate it's clickable */
+        }
+    </style>
+</head>
 <body>
 <div th:fragment="commonCalendar(dateArr)" class="rounded-lg shadow mt-2"
      style="overflow: hidden;">
@@ -17,14 +25,15 @@
         </thead>
         <tbody>
         <tr th:each="week : ${dateArr}">
-            <td th:each="date : ${week}" th:text="${date.day}" class="align-middle py-4">
-                <div th:if="${date.available}">
-                    <div th:text="가능"></div>
-                </div>
+            <td th:each="date : ${week}" class="bg-light">
+                <div th:if="${date.available}" th:text="${date.day}" class="align-middle py-4" th:attr="data-day=${date.day}" onclick="selectDate(this)"></div>
+                <div th:unless="${date.available}" th:text="${date.day}" class="align-middle py-4 bg-dark"></div>
             </td>
         </tr>
         </tbody>
     </table>
 </div>
 </body>
+
+
 </html>

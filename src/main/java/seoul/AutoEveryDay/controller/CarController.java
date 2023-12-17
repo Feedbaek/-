@@ -47,14 +47,17 @@ public class CarController {
         Car car = carManageService.getCar(carId);
         List<List<CarAvailableDate>> dateArr = carRentalService.getAvailableDate(car);
         model.addAttribute("dateArr", dateArr);
+        model.addAttribute("year", LocalDate.now().getYear());
         model.addAttribute("month", LocalDate.now().getMonthValue());
+        model.addAttribute("today", LocalDate.now().getDayOfMonth());
+        model.addAttribute("carId", carId);
         return "carRentalDate";
     }
 
 
     @ResponseBody
     @PostMapping("/rental") // 차량 대여 신청
-    public JsonBody rentalPost(@Validated RentCarDto rentCarDto) {
+    public JsonBody rentalPost(@Validated @RequestBody RentCarDto rentCarDto) {
         User user = loginService.getLoginUser();
         Car car = carManageService.getCar(rentCarDto.getCarId());
         return JsonBody.builder()
@@ -65,7 +68,7 @@ public class CarController {
 
     @ResponseBody
     @PutMapping("/rental")  // 차량 반납
-    public JsonBody rentalPut(@Validated RentCarDto rentCarDto) {
+    public JsonBody rentalPut(@Validated @RequestBody RentCarDto rentCarDto) {
         User user = loginService.getLoginUser();
         Car car = carManageService.getCar(rentCarDto.getCarId());
         return JsonBody.builder()
@@ -76,7 +79,7 @@ public class CarController {
 
     @ResponseBody
     @DeleteMapping("/rental")   // 차량 대여 취소
-    public JsonBody rentalDelete(@Validated RentCarDto rentCarDto) {
+    public JsonBody rentalDelete(@Validated @RequestBody RentCarDto rentCarDto) {
         User user = loginService.getLoginUser();
         Car car = carManageService.getCar(rentCarDto.getCarId());
         return JsonBody.builder()
@@ -99,7 +102,7 @@ public class CarController {
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/manage") // 새로운 차량 등록
-    public JsonBody newCar(@Validated CarDto carDto) {
+    public JsonBody newCar(@Validated @RequestBody CarDto carDto) {
         return JsonBody.builder()
                 .message("차량 등록 성공")
                 .data(carManageService.createCar(carDto))
@@ -108,7 +111,7 @@ public class CarController {
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/manage")  // 차량 정보 수정
-    public JsonBody editCar(@Validated CarDto carDto) {
+    public JsonBody editCar(@Validated @RequestBody CarDto carDto) {
         return JsonBody.builder()
                 .message("차량 정보 수정 성공")
                 .data(carManageService.updateCar(carDto))
@@ -117,7 +120,7 @@ public class CarController {
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/manage")   // 차량 삭제
-    public JsonBody deleteCar(@RequestParam String number) {
+    public JsonBody deleteCar(@RequestParam("number") String number) {
         return JsonBody.builder()
                 .message("차량 삭제 성공")
                 .data(carManageService.deleteCar(number))

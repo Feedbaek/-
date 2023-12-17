@@ -20,10 +20,9 @@
                         th:attr="data-target='#editCarModal-' + ${dataObj.id}" data-toggle="modal">수정
                 </button>
                 <button th:if="${type == 'manage'}" type="button" class="btn btn-secondary btn-sm"
-                        th:attr="data-car-number='${dataObj.number}'" onclick="deleteCar(this)">삭제
+                        th:attr="data-car-number=${dataObj.number}" onclick="deleteCar(this)">삭제
                 </button>
-                <button th:if="${type == 'rental'}" type="button" class="btn btn-info" data-toggle="modal"
-                        th:attr="data-target='#rentCarModal-' + ${dataObj.number}">대여
+                <button th:if="${type == 'rental'}" type="button" class="btn btn-info" th:onclick="'location.href=\'/car/rental/' + ${dataObj.id} + '\'' ">대여
                 </button>
             </td>
         </tr>
