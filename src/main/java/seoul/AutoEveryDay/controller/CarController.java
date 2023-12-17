@@ -6,20 +6,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import seoul.AutoEveryDay.dto.*;
 import seoul.AutoEveryDay.entity.Car;
-import seoul.AutoEveryDay.entity.RentalHistory;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.CarManageService;
 import seoul.AutoEveryDay.service.CarRentalService;
 import seoul.AutoEveryDay.service.LoginService;
-import seoul.AutoEveryDay.utils.DtoConverter;
+import seoul.AutoEveryDay.utils.Converter;
 
 import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("/car")
@@ -29,7 +28,7 @@ public class CarController {
     private final LoginService loginService;
     private final CarManageService carManageService;
     private final CarRentalService carRentalService;
-    private final DtoConverter dtoConverter;
+    private final Converter converter;
 
     /* 차량 대여 */
     @GetMapping("/rental")  // 차량 대여 페이지
@@ -43,7 +42,7 @@ public class CarController {
                             @RequestParam(value = "q", required = false) String carNumber) {
         List<CarDto> carDtoList = carManageService.searchCar(carModelId, carNumber);
         String[] carInfo = {"차량 번호", "차종", "상태", "메모", "대여/반납"};
-        List<List<String>> listList = dtoConverter.convertCarDtoList(carDtoList);
+        List<List<String>> listList = converter.convertCarDtoList(carDtoList);
         model.addAttribute("carList", listList);
         model.addAttribute("carListTitles", carInfo);
         model.addAttribute("search", carNumber);
@@ -53,11 +52,16 @@ public class CarController {
     @GetMapping("/rental/{carModel}/{carId}") // 차량 대여 날짜 선택 페이지
     public String rentalGet(@PathVariable("carId") Long carId, Model model) {
         Car car = carManageService.getCar(carId);
+        LocalDate now = LocalDate.now();
+
         List<List<CarAvailableDate>> dateArr = carRentalService.getAvailableDate(car);
+        List<String> dayOfWeek = converter.getDayOfWeek(now);
+
         model.addAttribute("dateArr", dateArr);
-        model.addAttribute("year", LocalDate.now().getYear());
-        model.addAttribute("month", LocalDate.now().getMonthValue());
-        model.addAttribute("today", LocalDate.now().getDayOfMonth());
+        model.addAttribute("dayOfWeek", dayOfWeek);
+        model.addAttribute("year", now.getYear());
+        model.addAttribute("month", now.getMonthValue());
+        model.addAttribute("today", now.getDayOfMonth());
         model.addAttribute("carId", carId);
         return "carRentalDate";
     }
@@ -103,7 +107,7 @@ public class CarController {
     public String getCar(Model model, @RequestParam(value = "q", required = false) String carNumber) {
         List<CarDto> carDtoList = carManageService.searchCar(carNumber);
         String[] carInfo = {"차량 번호", "차종", "상태", "메모", "수정/삭제"};
-        List<List<String>> listList = dtoConverter.convertCarDtoList(carDtoList);
+        List<List<String>> listList = converter.convertCarDtoList(carDtoList);
         model.addAttribute("carList", listList);
         model.addAttribute("carListTitles", carInfo);
         model.addAttribute("search", carNumber);
@@ -121,7 +125,7 @@ public class CarController {
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/manage")  // 차량 정보 수정
-    public JsonBody editCar(@Validated @RequestBody CarDto carDto) {
+    public JsonBody editCar(@Validated @ModelAttribute CarDto carDto) {
         return JsonBody.builder()
                 .message("차량 정보 수정 성공")
                 .data(carManageService.updateCar(carDto))

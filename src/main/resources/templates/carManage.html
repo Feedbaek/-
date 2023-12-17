@@ -13,7 +13,7 @@
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <form class="d-flex" action="/car/manage" method="get">
-                    <input class="form-control me-2" type="search" th:placeholder="search" aria-label="Search" name="q">
+                    <input class="form-control me-2" type="search" th:placeholder="${search}" aria-label="Search" name="q">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
             </div>
@@ -75,14 +75,15 @@
                     <div class="modal-body">
                         <input type="hidden" name="id" th:value="${car[0]}"/>
                         <input type="hidden" name="number" th:value="${car[1]}"/>
+                        <input type="hidden" name="model" th:value="${car[2]}"/>
 
                         <div class="form-group">
-                            <label th:for="'carStatus-' + ${car[1]}">Car Status</label>
+                            <label th:for="'carStatus-' + ${car[0]}">Car Status</label>
                             <input type="text" class="form-control" th:id="'carStatus-' + ${car[0]}" name="status">
                         </div>
                         <div class="form-group">
-                            <label th:for="'carComment-' + ${car[1]}">Car Comment</label>
-                            <textarea class="form-control" th:id="'carStatus-' + ${car[0]}" name="comment"></textarea>
+                            <label th:for="'carComment-' + ${car[0]}">Car Comment</label>
+                            <textarea class="form-control" th:id="'carComment-' + ${car[0]}" name="comment"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -109,6 +110,46 @@
                     });
             }
         }
+
+        // 오름차순으로 정렬
+        function sortTable(element) {
+            const n = element.getAttribute('data-index');
+            const table = document.getElementsByClassName('table')[0];
+            let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir === "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir === "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount === 0 && dir === "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+
         // Add Car Modal Form Submit Event Listener
         document.getElementById('carForm').addEventListener('submit', function(event) {
             event.preventDefault(); // 폼의 기본 제출 동작 방지

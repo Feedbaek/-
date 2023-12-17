@@ -42,7 +42,7 @@ public class CarRentalService {
      * */
     private void validatePickUpDateAndReturnDate(RentCarDto rentCarDto) {
         // 겹치는 차량 예약 내역이 있으면 ResponseStatusException 발생
-        if (rentalHistoryRepository.existsByCarIdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual(
+        if (rentalHistoryRepository.existsByCar_IdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual(
                 rentCarDto.getCarId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate())) {
             log.error(DATE_ERROR_MESSAGE_RESERVED);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_RESERVED);
@@ -100,7 +100,7 @@ public class CarRentalService {
     public RentCarDto returnCar(RentCarDto rentCarDto, User user, Car car) {
         // 대여 기록이 없으면 ResponseStatusException 발생
         RentalHistory rentalHistory = rentalHistoryRepository
-                .findByUserIdAndCarIdAndPickupDateAndReturnDate(user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate()).orElseThrow(
+                .findByUser_IdAndCarIdAndPickupDateAndReturnDate(user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_NOT_RESERVED));
         if (rentalHistory.getReturnDate().isBefore(LocalDate.now())) {
             log.error(DATE_ERROR_MESSAGE_ALREADY_RETURNED);
@@ -129,7 +129,7 @@ public class CarRentalService {
 
         carDtoList.forEach(carDto -> {
             Long id = carDto.getId();
-            rentalHistoryMap.put(id, rentalHistoryRepository.findByCarIdAndReturnDateGreaterThanEqual(id, LocalDate.now()));
+            rentalHistoryMap.put(id, rentalHistoryRepository.findByCar_IdAndReturnDateGreaterThanEqual(id, LocalDate.now()));
         });
 
         return rentalHistoryMap;
@@ -142,7 +142,7 @@ public class CarRentalService {
     public RentCarDto deleteRental(RentCarDto rentCarDto, User user, Car car) {
         // 대여 기록이 없으면 ResponseStatusException 발생
         RentalHistory rentalHistory = rentalHistoryRepository
-                .findByUserIdAndCarIdAndPickupDateAndReturnDate(user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate()).orElseThrow(
+                .findByUser_IdAndCarIdAndPickupDateAndReturnDate(user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_NOT_RESERVED));
 
         try {
@@ -161,7 +161,7 @@ public class CarRentalService {
 
     public List<List<CarAvailableDate>> getAvailableDate(Car car) {
         // 오늘 이후 대여 날짜를 가져옴
-        List<RentalHistory> unavailableDate = rentalHistoryRepository.findByCarIdAndReturnDateGreaterThanEqual(
+        List<RentalHistory> unavailableDate = rentalHistoryRepository.findByCar_IdAndReturnDateGreaterThanEqual(
                 car.getId(), LocalDate.now());
         List<List<CarAvailableDate>> availableDate = new ArrayList<>();
 

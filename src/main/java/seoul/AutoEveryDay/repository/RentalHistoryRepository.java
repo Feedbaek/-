@@ -10,9 +10,11 @@ import java.util.Optional;
 
 @Repository
 public interface RentalHistoryRepository extends JpaRepository<RentalHistory, Long> {
-    Boolean existsByCarIdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual(Long carId, LocalDate pickUpDate, LocalDate returnDate);
-    List<RentalHistory> findByCarIdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual(Long carId, LocalDate pickUpDate, LocalDate returnDate);
-    List<RentalHistory> findByCarIdAndReturnDateGreaterThanEqual(Long carId, LocalDate pickUpDate);
-    Optional<RentalHistory> findByCarIdAndPickupDateAndReturnDate(Long carId, LocalDate pickUpDate, LocalDate returnDate);
-    Optional<RentalHistory> findByUserIdAndCarIdAndPickupDateAndReturnDate(Long userId, Long carId, LocalDate pickUpDate, LocalDate returnDate);
+    Boolean existsByCar_IdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual(Long carId, LocalDate pickUpDate, LocalDate returnDate);
+    List<RentalHistory> findByCar_IdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual(Long carId, LocalDate pickUpDate, LocalDate returnDate);
+    List<RentalHistory> findByCar_IdAndReturnDateGreaterThanEqual(Long carId, LocalDate pickUpDate);
+    Optional<RentalHistory> findByCar_IdAndPickupDateAndReturnDate(Long carId, LocalDate pickUpDate, LocalDate returnDate);
+    Optional<RentalHistory> findByUser_IdAndCarIdAndPickupDateAndReturnDate(Long userId, Long carId, LocalDate pickUpDate, LocalDate returnDate);
+
+    boolean existsByCar_IdAndPickupDateGreaterThanEqual(Long carId, LocalDate pickUpDate);
 }

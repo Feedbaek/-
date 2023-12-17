@@ -11,4 +11,9 @@ public class IndexController {
     public String index() {
         return "index";
     }
+
+    @GetMapping("/todo")
+    public String todo() {
+        return "todo";
+    }
 }

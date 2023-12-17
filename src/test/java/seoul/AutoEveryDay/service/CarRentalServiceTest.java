@@ -80,7 +80,7 @@ public class CarRentalServiceTest {
         Car car = makeCar();
         RentCarDto rentCarDto = makeRentCarDto(car);
 
-        given(rentalHistoryRepository.findByCarIdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual
+        given(rentalHistoryRepository.findByCar_IdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual
                 (makeRentCarDto().getCarId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate())).willReturn(List.of()); // 대여 기록이 없는 상태
         given(rentalHistoryRepository.save(Mockito.any(RentalHistory.class))).willReturn(makeRentalHistory()); // 대여 기록 저장 성공
 
@@ -104,7 +104,7 @@ public class CarRentalServiceTest {
         RentCarDto rentCarDto = makeRentCarDto(car);
         RentalHistory rentalHistory = makeRentalHistory(user, car);
 
-        given(rentalHistoryRepository.findByCarIdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual
+        given(rentalHistoryRepository.findByCar_IdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual
                 (rentCarDto.getCarId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate())).willReturn(List.of(rentalHistory)); // 대여 기록이 있는 상태
 
         // when
@@ -171,7 +171,7 @@ public class CarRentalServiceTest {
         RentCarDto rentCarDto = makeRentCarDto(car);
         RentalHistory rentalHistory = makeRentalHistory();
 
-        given(rentalHistoryRepository.findByUserIdAndCarIdAndPickupDateAndReturnDate
+        given(rentalHistoryRepository.findByUser_IdAndCarIdAndPickupDateAndReturnDate
                 (user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate())).willReturn(Optional.of(rentalHistory)); // 대여 기록이 있는 상태
 
         // when
@@ -193,7 +193,7 @@ public class CarRentalServiceTest {
         Car car = makeCar();
         RentCarDto rentCarDto = makeRentCarDto(car);
 
-        given(rentalHistoryRepository.findByUserIdAndCarIdAndPickupDateAndReturnDate
+        given(rentalHistoryRepository.findByUser_IdAndCarIdAndPickupDateAndReturnDate
                 (user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate())).willReturn(Optional.empty()); // 대여 기록이 없는 상태
 
         // when
@@ -213,7 +213,7 @@ public class CarRentalServiceTest {
         RentalHistory rentalHistory = makeRentalHistory();
         rentalHistory.setReturnDate(LocalDate.now().minusDays(1));
 
-        given(rentalHistoryRepository.findByUserIdAndCarIdAndPickupDateAndReturnDate
+        given(rentalHistoryRepository.findByUser_IdAndCarIdAndPickupDateAndReturnDate
                 (user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate())).willReturn(Optional.of(rentalHistory)); // 대여 기록이 있는 상태
 
         // when
@@ -233,7 +233,7 @@ public class CarRentalServiceTest {
         RentalHistory rentalHistory = makeRentalHistory();
         rentalHistory.setPickupDate(LocalDate.now().plusDays(1));
 
-        given(rentalHistoryRepository.findByUserIdAndCarIdAndPickupDateAndReturnDate
+        given(rentalHistoryRepository.findByUser_IdAndCarIdAndPickupDateAndReturnDate
                 (user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate())).willReturn(Optional.of(rentalHistory)); // 대여 기록이 있는 상태
 
         // when
@@ -252,7 +252,7 @@ public class CarRentalServiceTest {
         RentalHistory rentalHistory = makeRentalHistory();
         List<CarDto> carDtoList = List.of(makeCarDto());
 
-        given(rentalHistoryRepository.findByCarIdAndReturnDateGreaterThanEqual
+        given(rentalHistoryRepository.findByCar_IdAndReturnDateGreaterThanEqual
                 (carId, LocalDate.now())).willReturn(List.of(rentalHistory)); // 대여 기록이 있는 상태
         // when
         Map<Long, List<RentalHistory>> res = carRentalService.getRentalHistory(carDtoList);
@@ -276,7 +276,7 @@ public class CarRentalServiceTest {
         RentCarDto rentCarDto = makeRentCarDto(car);
         RentalHistory rentalHistory = makeRentalHistory();
 
-        given(rentalHistoryRepository.findByUserIdAndCarIdAndPickupDateAndReturnDate
+        given(rentalHistoryRepository.findByUser_IdAndCarIdAndPickupDateAndReturnDate
                 (user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate())).willReturn(Optional.of(rentalHistory)); // 대여 기록이 있는 상태
 
         // when
@@ -298,7 +298,7 @@ public class CarRentalServiceTest {
         Car car = makeCar();
         RentCarDto rentCarDto = makeRentCarDto(car);
 
-        given(rentalHistoryRepository.findByUserIdAndCarIdAndPickupDateAndReturnDate
+        given(rentalHistoryRepository.findByUser_IdAndCarIdAndPickupDateAndReturnDate
                 (user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate())).willReturn(Optional.empty()); // 대여 기록이 없는 상태
 
         // when

@@ -1,12 +1,21 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        th:hover {
+            background-color: #f8f9fa; /* Light grey background on hover */
+            cursor: pointer; /* Optional: Changes cursor to indicate clickable */
+        }
+    </style>
+</head>
 <body>
 <div th:fragment="commonTable(headers, dataList, type)" class="rounded-lg shadow mt-2"
      style="overflow: hidden;">
     <table class="table table-hover table-borderless text-center">
         <thead class="bg-info text-white">
         <tr>
-            <th th:each="header : ${headers}" th:text="${header}"></th>
+<!--            <th th:each="header : ${headers}" th:text="${header}"></th>-->
+            <th th:each="header, iterStat : ${headers}" th:attr="data-index=${iterStat.index}" onclick="sortTable(this)" th:text="${header}"></th>
         </tr>
         </thead>
         <tbody>

@@ -11,7 +11,9 @@ import seoul.AutoEveryDay.entity.Car;
 import seoul.AutoEveryDay.entity.CarModel;
 import seoul.AutoEveryDay.repository.CarModelRepository;
 import seoul.AutoEveryDay.repository.CarRepository;
+import seoul.AutoEveryDay.repository.RentalHistoryRepository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,7 @@ import java.util.List;
 public class CarManageService {
     private final CarRepository carRepository;
     private final CarModelRepository carModelRepository;
+    private final RentalHistoryRepository rentalHistoryRepository;
 
     /** <h3>차량 등록.</h3>
      * 이미 존재하는 차량 번호면 ResponseStatusException 발생 */
@@ -153,6 +156,10 @@ public class CarManageService {
     public CarDto deleteCar(String number) {
         Car car = carRepository.findByNumber(number).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
+        if (rentalHistoryRepository.existsByCar_IdAndPickupDateGreaterThanEqual(car.getId(), LocalDate.now())) {
+            log.error("대여 중인 차량은 삭제할 수 없습니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "대여 중인 차량은 삭제할 수 없습니다.");
+        }
         try {
             carRepository.delete(car);
         } catch (Exception e) {

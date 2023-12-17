@@ -13,7 +13,7 @@ import seoul.AutoEveryDay.entity.Role;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.AuthorizeService;
 import seoul.AutoEveryDay.service.LoginService;
-import seoul.AutoEveryDay.utils.DtoConverter;
+import seoul.AutoEveryDay.utils.Converter;
 
 import java.util.*;
 
@@ -24,7 +24,7 @@ import java.util.*;
 public class AuthorizeController {
     private final LoginService loginService;
     private final AuthorizeService authorizeService;
-    private final DtoConverter dtoConverter;
+    private final Converter converter;
 
     @GetMapping("/manage")
     public String manage(Model model) {
@@ -48,8 +48,8 @@ public class AuthorizeController {
             }
         }
 
-        roleLists.add(dtoConverter.convertToRoleDtoList(assignedRole));
-        roleLists.add(dtoConverter.convertToRoleDtoList(unassignedRole));
+        roleLists.add(converter.convertToRoleDtoList(assignedRole));
+        roleLists.add(converter.convertToRoleDtoList(unassignedRole));
         return JsonBody.builder()
                 .message("역할 조회 성공")
                 .data(roleLists)

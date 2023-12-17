@@ -1,26 +1,12 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <style>
-        .custom-hover:hover {
-            background-color: #f8f9fa; /* Light grey background */
-            cursor: pointer; /* Change cursor to indicate it's clickable */
-        }
-    </style>
-</head>
 <body>
-<div th:fragment="commonCalendar(header, dateArr)" class="rounded-lg shadow mt-2"
+<div th:fragment="commonCalendar(dayOfWeek, dateArr)" class="rounded-lg shadow mt-2"
      style="overflow: hidden;">
     <table class="table table-bordered text-center">
         <thead class="bg-info text-white">
         <tr>
-            <th>일</th>
-            <th>월</th>
-            <th>화</th>
-            <th>수</th>
-            <th>목</th>
-            <th>금</th>
-            <th>토</th>
+            <th th:each="day : ${dayOfWeek}" th:text="${day}"></th>
         </tr>
         </thead>
         <tbody>
