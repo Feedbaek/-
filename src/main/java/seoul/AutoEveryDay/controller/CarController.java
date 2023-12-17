@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import seoul.AutoEveryDay.dto.*;
 import seoul.AutoEveryDay.entity.Car;
 import seoul.AutoEveryDay.entity.RentalHistory;
@@ -15,6 +16,7 @@ import seoul.AutoEveryDay.service.CarRentalService;
 import seoul.AutoEveryDay.service.LoginService;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,19 +32,22 @@ public class CarController {
     /* 차량 대여 */
     @GetMapping("/rental")  // 차량 대여 페이지
     public String rentalGet(Model model) {
-        List<CarDto> carDtoList = carManageService.getAllCar();
+        return "modelSelect";
+    }
+
+    @GetMapping("/rental/{model}")  // 차량 대여 페이지
+    public String rentalGet(Model model,
+                            @PathVariable(value = "model", required = false) Long carModelId,
+                            @RequestParam(value = "q", required = false) String carNumber) {
+        List<CarDto> carDtoList = carManageService.searchCar(carModelId, carNumber);
         String[] carInfo = {"차량 번호", "차종", "상태", "메모", "대여/반납"};
         model.addAttribute("carList", carDtoList);
         model.addAttribute("carListTitles", carInfo);
-        Map<Long, List<RentalHistory>> rentalHistoryMap = carRentalService.getRentalHistory(carDtoList);
-        model.addAttribute("rentalListMap", rentalHistoryMap);
-        model.addAttribute("minDay", LocalDate.now());
-        model.addAttribute("maxDay", LocalDate.now().plusDays(7));
-        model.addAttribute("returnDay", LocalDate.now().plusDays(14));
+        model.addAttribute("search", carNumber);
         return "carRental";
     }
 
-    @GetMapping("/rental/{carId}") // 차량 대여 날짜 선택 페이지
+    @GetMapping("/rental/{model}/{carId}") // 차량 대여 날짜 선택 페이지
     public String rentalGet(@PathVariable("carId") Long carId, Model model) {
         Car car = carManageService.getCar(carId);
         List<List<CarAvailableDate>> dateArr = carRentalService.getAvailableDate(car);
@@ -92,11 +97,12 @@ public class CarController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/manage")  // 차량 관리 페이지
-    public String getCar(Model model) {
-        List<CarDto> allCar = carManageService.getAllCar();
+    public String getCar(Model model, @RequestParam(value = "q", required = false) String carNumber) {
+        List<CarDto> carDtoList = carManageService.searchCar(carNumber);
         String[] carInfo = {"차량 번호", "차종", "상태", "메모", "수정/삭제"};
-        model.addAttribute("carList", allCar);
+        model.addAttribute("carList", carDtoList);
         model.addAttribute("carListTitles", carInfo);
+        model.addAttribute("search", carNumber);
         return "carManage";
     }
     @ResponseBody

@@ -50,9 +50,18 @@ public class CarManageService {
 
     /** <h3>차량 정보 조회.</h3>
      * 차량 번호가 존재하지 않으면 ResponseStatusException 발생 */
-    public Car getCar(String number) {
-        return carRepository.findByNumber(number).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
+    public CarDto getCar(String number) {
+        Car car = carRepository.findByNumber(number).orElse(null);
+        if (car == null) {
+            return null;
+        }
+        return CarDto.builder()
+                .id(car.getId())
+                .number(car.getNumber())
+                .model(car.getCarModel().getName())
+                .status(car.getStatus())
+                .comment(car.getComment())
+                .build();
     }
     public Car getCar(Long id) {
         return carRepository.findById(id).orElseThrow(
@@ -63,6 +72,51 @@ public class CarManageService {
     public List<CarDto> getAllCar() {
         List<Car> carList = carRepository.findAll();
         List<CarDto> carDtoList = new ArrayList<>();
+
+        carList.forEach(car -> {
+            carDtoList.add(CarDto.builder()
+                    .id(car.getId())
+                    .number(car.getNumber())
+                    .model(car.getCarModel().getName())
+                    .status(car.getStatus())
+                    .comment(car.getComment())
+                    .build());
+        });
+
+        return carDtoList;
+    }
+
+    /** <h3>차량 검색.</h3>
+     * 입력받은 번호 포함하는 차량 검색. 없으면 빈 리스트 반환
+    * */
+    public List<CarDto> searchCar(String number) {
+        List<CarDto> carDtoList = new ArrayList<>();
+
+        if (number == null || number.isEmpty()) {
+            return getAllCar();
+        } else {
+            List<Car> carList = carRepository.findByNumberContaining(number);
+            carList.forEach(car -> {
+                carDtoList.add(CarDto.builder()
+                        .id(car.getId())
+                        .number(car.getNumber())
+                        .model(car.getCarModel().getName())
+                        .status(car.getStatus())
+                        .comment(car.getComment())
+                        .build());
+            });
+        }
+        return carDtoList;
+    }
+    public List<CarDto> searchCar(Long carModel, String number) {
+        List<CarDto> carDtoList = new ArrayList<>();
+        List<Car> carList;
+
+        if (number == null || number.isEmpty()) {
+            carList = carRepository.findByCarModel_Id(carModel);
+        } else {
+            carList = carRepository.findByCarModel_IdAndNumberContaining(carModel, number);
+        }
 
         carList.forEach(car -> {
             carDtoList.add(CarDto.builder()
