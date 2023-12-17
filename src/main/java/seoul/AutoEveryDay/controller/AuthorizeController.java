@@ -24,7 +24,7 @@ import java.util.*;
 public class AuthorizeController {
     private final LoginService loginService;
     private final AuthorizeService authorizeService;
-    private final DtoConverter dc;
+    private final DtoConverter dtoConverter;
 
     @GetMapping("/manage")
     public String manage(Model model) {
@@ -48,8 +48,8 @@ public class AuthorizeController {
             }
         }
 
-        roleLists.add(dc.convertToRoleDtoList(assignedRole));
-        roleLists.add(dc.convertToRoleDtoList(unassignedRole));
+        roleLists.add(dtoConverter.convertToRoleDtoList(assignedRole));
+        roleLists.add(dtoConverter.convertToRoleDtoList(unassignedRole));
         return JsonBody.builder()
                 .message("역할 조회 성공")
                 .data(roleLists)

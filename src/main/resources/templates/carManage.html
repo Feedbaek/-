@@ -29,7 +29,7 @@
     </div>
 
     <!-- 카 테이블 프래그먼트 -->
-    <div th:replace="~{fragments/carTable :: commonTable(${carListTitles}, ${carList}, 'manage')}"></div>
+    <div th:replace="~{fragments/table :: commonTable(${carListTitles}, ${carList}, 'manage')}"></div>
 
     <!-- Add Car Modal -->
     <div class="modal fade" id="addCarModal" tabindex="-1" role="dialog" aria-labelledby="addCarModalLabel" aria-hidden="true">
@@ -69,27 +69,27 @@
     </div>
 
     <!-- Edit Car Modal (Repeat for each car) -->
-    <div th:each="car : ${carList}" class="modal fade" th:id="'editCarModal-' + ${car.getId()}" tabindex="-1" role="dialog" aria-labelledby="editCarModalLabel" aria-hidden="true">
+    <div th:each="car : ${carList}" class="modal fade" th:id="'editCarModal-' + ${car[0]}" tabindex="-1" role="dialog" aria-labelledby="editCarModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" th:text="'Edit Car ' + ${car.getNumber()}"></h5>
+                    <h5 class="modal-title" th:text="'Edit Car ' + ${car[1]}"></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form th:id="'carForm-' + ${car.getId()}" th:action="@{/car/manage}" method="post">
+                <form th:id="'carForm-' + ${car[0]}" th:action="@{/car/manage}" method="post">
                     <div class="modal-body">
-                        <input type="hidden" name="id" th:value="${car.getId()}"/>
-                        <input type="hidden" name="number" th:value="${car.getNumber()}"/>
+                        <input type="hidden" name="id" th:value="${car[0]}"/>
+                        <input type="hidden" name="number" th:value="${car[1]}"/>
 
                         <div class="form-group">
-                            <label th:for="'carStatus-' + ${car.getNumber()}">Car Status</label>
-                            <input type="text" class="form-control" th:id="'carStatus-' + ${car.getId()}" name="status">
+                            <label th:for="'carStatus-' + ${car[1]}">Car Status</label>
+                            <input type="text" class="form-control" th:id="'carStatus-' + ${car[0]}" name="status">
                         </div>
                         <div class="form-group">
-                            <label th:for="'carComment-' + ${car.getNumber()}">Car Comment</label>
-                            <textarea class="form-control" th:id="'carStatus-' + ${car.getId()}" name="comment"></textarea>
+                            <label th:for="'carComment-' + ${car[1]}">Car Comment</label>
+                            <textarea class="form-control" th:id="'carStatus-' + ${car[0]}" name="comment"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">

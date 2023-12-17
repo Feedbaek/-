@@ -22,72 +22,13 @@
         </div>
     </div>
     <!-- 카 테이블 프래그먼트 -->
-    <div th:replace="~{fragments/carTable :: commonTable(${carListTitles}, ${carList}, 'rental')}"></div>
-    <!-- The Modal -->
-<!--    <div class="modal fade" th:each="car : ${carList}" th:id="'rentCarModal-' + ${car.getNumber()}" tabindex="-1" role="dialog" aria-labelledby="rentCarModalLabel" aria-hidden="true">-->
-<!--        <div class="modal-dialog" role="document">-->
-<!--            <div class="modal-content">-->
-<!--                <div class="modal-header">-->
-<!--                    <h5 class="modal-title" id="rentCarModalLabel">Rent Car</h5>-->
-<!--                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
-<!--                        <span aria-hidden="true">&times;</span>-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <div class="modal-body">-->
-<!--                    <form th:id="'rentCarForm-' + ${car.getNumber()}" th:action="@{/car/rental}" method="post">-->
-<!--                        <input type="hidden" th:name="'carId'" th:value="${car.getId()}"/>-->
-<!--                        <div th:if="${rentalListMap[car.getNumber()] != null}">-->
-<!--                            <label>예약 현황</label>-->
-<!--                            <ul>-->
-<!--                                <li th:each="rental : ${rentalListMap[car.getNumber()]}">-->
-<!--                                    &lt;!&ndash; 여기에 각 rental 항목을 표시하는 방법을 정의 &ndash;&gt;-->
-<!--                                    <span th:text="${rental.getUser().getUsername()}"></span>-->
-<!--                                    <span>대여일:</span>-->
-<!--                                    <span th:text="${rental.getPickupDate()}"></span>-->
-<!--                                    <span>반납일:</span>-->
-<!--                                    <span th:text="${rental.getReturnDate()}"></span>-->
-<!--                                </li>-->
-<!--                            </ul>-->
-<!--                        </div>-->
-<!--                        <div class="form-group">-->
-<!--                            <label for="pickupDate">Pick-up Date:</label>-->
-<!--                            <input type="date" class="form-control" th:min="${minDay}" th:max="${maxDay}" id="pickupDate" name="pickupDate" required>-->
-<!--                        </div>-->
-<!--                        <div class="form-group">-->
-<!--                            <label for="returnDate">Return Date:</label>-->
-<!--                            <input type="date" class="form-control" th:min="${minDay}" th:max="${returnDay}" id="returnDate" name="returnDate" required>-->
-<!--                        </div>-->
-<!--                        <input type="submit" class="btn btn-primary" value="대여 신청">-->
-<!--                    </form>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
+    <div th:replace="~{fragments/table :: commonTable(${carListTitles}, ${carList}, 'rental')}"></div>
 
     <script>
-        // document.querySelectorAll("[id^='rentCarForm-']").forEach((element) =>
-        //     element.addEventListener('submit', function(event) {
-        //         event.preventDefault(); // 폼의 기본 제출 동작을 방지
-        //
-        //         const formData = new FormData(this);
-        //
-        //         fetch(this.action, {
-        //             method: this.method,
-        //             body: formData
-        //         })
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             alert(data.message); // 서버 응답 메시지를 알림으로 표시
-        //         })
-        //         .catch(error => {
-        //             console.error('Error:', error);
-        //             alert('An error occurred'); // 오류 발생 시 알림
-        //         })
-        //         .finally(() => {
-        //             location.reload(); // 페이지 새로고침
-        //         });
-        //     })
-        // );
+        function rentCar(element) {
+            const carId = element.getAttribute('data-car-id');
+            window.location.href = '/car/rental/' + carId;
+        }
     </script>
 </main>
 </html>

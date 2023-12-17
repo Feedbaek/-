@@ -25,24 +25,47 @@ import java.util.Map;
 @Transactional
 @RequiredArgsConstructor
 public class CarRentalService {
+    private final static String DATE_ERROR_MESSAGE_PREFIX = "대여는 오늘부터 가능합니다.";
+    private final static String DATE_ERROR_MESSAGE_SUFFIX = "반납일이 대여일보다 빠를 수 없습니다.";
+    private final static String DATE_ERROR_MESSAGE_OVER_21 = "21일 이내로만 신청할 수 있습니다.";
+    private final static String DATE_ERROR_MESSAGE_OVER_7 = "최대 7일동안 대여할 수 있습니다.";
+    private final static String DATE_ERROR_MESSAGE_RESERVED = "이미 예약된 날짜입니다.";
+    private final static String DATE_ERROR_MESSAGE_NOT_RENTED = "아직 대여하지 않은 차량입니다.";
+    private final static String DATE_ERROR_MESSAGE_ALREADY_RETURNED = "이미 반납된 차량입니다.";
+    private final static String DATE_ERROR_MESSAGE_NOT_RESERVED = "예약되지 않은 차량입니다.";
+
+
     private final RentalHistoryRepository rentalHistoryRepository;
 
+    /**
+     * <h3>차량 대여 날짜 검사.</h3>
+     * */
     private void validatePickUpDateAndReturnDate(RentCarDto rentCarDto) {
-        if (LocalDate.now().isAfter(rentCarDto.getPickupDate())) {
-            log.error("대여는 오늘부터 가능합니다.");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "대여는 오늘부터 가능합니다.");
+        // 겹치는 차량 예약 내역이 있으면 ResponseStatusException 발생
+        if (rentalHistoryRepository.existsByCarIdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual(
+                rentCarDto.getCarId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate())) {
+            log.error(DATE_ERROR_MESSAGE_RESERVED);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_RESERVED);
         }
-        if (!rentCarDto.getPickupDate().isBefore(rentCarDto.getReturnDate())) {
-            log.error("반납일이 대여일보다 빠르거나 같을 수 없습니다.");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "반납일이 대여일보다 빠르거나 같을 수 없습니다.");
+        // 대여일이 오늘 이전이면 ResponseStatusException 발생
+        if (rentCarDto.getPickupDate().isBefore(LocalDate.now())) {
+            log.error(DATE_ERROR_MESSAGE_PREFIX);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_PREFIX);
         }
-        if (rentCarDto.getReturnDate().isAfter(LocalDate.now().plusDays(21))) {
-            log.error("21일 이내로만 신청할 수 있습니다.");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "21 이내로만 신청할 수 있습니다.");
+        // 반납일이 대여일보다 빠르면 ResponseStatusException 발생
+        if (rentCarDto.getReturnDate().isBefore(rentCarDto.getPickupDate())) {
+            log.error(DATE_ERROR_MESSAGE_SUFFIX);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_SUFFIX);
         }
-        if (!rentCarDto.getPickupDate().isAfter(rentCarDto.getReturnDate().minusDays(8))) {
-            log.error("7일 이내로만 대여할 수 있습니다.");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "7일 이내로만 대여할 수 있습니다.");
+        // 오늘로부터 21일 이후 반납이면 ResponseStatusException 발생
+        if (rentCarDto.getReturnDate().isAfter(LocalDate.now().plusDays(20))) {
+            log.error(DATE_ERROR_MESSAGE_OVER_21);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_OVER_21);
+        }
+        // 대여일로부터 7일 이후 반납이면 ResponseStatusException 발생
+        if (rentCarDto.getReturnDate().isAfter(rentCarDto.getPickupDate().plusDays(6))) {
+            log.error(DATE_ERROR_MESSAGE_OVER_7);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_OVER_7);
         }
     }
 
@@ -52,11 +75,7 @@ public class CarRentalService {
      * 반납일이 대여일보다 빠르거나 같으면, 대여일로부터 7일 이후 반납이면 ResponseStatusException 발생
      */
     public RentCarDto rentCar(RentCarDto rentCarDto, User user, Car car) {
-        if (!rentalHistoryRepository.findByCarIdAndReturnDateGreaterThanAndPickupDateLessThan(car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate()).isEmpty()) {
-            log.error("이미 대여된 차량입니다.");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 대여된 차량입니다.");
-        }
-
+        rentCarDto.setCarId(car.getId());
         validatePickUpDateAndReturnDate(rentCarDto);
 
         RentalHistory rentalHistory = RentalHistory.builder()
@@ -79,16 +98,17 @@ public class CarRentalService {
      * 차량 번호가 존재하지 않으면, 대여 기록이 없으면 ResponseStatusException 발생
      */
     public RentCarDto returnCar(RentCarDto rentCarDto, User user, Car car) {
+        // 대여 기록이 없으면 ResponseStatusException 발생
         RentalHistory rentalHistory = rentalHistoryRepository
                 .findByUserIdAndCarIdAndPickupDateAndReturnDate(user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "대여 기록이 없습니다."));
+                    () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_NOT_RESERVED));
         if (rentalHistory.getReturnDate().isBefore(LocalDate.now())) {
-            log.error("이미 반납된 차량입니다.");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 반납된 차량입니다.");
+            log.error(DATE_ERROR_MESSAGE_ALREADY_RETURNED);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_ALREADY_RETURNED);
         }
         if (rentalHistory.getPickupDate().isAfter(LocalDate.now())) {
-            log.error("아직 대여하지 않은 차량입니다.");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "아직 대여일이 되지 않은 차량입니다.");
+            log.error(DATE_ERROR_MESSAGE_NOT_RENTED);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_NOT_RENTED);
         }
 
         rentalHistory.setReturnDate(LocalDate.now());
@@ -109,7 +129,7 @@ public class CarRentalService {
 
         carDtoList.forEach(carDto -> {
             Long id = carDto.getId();
-            rentalHistoryMap.put(id, rentalHistoryRepository.findByCarIdAndReturnDateGreaterThan(id, LocalDate.now()));
+            rentalHistoryMap.put(id, rentalHistoryRepository.findByCarIdAndReturnDateGreaterThanEqual(id, LocalDate.now()));
         });
 
         return rentalHistoryMap;
@@ -120,8 +140,10 @@ public class CarRentalService {
      * 차량 번호가 존재하지 않으면, 대여 기록이 없으면 ResponseStatusException 발생
      */
     public RentCarDto deleteRental(RentCarDto rentCarDto, User user, Car car) {
-        RentalHistory rentalHistory = rentalHistoryRepository.findByUserIdAndCarIdAndPickupDateAndReturnDate(user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "대여 기록이 없습니다."));
+        // 대여 기록이 없으면 ResponseStatusException 발생
+        RentalHistory rentalHistory = rentalHistoryRepository
+                .findByUserIdAndCarIdAndPickupDateAndReturnDate(user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_NOT_RESERVED));
 
         try {
             rentalHistoryRepository.delete(rentalHistory);
@@ -138,7 +160,8 @@ public class CarRentalService {
     }
 
     public List<List<CarAvailableDate>> getAvailableDate(Car car) {
-        List<RentalHistory> unavailableDate = rentalHistoryRepository.findByCarIdAndReturnDateGreaterThan(
+        // 오늘 이후 대여 날짜를 가져옴
+        List<RentalHistory> unavailableDate = rentalHistoryRepository.findByCarIdAndReturnDateGreaterThanEqual(
                 car.getId(), LocalDate.now());
         List<List<CarAvailableDate>> availableDate = new ArrayList<>();
 
@@ -163,7 +186,7 @@ public class CarRentalService {
                 // 대여 기록이 있는 날짜를 제거
                 for (RentalHistory rentalHistory : unavailableDate) {
                     if ((date.isEqual(rentalHistory.getPickupDate()) || date.isAfter(rentalHistory.getPickupDate()))
-                            && date.isBefore(rentalHistory.getReturnDate())) {
+                            && (date.isEqual(rentalHistory.getReturnDate()) || date.isBefore(rentalHistory.getReturnDate()))) {
                         carAvailableDate.setAvailable(false);
                         break;
                     }

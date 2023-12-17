@@ -14,6 +14,7 @@ import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.CarManageService;
 import seoul.AutoEveryDay.service.CarRentalService;
 import seoul.AutoEveryDay.service.LoginService;
+import seoul.AutoEveryDay.utils.DtoConverter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class CarController {
     private final LoginService loginService;
     private final CarManageService carManageService;
     private final CarRentalService carRentalService;
+    private final DtoConverter dtoConverter;
 
     /* 차량 대여 */
     @GetMapping("/rental")  // 차량 대여 페이지
@@ -41,7 +43,8 @@ public class CarController {
                             @RequestParam(value = "q", required = false) String carNumber) {
         List<CarDto> carDtoList = carManageService.searchCar(carModelId, carNumber);
         String[] carInfo = {"차량 번호", "차종", "상태", "메모", "대여/반납"};
-        model.addAttribute("carList", carDtoList);
+        List<List<String>> listList = dtoConverter.convertCarDtoList(carDtoList);
+        model.addAttribute("carList", listList);
         model.addAttribute("carListTitles", carInfo);
         model.addAttribute("search", carNumber);
         return "carRental";
@@ -100,7 +103,8 @@ public class CarController {
     public String getCar(Model model, @RequestParam(value = "q", required = false) String carNumber) {
         List<CarDto> carDtoList = carManageService.searchCar(carNumber);
         String[] carInfo = {"차량 번호", "차종", "상태", "메모", "수정/삭제"};
-        model.addAttribute("carList", carDtoList);
+        List<List<String>> listList = dtoConverter.convertCarDtoList(carDtoList);
+        model.addAttribute("carList", listList);
         model.addAttribute("carListTitles", carInfo);
         model.addAttribute("search", carNumber);
         return "carManage";
