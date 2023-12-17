@@ -11,7 +11,7 @@
     <h1 class="display-5">대여 날짜</h1>
     <div th:text="${month} + '월'"></div>
     <!-- 캘린더 프래그먼트 -->
-    <div th:replace="~{fragments/calendar :: commonCalendar(${dateArr})}"></div>
+    <div th:replace="~{fragments/calendar :: commonCalendar(${header}, ${dateArr})}"></div>
 
     <script>
         let pickupDay = null;

@@ -37,9 +37,9 @@ public class CarController {
         return "modelSelect";
     }
 
-    @GetMapping("/rental/{model}")  // 차량 대여 페이지
+    @GetMapping("/rental/{carModel}")  // 차량 대여 페이지
     public String rentalGet(Model model,
-                            @PathVariable(value = "model", required = false) Long carModelId,
+                            @PathVariable(value = "carModel", required = false) Long carModelId,
                             @RequestParam(value = "q", required = false) String carNumber) {
         List<CarDto> carDtoList = carManageService.searchCar(carModelId, carNumber);
         String[] carInfo = {"차량 번호", "차종", "상태", "메모", "대여/반납"};
@@ -50,7 +50,7 @@ public class CarController {
         return "carRental";
     }
 
-    @GetMapping("/rental/{model}/{carId}") // 차량 대여 날짜 선택 페이지
+    @GetMapping("/rental/{carModel}/{carId}") // 차량 대여 날짜 선택 페이지
     public String rentalGet(@PathVariable("carId") Long carId, Model model) {
         Car car = carManageService.getCar(carId);
         List<List<CarAvailableDate>> dateArr = carRentalService.getAvailableDate(car);

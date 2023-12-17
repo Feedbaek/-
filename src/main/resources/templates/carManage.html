@@ -7,17 +7,9 @@
     <title>차량 보기</title>
 </head>
 <main layout:fragment="content" class="container mt-5">
-    <div class="row">
-        <div class="col">
-            <h1 class="display-5">차량 보기</h1>
-        </div>
-        <div class="col text-right mt-5">
-            <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#addCarModal">차량 등록</button>
-        </div>
-    </div>
-
-    <!-- 검색 창 -->
-    <div class="container mt-3">
+    <h1 class="display-5">차량 보기</h1>
+    <div class="col text-right mt-5">
+        <!-- 검색 창 -->
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <form class="d-flex" action="/car/manage" method="get">
@@ -26,8 +18,9 @@
                 </form>
             </div>
         </div>
+        <!-- 차량 등록 -->
+        <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#addCarModal">차량 등록</button>
     </div>
-
     <!-- 카 테이블 프래그먼트 -->
     <div th:replace="~{fragments/table :: commonTable(${carListTitles}, ${carList}, 'manage')}"></div>
 
