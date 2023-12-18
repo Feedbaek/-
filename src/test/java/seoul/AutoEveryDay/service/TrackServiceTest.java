@@ -196,7 +196,7 @@ public class TrackServiceTest {
         Track track = makeTrack();
 
         given(trackRepository.findById(trackDto.getId())).willReturn(Optional.of(track));
-        given(reserveTrackRepository.existsByTrackId(track.getId())).willReturn(true);
+        given(reserveTrackRepository.existsByTrack_Id(track.getId())).willReturn(true);
 
         // when
         Throwable thrown = catchThrowable(() -> trackService.deleteTestTrack(trackDto.getId()));
@@ -233,7 +233,7 @@ public class TrackServiceTest {
         ReserveTrackDto reserveTrackDto = makeDriveHistoryDto();
         User user = makeUser();
 
-        given(reserveTrackRepository.findByTrackIdAndDate(track.getId(), reserveTrackDto.getDate())).willReturn(Optional.empty());
+        given(reserveTrackRepository.findByTrack_IdAndDate(track.getId(), reserveTrackDto.getDate())).willReturn(Optional.empty());
         given(trackRepository.findById(track.getId())).willReturn(Optional.of(track));
         given(reserveTrackRepository.save(Mockito.any(ReserveTrack.class))).will((invocation) -> {
             ReserveTrack d = invocation.getArgument(0);
@@ -276,7 +276,7 @@ public class TrackServiceTest {
         ReserveTrackDto reserveTrackDto = makeDriveHistoryDto();
         User user = makeUser();
 
-        given(reserveTrackRepository.findByTrackIdAndDate(track.getId(), reserveTrackDto.getDate())).willReturn(Optional.of(ReserveTrack.builder().build()));
+        given(reserveTrackRepository.findByTrack_IdAndDate(track.getId(), reserveTrackDto.getDate())).willReturn(Optional.of(ReserveTrack.builder().build()));
 
         // when
         Throwable thrown = catchThrowable(() -> trackService.createReserveHistory(reserveTrackDto, user));
@@ -294,7 +294,7 @@ public class TrackServiceTest {
         ReserveTrackDto reserveTrackDto = makeDriveHistoryDto();
         User user = makeUser();
 
-        given(reserveTrackRepository.findByTrackIdAndDate(track.getId(), reserveTrackDto.getDate())).willReturn(Optional.empty());
+        given(reserveTrackRepository.findByTrack_IdAndDate(track.getId(), reserveTrackDto.getDate())).willReturn(Optional.empty());
         given(trackRepository.findById(track.getId())).willReturn(Optional.empty());
 
         // when
@@ -314,7 +314,7 @@ public class TrackServiceTest {
         User user = makeUser();
 
         given(trackRepository.findById(reserveTrackDto.getId())).willReturn(Optional.of(track));
-        given(reserveTrackRepository.findByUserIdAndTrackIdAndDate(user.getId(), track.getId(), reserveTrackDto.getDate())).willReturn(Optional.of(ReserveTrack.builder().build()));
+        given(reserveTrackRepository.findByUser_IdAndTrack_IdAndDate(user.getId(), track.getId(), reserveTrackDto.getDate())).willReturn(Optional.of(ReserveTrack.builder().build()));
 
         // when
         ReserveTrackDto res = trackService.deleteReserveHistory(reserveTrackDto, user);
@@ -352,7 +352,7 @@ public class TrackServiceTest {
         User user = makeUser();
 
         given(trackRepository.findById(reserveTrackDto.getId())).willReturn(Optional.of(track));
-        given(reserveTrackRepository.findByUserIdAndTrackIdAndDate(user.getId(), track.getId(), reserveTrackDto.getDate())).willReturn(Optional.empty());
+        given(reserveTrackRepository.findByUser_IdAndTrack_IdAndDate(user.getId(), track.getId(), reserveTrackDto.getDate())).willReturn(Optional.empty());
 
         // when
         Throwable thrown = catchThrowable(() -> trackService.deleteReserveHistory(reserveTrackDto, user));

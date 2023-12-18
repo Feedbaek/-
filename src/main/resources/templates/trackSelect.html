@@ -4,7 +4,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/default_layout}">
 <head>
-    <title>차량 대여</title>
+    <title>시험장 예약</title>
     <style>
         th:hover {
             background-color: rgba(197, 197, 197, 0.86); /* Light grey background on hover */
@@ -14,26 +14,27 @@
 </head>
 <!-- Content -->
 <main layout:fragment="content" class="container mt-4">
-    <h1 class="display-5">차량 대여하기</h1>
-    <!-- 여기에 carList 리스트 값을 리스트 형식으로 보여줌 -->
-    <!-- 검색 창 -->
-    <div class="container mt-3">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <form class="d-flex" action="" method="get">
-                    <input class="form-control me-2" type="search" th:placeholder="${search}" aria-label="Search" name="q">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
+    <h1 class="display-5">시험장 예약하기</h1>
+    <div class="card bg-light rounded">
+        <div class="card-body">
+            <div class="text-center">
+                <h2>트랙을 선택해 주세요.</h2>
+                <br>
+                <div class="container my-4">
+                    <div class="row justify-content-center">
+                        <div th:each="track, iter : ${trackList}" class="col-md-4">
+                            <div th:replace="~{fragments/selectCard :: selectCard(${iter.index + 1}, ${track}, 'track')}"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <!-- 카 테이블 프래그먼트 -->
-    <div th:replace="~{fragments/table :: commonTable(${carListTitles}, ${carList}, 'rental')}"></div>
 
     <script>
-        function rentCar(element) {
-            const carId = element.getAttribute('data-car-id');
-            window.location.href = window.location.pathname + '/' + carId;
+        function reserveTrack(element) {
+            const trackId = element.getAttribute('data-track-id');
+            window.location.href = window.location.pathname + '/' + trackId;
         }
 
         // 오름차순으로 정렬

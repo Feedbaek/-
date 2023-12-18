@@ -116,9 +116,10 @@ public class SetupDummyData {
     @PostConstruct
     @Transactional
     public void setupTestTrack() { // 테스트 트랙 더미
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
+            char ch = (char) ('A' + i);
             trackRepository.save(Track.builder()
-                    .name("테스트 트랙" + i)
+                    .name("트랙" + ch)
                     .description("테스트 트랙 설명" + i)
                     .build());
         }

@@ -9,15 +9,16 @@ import org.springframework.web.bind.annotation.*;
 import seoul.AutoEveryDay.dto.JsonBody;
 import seoul.AutoEveryDay.dto.TrackDto;
 import seoul.AutoEveryDay.dto.ReserveTrackDto;
+import seoul.AutoEveryDay.entity.Track;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.LoginService;
 import seoul.AutoEveryDay.service.TrackService;
 
-import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@PreAuthorize(value = "hasAuthority('TEST_TRACK')")
 @RequestMapping("/center")
 public class CenterController { // 테스트 트랙 관련 컨트롤러
     private final TrackService trackService;
@@ -26,15 +27,23 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
     // 예약 관련 컨트롤러
     @GetMapping("/track/reserve")  // 테스트 트랙 예약 페이지
     public String reserveGet(Model model) {
-        model.addAttribute("testTrackList", trackService.getAllTestTrack());
-        model.addAttribute("minDay", LocalDate.now());
-        model.addAttribute("maxDay", LocalDate.now().plusDays(7));
-        return "trackReserve";
+        model.addAttribute("trackList", trackService.getAllTestTrack());
+        return "trackSelect";
+    }
+
+    @GetMapping("/track/reserve/{trackId}")  // 테스트 트랙 예약 날짜 선택 페이지
+    public String reserveGet(@PathVariable("trackId") Long trackId, Model model) {
+        Track track = trackService.getTestTrack(trackId);
+        List<String> unavailableDateList = trackService.getUnavailableDateList(track);
+        model.addAttribute("dateArr", unavailableDateList);
+        model.addAttribute("trackId", trackId);
+        return "trackReserveDate";
     }
 
     @ResponseBody
+    @PreAuthorize(value = "hasAuthority('TRACK_RESERVE')")
     @PostMapping("/track/reserve")  // 테스트 트랙 예약
-    public JsonBody reservePost(@Validated ReserveTrackDto reserveTrackDto) {
+    public JsonBody reservePost(@Validated @RequestBody ReserveTrackDto reserveTrackDto) {
         User user = userService.getLoginUser();
         return JsonBody.builder()
                 .message("예약 성공")
@@ -42,6 +51,7 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
                 .build();
     }
     @ResponseBody
+    @PreAuthorize(value = "hasAuthority('TRACK_RESERVE')")
     @DeleteMapping("/track/reserve")  // 테스트 트랙 예약 취소
     public JsonBody reserveDelete(@Validated @RequestParam ReserveTrackDto reserveTrackDto) {
         User user = userService.getLoginUser();

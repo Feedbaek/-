@@ -175,4 +175,15 @@ public class CarManageService {
                 .comment(car.getComment())
                 .build();
     }
+
+    public List<String> getAllCarModelNames() {
+        List<CarModel> carModelList = carModelRepository.findAllByOrderById();
+        List<String> carModelNameList = new ArrayList<>();
+
+        carModelList.forEach(carModel -> {
+            carModelNameList.add(carModel.getName());
+        });
+
+        return carModelNameList;
+    }
 }

@@ -16,13 +16,15 @@
     <table class="table table-hover table-borderless text-center">
         <thead class="bg-info text-white">
         <tr>
-            <!-- 차량 관련 테이블 헤더 -->
-            <th th:each="header, iter : ${headers}" th:if="${(type == 'manage' || type == 'rental' || type == 'rentalHistory') && iter.index != 4}"
+            <!-- 차량 대여, 관리 테이블 헤더 -->
+            <th th:each="header, iter : ${headers}" th:if="${(type == 'manage' || type == 'rental') && iter.index != 4}"
+                th:attr="data-index=${iter.index}" onclick="sortTable(this)" th:text="${header}"></th>
+            <!-- 차량 대여 내역 테이블 헤더 -->
+            <th th:each="header, iter : ${headers}" th:if="${type == 'rentalHistory'}"
                 th:attr="data-index=${iter.index}" onclick="sortTable(this)" th:text="${header}"></th>
             <!-- 액션 버튼 유무 -->
             <th th:if="${type == 'manage'}" sec:authorize="hasAuthority('ADMIN')" th:text="${headers[4]}"></th>
             <th th:if="${type == 'rental'}" sec:authorize="hasAuthority('CAR_RENTAL')" th:text="${headers[4]}"></th>
-            <th th:if="${type == 'rentalHistory'}" sec:authorize="hasAuthority('CAR_RENTAL')" th:text="${headers[4]}"></th>
         </tr>
         </thead>
         <tbody>
@@ -42,7 +44,7 @@
         <tr th:each="dataObj : ${dataList}" th:if="${type} == 'rental'">
             <td th:each="data, iter : ${dataObj}" th:if="${iter.index} != 0" th:text="${data}" class="align-middle py-4"></td>
             <td sec:authorize="hasAuthority('CAR_RENTAL')" class="align-middle">
-                <button th:if="${type == 'rental'}" type="button" class="btn btn-info" th:attr="data-car-id=${dataObj[0]}" onclick="rentCar(this)">대여
+                <button type="button" class="btn btn-info" th:attr="data-car-id=${dataObj[0]}" onclick="rentCar(this)">대여
                 </button>
             </td>
         </tr>
@@ -50,8 +52,10 @@
         <tr th:each="dataObj : ${dataList}" th:if="${type} == 'rentalHistory'">
             <td th:each="data, iter : ${dataObj}" th:if="${iter.index} != 0" th:text="${data}" class="align-middle py-4"></td>
             <td sec:authorize="hasAuthority('CAR_RENTAL')" class="align-middle">
-                <button th:if="${type == 'rentalHistory'}" type="button" class="btn btn-info" th:attr="data-car-id=${dataObj[0]}" onclick="returnCar(this)">반납
-                </button>
+                <button th:if="${dataObj[5] == '대여 신청'}" type="button" class="btn btn-danger" th:attr="data-history-id=${dataObj[0]}" onclick="deleteRental(this)">취소</button>
+                <button th:if="${dataObj[5] == '대여 중'}" type="button" class="btn btn-info" th:attr="data-history-id=${dataObj[0]}" onclick="returnCar(this)">반납</button>
+                <button th:if="${dataObj[5] == '반납 완료'}" type="button" class="btn btn-secondary" disabled>반납 완료</button>
+                <button th:if="${dataObj[5] == '취소 완료'}" type="button" class="btn btn-secondary" disabled>취소 완료</button>
             </td>
         </tr>
         </tbody>

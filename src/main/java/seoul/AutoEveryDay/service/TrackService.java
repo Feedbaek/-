@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import seoul.AutoEveryDay.dto.AvailableDate;
 import seoul.AutoEveryDay.dto.TrackDto;
 import seoul.AutoEveryDay.dto.ReserveTrackDto;
 import seoul.AutoEveryDay.entity.Track;
@@ -15,6 +16,7 @@ import seoul.AutoEveryDay.repository.TrackRepository;
 import seoul.AutoEveryDay.repository.ReserveTrackRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,7 +31,7 @@ public class TrackService {
         if (testHistory.getDate().isBefore(LocalDate.now())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약은 오늘 이후로만 가능합니다.");
         }
-        if (reserveTrackRepository.findByTrackIdAndDate(user.getId(), testHistory.getDate()).isPresent()) {
+        if (reserveTrackRepository.findByTrack_IdAndDate(testHistory.getTrackId(), testHistory.getDate()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 예약된 날짜입니다.");
         }
     }
@@ -71,7 +73,7 @@ public class TrackService {
     }
     public TrackDto deleteTestTrack(Long id) {
         Track track = getTrack(id);
-        if (reserveTrackRepository.existsByTrackId(track.getId())) {
+        if (reserveTrackRepository.existsByTrack_Id(track.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약된 트랙은 삭제할 수 없습니다.");
         }
         try {
@@ -117,7 +119,7 @@ public class TrackService {
 
     public ReserveTrackDto deleteReserveHistory(ReserveTrackDto reserveTrackDto, User user) {
         Track track = getTrack(reserveTrackDto.getTrackId());
-        ReserveTrack reserveTrack = reserveTrackRepository.findByUserIdAndTrackIdAndDate(user.getId(), track.getId(), reserveTrackDto.getDate()).orElseThrow(
+        ReserveTrack reserveTrack = reserveTrackRepository.findByUser_IdAndTrack_IdAndDate(user.getId(), track.getId(), reserveTrackDto.getDate()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "예약을 찾을 수 없습니다.")
         );
         reserveTrackDto.setId(reserveTrack.getId());
@@ -130,4 +132,22 @@ public class TrackService {
         return reserveTrackDto;
     }
 
+    public Track getTestTrack(Long trackId) {
+        return trackRepository.findById(trackId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "트랙을 찾을 수 없습니다.")
+        );
+    }
+
+    public List<String> getUnavailableDateList(Track track) {
+        // 오늘 이후 예약 날짜를 가져옴
+        List<ReserveTrack> reserveTrackList = reserveTrackRepository.findByTrack_IdAndDateGreaterThanEqual(track.getId(), LocalDate.now());
+        List<String> unavailableDateList = new ArrayList<>();
+
+        reserveTrackList.forEach((reserveTrack) -> {
+            String date = reserveTrack.getDate().toString();
+            unavailableDateList.add(date);
+        });
+
+        return unavailableDateList;
+    }
 }

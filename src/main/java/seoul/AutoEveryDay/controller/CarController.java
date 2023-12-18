@@ -8,7 +8,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import seoul.AutoEveryDay.dto.*;
 import seoul.AutoEveryDay.entity.Car;
-import seoul.AutoEveryDay.entity.RentCar;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.CarManageService;
 import seoul.AutoEveryDay.service.CarRentalService;
@@ -30,8 +29,13 @@ public class CarController {
 
     /* 차량 대여 */
     @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
-    @GetMapping("/rental")  // 차량 대여 페이지
+    @GetMapping("/rental")  // 차량 모델 선택 페이지
     public String rentalGet(Model model) {
+        List<String> carModelList = carManageService.getAllCarModelNames();
+        for (String carModel : carModelList) {
+            System.out.println(carModel);
+        }
+        model.addAttribute("carModelList", carModelList);
         return "modelSelect";
     }
 
@@ -55,14 +59,10 @@ public class CarController {
         Car car = carManageService.getCar(carId);
         LocalDate now = LocalDate.now();
 
-        List<List<CarAvailableDate>> dateArr = carRentalService.getAvailableDate(car);
+        List<List<AvailableDate>> dateArr = carRentalService.getAvailableDate(car);
         List<String> dayOfWeek = converter.getDayOfWeek(now);
 
         model.addAttribute("dateArr", dateArr);
-//        model.addAttribute("dayOfWeek", dayOfWeek);
-//        model.addAttribute("year", now.getYear());
-//        model.addAttribute("month", now.getMonthValue());
-//        model.addAttribute("today", now.getDayOfMonth());
         model.addAttribute("carId", carId);
         return "carRentalDate";
     }
@@ -71,7 +71,7 @@ public class CarController {
     @GetMapping("/rental/history") // 차량 대여 내역 페이지
     public String rentalHistoryGet(Model model) {
         User user = loginService.getLoginUser();
-        String[] rentalHistoryTitles = {"차량 번호", "차종", "대여일", "반납일", "상태", "취소"};
+        String[] rentalHistoryTitles = {"차량 번호", "차종", "대여일", "반납일", "상태", "취소/반납"};
 
         List<List<String>> rentalHistoryList = carRentalService.getRentalHistoryList(user);
         model.addAttribute("rentalHistoryTitles", rentalHistoryTitles);
@@ -94,25 +94,32 @@ public class CarController {
 
     @ResponseBody
     @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
-    @PutMapping("/rental")  // 차량 반납
-    public JsonBody rentalPut(@Validated @RequestBody RentCarDto rentCarDto) {
-        User user = loginService.getLoginUser();
-        Car car = carManageService.getCar(rentCarDto.getCarId());
+    @PostMapping("/rental/return/{historyId}")  // 차량 반납
+    public JsonBody rentalPut(@PathVariable("historyId") Long historyId) {
         return JsonBody.builder()
                 .message("차량 반납 성공")
-                .data(carRentalService.returnCar(rentCarDto, user, car))
+                .data(carRentalService.returnCar(historyId))
                 .build();
     }
 
     @ResponseBody
     @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
-    @DeleteMapping("/rental")   // 차량 대여 취소
-    public JsonBody rentalDelete(@Validated @RequestBody RentCarDto rentCarDto) {
-        User user = loginService.getLoginUser();
-        Car car = carManageService.getCar(rentCarDto.getCarId());
+    @PostMapping("/rental/cancel/{historyId}")  // 차량 대여 취소
+    public JsonBody rentalCancel(@PathVariable("historyId") Long historyId) {
         return JsonBody.builder()
                 .message("차량 대여 취소 성공")
-                .data(carRentalService.deleteRental(rentCarDto, user, car))
+                .data(carRentalService.cancelRental(historyId))
+                .build();
+    }
+
+
+    @ResponseBody
+    @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
+    @DeleteMapping("/rental/{historyId}")   // 대여 기록 삭제
+    public JsonBody rentalDelete(@PathVariable("historyId") Long historyId) {
+        return JsonBody.builder()
+                .message("차량 대여 취소 성공")
+                .data(carRentalService.deleteRental(historyId))
                 .build();
     }
 

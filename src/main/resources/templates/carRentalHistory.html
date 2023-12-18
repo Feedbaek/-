@@ -32,8 +32,43 @@
 
     <script>
         function returnCar(element) {
-            // const carId = element.getAttribute('data-car-id');
-            // window.location.href += "/" + carId;
+            const historyId = element.getAttribute('data-history-id');
+            fetch('/car/rental/return/' + historyId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(response => {
+                if (response.ok) {
+                    alert('반납 완료');
+                } else {
+                    alert('반납 실패');
+                }
+            }).catch(error => {
+                console.log(error);
+            }).finally(() => {
+                window.location.reload();
+            });
+        }
+
+        function deleteRental(element) {
+            const historyId = element.getAttribute('data-history-id');
+            fetch('/car/rental/cancel/' + historyId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(response => {
+                if (response.ok) {
+                    alert('취소 완료');
+                } else {
+                    alert('취소 실패');
+                }
+            }).catch(error => {
+                console.log(error);
+            }).finally(() => {
+                window.location.reload();
+            });
         }
 
         // 오름차순으로 정렬

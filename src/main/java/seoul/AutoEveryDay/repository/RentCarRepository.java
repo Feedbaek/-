@@ -10,10 +10,10 @@ import java.util.Optional;
 
 @Repository
 public interface RentCarRepository extends JpaRepository<RentCar, Long> {
-    Boolean existsByCar_IdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual(Long carId, LocalDate pickUpDate, LocalDate returnDate);
+    Boolean existsByCar_IdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqualAndIsReturned(Long carId, LocalDate pickUpDate, LocalDate returnDate, Boolean isReturned);
     List<RentCar> findByCar_IdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual(Long carId, LocalDate pickUpDate, LocalDate returnDate);
     List<RentCar> findByCar_IdAndReturnDateGreaterThanEqual(Long carId, LocalDate pickUpDate);
-    Optional<RentCar> findByCar_IdAndPickupDateAndReturnDate(Long carId, LocalDate pickUpDate, LocalDate returnDate);
+    List<RentCar> findByCar_IdAndReturnDateGreaterThanEqualAndIsReturned(Long carId, LocalDate pickUpDate, Boolean isReturned);
     Optional<RentCar> findByUser_IdAndCarIdAndPickupDateAndReturnDate(Long userId, Long carId, LocalDate pickUpDate, LocalDate returnDate);
 
     boolean existsByCar_IdAndPickupDateGreaterThanEqual(Long carId, LocalDate pickUpDate);

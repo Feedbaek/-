@@ -20,7 +20,7 @@
                     <p>원하는 서비스를 선택해 주세요.</p>
                     <button sec:authorize="hasAuthority('CAR_RENTAL')" type="button" class="btn btn-primary mx-1" onclick="location.href='/car/rental'">차량 대여</button>
                     <button type="button" class="btn btn-secondary mx-1" onclick="location.href='/car/manage'">차량 보기</button>
-                    <button sec:authorize="hasAuthority('TEST_TRACK')" type="button" class="btn btn-success mx-1" onclick="location.href='/center/track/manage'">시험장 보기</button>
+                    <button sec:authorize="hasAuthority('TRACK_RESERVE')" type="button" class="btn btn-success mx-1" onclick="location.href='/center/track/reserve'">시험장 보기</button>
                 </div>
             </div>
         </div>

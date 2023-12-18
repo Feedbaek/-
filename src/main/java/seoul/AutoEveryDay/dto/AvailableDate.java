@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CarAvailableDate {
+public class AvailableDate {
     private Integer day;
     private boolean available;
 }

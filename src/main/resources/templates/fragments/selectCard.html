@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="selectCard(index, data, type)" class="card h-100" style="width: 18rem; margin-left: 10px; margin-right: 10px;">
+    <img th:src="@{'/image/' + ${type} +'/' + ${index} + '.jpeg'}" class="card-img-top img-fluid" style="height: 200px; object-fit: cover;">
+    <!-- 자동차 모델 카드 -->
+    <div th:if="${type == 'car'}" class="card-body d-flex flex-column justify-content-between">
+        <h5 class="card-title" th:text="${data}"></h5>
+        <a th:href="@{'/car/rental/' + ${index}}" class="btn btn-outline-info">차량 보기</a>
+    </div>
+    <!-- 시험장 트랙 카드 -->
+    <div th:if="${type == 'track'}" class="card-body d-flex flex-column justify-content-between">
+        <h5 class="card-title" th:text="${data.name}"></h5>
+        <p class="card-text" th:text="${data.description}"></p>
+        <a th:href="@{'/center/track/reserve/' + ${index}}" class="btn btn-outline-info">예약 하기</a>
+    </div>
+</div>
+
+</body>
+</html>

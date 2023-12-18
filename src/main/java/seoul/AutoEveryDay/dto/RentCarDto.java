@@ -22,4 +22,5 @@ public class RentCarDto {
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate returnDate;
+    private Boolean isReturned;
 }

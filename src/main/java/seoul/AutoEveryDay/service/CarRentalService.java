@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import seoul.AutoEveryDay.dto.CarAvailableDate;
+import seoul.AutoEveryDay.dto.AvailableDate;
 import seoul.AutoEveryDay.dto.CarDto;
 import seoul.AutoEveryDay.dto.RentCarDto;
 import seoul.AutoEveryDay.entity.Car;
@@ -42,8 +42,8 @@ public class CarRentalService {
      * */
     private void validatePickUpDateAndReturnDate(RentCarDto rentCarDto) {
         // 겹치는 차량 예약 내역이 있으면 ResponseStatusException 발생
-        if (rentCarRepository.existsByCar_IdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual(
-                rentCarDto.getCarId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate())) {
+        if (rentCarRepository.existsByCar_IdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqualAndIsReturned(
+                rentCarDto.getCarId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate(), false)) {
             log.error(DATE_ERROR_MESSAGE_RESERVED);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_RESERVED);
         }
@@ -76,6 +76,7 @@ public class CarRentalService {
      */
     public RentCarDto rentCar(RentCarDto rentCarDto, User user, Car car) {
         rentCarDto.setCarId(car.getId());
+        rentCarDto.setIsReturned(false);
         validatePickUpDateAndReturnDate(rentCarDto);
 
         RentCar rentCar = RentCar.builder()
@@ -83,6 +84,7 @@ public class CarRentalService {
                 .user(user)
                 .pickupDate(rentCarDto.getPickupDate())
                 .returnDate(rentCarDto.getReturnDate())
+                .isReturned(false)
                 .build();
         try {
             rentCarRepository.save(rentCar);
@@ -102,7 +104,7 @@ public class CarRentalService {
         RentCar rentCar = rentCarRepository
                 .findByUser_IdAndCarIdAndPickupDateAndReturnDate(user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_NOT_RESERVED));
-        if (rentCar.getReturnDate().isBefore(LocalDate.now())) {
+        if (rentCar.getIsReturned()) {
             log.error(DATE_ERROR_MESSAGE_ALREADY_RETURNED);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_ALREADY_RETURNED);
         }
@@ -112,11 +114,36 @@ public class CarRentalService {
         }
 
         rentCar.setReturnDate(LocalDate.now());
+        rentCar.setIsReturned(true);
         return RentCarDto.builder()
                 .id(rentCar.getId())
                 .carId(car.getId())
                 .pickupDate(rentCar.getPickupDate())
                 .returnDate(rentCar.getReturnDate())
+                .isReturned(true)
+                .build();
+    }
+
+    public RentCarDto returnCar(Long historyId) {
+        RentCar rentCar = rentCarRepository.findById(historyId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_NOT_RESERVED));
+        if (rentCar.getIsReturned()) {
+            log.error(DATE_ERROR_MESSAGE_ALREADY_RETURNED);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_ALREADY_RETURNED);
+        }
+        if (rentCar.getPickupDate().isAfter(LocalDate.now())) {
+            log.error(DATE_ERROR_MESSAGE_NOT_RENTED);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_NOT_RENTED);
+        }
+        rentCar.setReturnDate(LocalDate.now());
+        rentCar.setIsReturned(true);
+        return RentCarDto.builder()
+                .id(rentCar.getId())
+                .userId(rentCar.getUser().getId())
+                .carId(rentCar.getCar().getId())
+                .pickupDate(rentCar.getPickupDate())
+                .returnDate(rentCar.getReturnDate())
+                .isReturned(true)
                 .build();
     }
 
@@ -129,7 +156,7 @@ public class CarRentalService {
 
         carDtoList.forEach(carDto -> {
             Long id = carDto.getId();
-            rentalHistoryMap.put(id, rentCarRepository.findByCar_IdAndReturnDateGreaterThanEqual(id, LocalDate.now()));
+            rentalHistoryMap.put(id, rentCarRepository.findByCar_IdAndReturnDateGreaterThanEqualAndIsReturned(id, LocalDate.now(), false));
         });
 
         return rentalHistoryMap;
@@ -160,14 +187,37 @@ public class CarRentalService {
                 .carId(car.getId())
                 .pickupDate(rentCar.getPickupDate())
                 .returnDate(rentCar.getReturnDate())
+                .isReturned(rentCar.getIsReturned())
                 .build();
     }
 
-    public List<List<CarAvailableDate>> getAvailableDate(Car car) {
+    public RentCarDto deleteRental(Long historyId) {
+        // 대여 기록이 없으면 ResponseStatusException 발생
+        RentCar rentCar = rentCarRepository.findById(historyId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_NOT_RESERVED));
+        try {
+            rentCarRepository.delete(rentCar);
+        } catch (Exception e) {
+            log.error("대여 기록 삭제 실패", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "대여 기록 삭제 실패");
+        }
+        return RentCarDto.builder()
+                .id(rentCar.getId())
+                .carId(rentCar.getCar().getId())
+                .pickupDate(rentCar.getPickupDate())
+                .returnDate(rentCar.getReturnDate())
+                .isReturned(rentCar.getIsReturned())
+                .build();
+    }
+
+    /**
+     * <h3>차량 대여 가능 날짜.</h3>
+    * */
+    public List<List<AvailableDate>> getAvailableDate(Car car) {
         // 오늘 이후 대여 날짜를 가져옴
-        List<RentCar> unavailableDate = rentCarRepository.findByCar_IdAndReturnDateGreaterThanEqual(
-                car.getId(), LocalDate.now());
-        List<List<CarAvailableDate>> availableDate = new ArrayList<>();
+        List<RentCar> unavailableDate = rentCarRepository.findByCar_IdAndReturnDateGreaterThanEqualAndIsReturned(
+                car.getId(), LocalDate.now(), false);
+        List<List<AvailableDate>> availableDate = new ArrayList<>();
 
         // 3주치 날짜를 미리 만들어놓고, 대여 기록이 있는 날짜는 제거
         LocalDate now = LocalDate.now();
@@ -176,7 +226,7 @@ public class CarRentalService {
             for (int j = 0; j < 7; j++) {
                 LocalDate date = now.plusDays(i * 7 + j);
 
-                CarAvailableDate carAvailableDate = CarAvailableDate.builder()
+                AvailableDate carAvailableDate = AvailableDate.builder()
                         .day(date.getDayOfMonth())
                         .available(true)
                         .build();
@@ -213,6 +263,7 @@ public class CarRentalService {
                     .carId(rentalHistory.getCar().getId())
                     .pickupDate(rentalHistory.getPickupDate())
                     .returnDate(rentalHistory.getReturnDate())
+                    .isReturned(rentalHistory.getIsReturned())
                     .build());
         });
 
@@ -231,11 +282,39 @@ public class CarRentalService {
             list.add(rentCar.getCar().getCarModel().getName());
             list.add(rentCar.getPickupDate().toString());
             list.add(rentCar.getReturnDate().toString());
-            list.add(rentCar.getReturnDate().isBefore(LocalDate.now()) ? "반납 완료" : "대여 중");
+
+            if (rentCar.getIsReturned()) {
+                if (rentCar.getPickupDate().isAfter(LocalDate.now()))
+                    list.add("취소 완료");
+                else
+                    list.add("반납 완료");
+            } else if (rentCar.getPickupDate().isAfter(LocalDate.now())) {
+                list.add("대여 신청");
+            } else {
+                list.add("대여 중");
+            }
 
             listList.add(list);
         }
 
         return listList;
+    }
+
+    public RentCarDto cancelRental(Long historyId) {
+        RentCar rentCar = rentCarRepository.findById(historyId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_NOT_RESERVED));
+        if (rentCar.getIsReturned()) {
+            log.error(DATE_ERROR_MESSAGE_ALREADY_RETURNED);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_ALREADY_RETURNED);
+        }
+        rentCar.setIsReturned(true);
+        return RentCarDto.builder()
+                .id(rentCar.getId())
+                .userId(rentCar.getUser().getId())
+                .carId(rentCar.getCar().getId())
+                .pickupDate(rentCar.getPickupDate())
+                .returnDate(rentCar.getReturnDate())
+                .isReturned(true)
+                .build();
     }
 }

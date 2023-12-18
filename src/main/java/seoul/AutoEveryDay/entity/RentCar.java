@@ -30,4 +30,7 @@ public class RentCar {
 
     @Column(name = "return_date", nullable = false)
     private LocalDate returnDate;
+
+    @Column(name = "is_returned", nullable = false)
+    private Boolean isReturned;
 }

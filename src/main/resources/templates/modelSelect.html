@@ -12,25 +12,19 @@
         <div class="card bg-light rounded">
             <div class="card-body">
                 <div class="text-center">
-                    <h2>차종을 선택해 주세요.(임시 페이지)</h2>
+                    <h2>차종을 선택해 주세요.</h2>
                     <br>
                     <div class="container my-4">
                         <div class="row justify-content-center">
-                            <div class="col-md-4" th:replace="~{fragments/modelSelectCard :: modelCard('1', '아반떼')}"></div>
-                            <div class="col-md-4" th:replace="~{fragments/modelSelectCard :: modelCard('2', '소나타')}"></div>
-                            <div class="col-md-4" th:replace="~{fragments/modelSelectCard :: modelCard('3', '스포티지')}"></div>
+                            <div th:each="carName, iter : ${carModelList}" class="col-md-4">
+                                <div th:replace="~{fragments/selectCard :: selectCard(${iter.index + 1}, ${carName}, 'car')}"></div>
+                            </div>
                         </div>
-                        <div class="row justify-content-center mt-3">
-                            <div class="col-md-4" th:replace="~{fragments/modelSelectCard :: modelCard('4', '그랜저')}"></div>
-                            <div class="col-md-4" th:replace="~{fragments/modelSelectCard :: modelCard('5', '제네시스')}"></div>
-                        </div>
+<!--                        <div class="row justify-content-center mt-3">-->
+<!--                            <div class="col-md-4" th:replace="~{fragments/selectCard :: selectCard('4', '그랜저', 'car')}"></div>-->
+<!--                            <div class="col-md-4" th:replace="~{fragments/selectCard :: selectCard('5', '제네시스', 'car')}"></div>-->
+<!--                        </div>-->
                     </div>
-
-                    <!--                    <button type="button" class="btn btn-secondary mx-1" onclick="location.href='/car/rental/1'">아반떼</button>-->
-                    <!--                    <button type="button" class="btn btn-secondary mx-1" onclick="location.href='/car/rental/2'">소나타</button>-->
-                    <!--                    <button type="button" class="btn btn-secondary mx-1" onclick="location.href='/car/rental/3'">스포티지</button>-->
-                    <!--                    <button type="button" class="btn btn-secondary mx-1" onclick="location.href='/car/rental/4'">그랜저</button>-->
-                    <!--                    <button type="button" class="btn btn-secondary mx-1" onclick="location.href='/car/rental/5'">제네시스</button>-->
                 </div>
             </div>
         </div>
