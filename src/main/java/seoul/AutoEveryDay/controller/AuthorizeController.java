@@ -6,9 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import seoul.AutoEveryDay.dto.JsonBody;
-import seoul.AutoEveryDay.dto.RoleChangeReq;
-import seoul.AutoEveryDay.dto.UserDto;
+import seoul.AutoEveryDay.dto.*;
+import seoul.AutoEveryDay.entity.Privilege;
 import seoul.AutoEveryDay.entity.Role;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.AuthorizeService;
@@ -27,10 +26,22 @@ public class AuthorizeController {
     private final Converter converter;
 
     @GetMapping("/manage")
-    public String manage(Model model) {
+    public String manage() {
+        return "authorizeManage";
+    }
+
+    @GetMapping("/user/role/manage")
+    public String userRole(Model model) {
         List<UserDto> userList = loginService.getAllUserDto();
         model.addAttribute("userList", userList);
-        return "authorizeManage";
+        return "userRoleManage";
+    }
+
+    @GetMapping("/role/privilege/manage")
+    public String rolePrivilege(Model model) {
+        List<RoleDto> roleList = loginService.findAllRoleDto();
+        model.addAttribute("roleList", roleList);
+        return "rolePrivilegeManage";
     }
 
     @ResponseBody
@@ -58,21 +69,21 @@ public class AuthorizeController {
 
     @ResponseBody
     @PostMapping("/user/role")
-    public JsonBody userAdd(@Validated @RequestBody RoleChangeReq req) {
+    public JsonBody userAddRole(@Validated @RequestBody RoleChangeReq req) {
         User user = loginService.findById(req.getUserId());
         return JsonBody.builder()
                 .message("역할 부여 성공")
-                .data(authorizeService.grantRole(user, req.getRoleName()))
+                .data(authorizeService.grantRole(user, req.getRoleId()))
                 .build();
     }
 
     @ResponseBody
     @DeleteMapping("/user/role")
-    public JsonBody userDelete(@Validated @RequestBody RoleChangeReq req) {
+    public JsonBody userDeleteRole(@Validated @RequestBody RoleChangeReq req) {
         User user = loginService.findById(req.getUserId());
         return JsonBody.builder()
                 .message("역할 회수 성공")
-                .data(authorizeService.revokeRole(user, req.getRoleName()))
+                .data(authorizeService.revokeRole(user, req.getRoleId()))
                 .build();
     }
 
@@ -96,20 +107,43 @@ public class AuthorizeController {
     }
 
     @ResponseBody
-    @PostMapping("/role/privilige")
-    public JsonBody priviligeAdd(@RequestParam String roleName, @RequestParam String privilegeName) {
+    @GetMapping("/role/privilege")
+    public JsonBody rolePrivilege(@RequestParam("id") Long roleId) {
+        List<Object> privilegeLists = new ArrayList<>();
+        List<Privilege> assignedPrivilege = authorizeService.findRolePrivileges(roleId);
+        List<Privilege> unassignedPrivilege = new ArrayList<>();
+
+        // 전제 privilege 목록 중에서 assignedPrivilege에 포함된 privilege 목록을 제외한 목록을 unassignedPrivilege에 추가
+        List<Privilege> allPrivileges = authorizeService.findAllPrivileges();
+        for (Privilege privilege : allPrivileges) {
+            if (!assignedPrivilege.contains(privilege)) {
+                unassignedPrivilege.add(privilege);
+            }
+        }
+
+        privilegeLists.add(converter.convertToPrivilegeDtoList(assignedPrivilege));
+        privilegeLists.add(converter.convertToPrivilegeDtoList(unassignedPrivilege));
         return JsonBody.builder()
-                .message("역할에게 권한 부여 성공")
-                .data(authorizeService.grantPrivilege(roleName, privilegeName))
+                .message("권한 조회 성공")
+                .data(privilegeLists)
                 .build();
     }
 
     @ResponseBody
-    @DeleteMapping("/role/privilige")
-    public JsonBody priviligeDelete(@RequestParam String roleName, @RequestParam String privilegeName) {
+    @PostMapping("/role/privilege")
+    public JsonBody roleAddPrivilge(@Validated @RequestBody PrivilegeChangeReq req) {
+        return JsonBody.builder()
+                .message("역할에게 권한 부여 성공")
+                .data(authorizeService.grantPrivilege(req.getRoleId(), req.getPrivilegeId()))
+                .build();
+    }
+
+    @ResponseBody
+    @DeleteMapping("/role/privilege")
+    public JsonBody roleDeletePrivilege(@Validated @RequestBody PrivilegeChangeReq req) {
         return JsonBody.builder()
                 .message("역할에서 권한 회수 성공")
-                .data(authorizeService.revokePrivilege(roleName, privilegeName))
+                .data(authorizeService.revokePrivilege(req.getRoleId(), req.getPrivilegeId()))
                 .build();
     }
 

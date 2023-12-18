@@ -24,4 +24,11 @@ public class Privilege {
 
     @ManyToMany(mappedBy = "privileges", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<Role> roles;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Privilege )) return false;
+        return id != null && id.equals(((Privilege) o).getId());
+    }
 }

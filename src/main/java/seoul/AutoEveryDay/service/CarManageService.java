@@ -11,7 +11,7 @@ import seoul.AutoEveryDay.entity.Car;
 import seoul.AutoEveryDay.entity.CarModel;
 import seoul.AutoEveryDay.repository.CarModelRepository;
 import seoul.AutoEveryDay.repository.CarRepository;
-import seoul.AutoEveryDay.repository.RentalHistoryRepository;
+import seoul.AutoEveryDay.repository.RentCarRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import java.util.List;
 public class CarManageService {
     private final CarRepository carRepository;
     private final CarModelRepository carModelRepository;
-    private final RentalHistoryRepository rentalHistoryRepository;
+    private final RentCarRepository rentCarRepository;
 
     /** <h3>차량 등록.</h3>
      * 이미 존재하는 차량 번호면 ResponseStatusException 발생 */
@@ -92,7 +92,7 @@ public class CarManageService {
     /** <h3>차량 검색.</h3>
      * 입력받은 번호 포함하는 차량 검색. 없으면 빈 리스트 반환
     * */
-    public List<CarDto> searchCar(String number) {
+    public List<CarDto> searchCarDto(String number) {
         List<CarDto> carDtoList = new ArrayList<>();
 
         if (number == null || number.isEmpty()) {
@@ -111,7 +111,7 @@ public class CarManageService {
         }
         return carDtoList;
     }
-    public List<CarDto> searchCar(Long carModel, String number) {
+    public List<CarDto> searchCarDto(Long carModel, String number) {
         List<CarDto> carDtoList = new ArrayList<>();
         List<Car> carList;
 
@@ -156,7 +156,7 @@ public class CarManageService {
     public CarDto deleteCar(String number) {
         Car car = carRepository.findByNumber(number).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
-        if (rentalHistoryRepository.existsByCar_IdAndPickupDateGreaterThanEqual(car.getId(), LocalDate.now())) {
+        if (rentCarRepository.existsByCar_IdAndPickupDateGreaterThanEqual(car.getId(), LocalDate.now())) {
             log.error("대여 중인 차량은 삭제할 수 없습니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "대여 중인 차량은 삭제할 수 없습니다.");
         }

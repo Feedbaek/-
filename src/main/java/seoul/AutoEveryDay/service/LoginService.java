@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import seoul.AutoEveryDay.dto.RoleDto;
 import seoul.AutoEveryDay.dto.UserDto;
 import seoul.AutoEveryDay.entity.Privilege;
 import seoul.AutoEveryDay.entity.Role;
@@ -23,6 +24,7 @@ import seoul.AutoEveryDay.entity.UserGroup;
 import seoul.AutoEveryDay.repository.RoleRepository;
 import seoul.AutoEveryDay.repository.UserGroupRepository;
 import seoul.AutoEveryDay.repository.UserRepository;
+import seoul.AutoEveryDay.utils.Converter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,6 +42,7 @@ public class LoginService implements UserDetailsService {
     private final UserGroupRepository userGroupRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Converter converter;
 
     // 로그인 여부 확인, 로그인 되어있으면 true, 아니면 false
     public static boolean isAuthenticated() {
@@ -76,8 +79,13 @@ public class LoginService implements UserDetailsService {
                 .build();
     }
 
-    public List<User> getAllUser() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public List<UserDto> getAllUserDto() {
+        List<User> users = getAllUsers();
+        return converter.convertToUserDtoList(users);
     }
 
     public List<Role> findUserRoles(Long id) {
@@ -126,6 +134,11 @@ public class LoginService implements UserDetailsService {
 
     public List<Role> findAllRoles() {
         return roleRepository.findAll();
+    }
+
+    public List<RoleDto> findAllRoleDto() {
+        List<Role> roles = findAllRoles();
+        return converter.convertToRoleDtoList(roles);
     }
 
 
@@ -195,19 +208,5 @@ public class LoginService implements UserDetailsService {
             privileges.add(item.getName());
         }
         return privileges;
-    }
-
-    public List<UserDto> getAllUserDto() {
-        List<User> users = userRepository.findAll();
-        List<UserDto> userList = new ArrayList<>();
-        users.forEach(user -> {
-            userList.add(UserDto.builder()
-                    .id(user.getId())
-                    .username(user.getUsername())
-                    .name(user.getName())
-                    .userGroup(user.getUserGroup().getName())
-                    .build());
-        });
-        return userList;
     }
 }

@@ -1,6 +1,5 @@
 package seoul.AutoEveryDay.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -11,7 +10,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReserveHistoryDto {
+public class ReserveTrackDto {
     private Long id;
     private Long userId;
     @NotNull

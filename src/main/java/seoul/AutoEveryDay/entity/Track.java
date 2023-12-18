@@ -21,6 +21,10 @@ public class Track {
     String name;
     @Column(name = "description")
     String description;
+
+    @Column(name = "image")
+    String imagePath;
+
     @OneToMany(mappedBy = "track", cascade = CascadeType.ALL)
-    private List<ReserveHistory> reserveHistories;
+    private List<ReserveTrack> reserveHistories;
 }

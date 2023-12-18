@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/default_layout}">
 <head>
@@ -19,7 +20,7 @@
             </div>
         </div>
         <!-- 차량 등록 -->
-        <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#addCarModal">차량 등록</button>
+        <button sec:authorize="hasAuthority('ADMIN')" type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#addCarModal">차량 등록</button>
     </div>
     <!-- 카 테이블 프래그먼트 -->
     <div th:replace="~{fragments/table :: commonTable(${carListTitles}, ${carList}, 'manage')}"></div>
@@ -66,7 +67,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" th:text="'Edit Car ' + ${car[1]}"></h5>
+                    <h5 class="modal-title" th:text="'차량 번호: ' + ${car[1]}"></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -78,26 +79,28 @@
                         <input type="hidden" name="model" th:value="${car[2]}"/>
 
                         <div class="form-group">
-                            <label th:for="'carStatus-' + ${car[0]}">Car Status</label>
+                            <label th:for="'carStatus-' + ${car[0]}">차량 상태</label>
                             <input type="text" class="form-control" th:id="'carStatus-' + ${car[0]}" name="status">
                         </div>
                         <div class="form-group">
-                            <label th:for="'carComment-' + ${car[0]}">Car Comment</label>
+                            <label th:for="'carComment-' + ${car[0]}">메모 하기</label>
                             <textarea class="form-control" th:id="'carComment-' + ${car[0]}" name="comment"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Edit Car</button>
+                        <button type="submit" class="btn btn-primary">수정 완료</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
+    <!-- 상세 정보 -->
+
     <script>
         function deleteCar(element) {
             const carNumber = element.getAttribute('data-car-number');
-            if (confirm('Are you sure you want to delete this car?')) {
+            if (confirm('정말로 차량을 삭제 하겠습니까?')) {
                 fetch(`/car/manage?number=${carNumber}`, { method: 'DELETE' })
                     .then(response => response.json())
                     .then(data => {

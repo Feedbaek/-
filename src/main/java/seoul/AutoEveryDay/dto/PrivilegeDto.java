@@ -1,7 +1,6 @@
 package seoul.AutoEveryDay.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -9,9 +8,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleChangeReq {
-    @NotNull
-    private Long userId;
-    @NotNull
-    private Long roleId;
+public class PrivilegeDto {
+    private Long id;
+    @NotBlank
+    private String name;
 }

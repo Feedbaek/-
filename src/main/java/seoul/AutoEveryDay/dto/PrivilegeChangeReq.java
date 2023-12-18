@@ -9,9 +9,9 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleChangeReq {
-    @NotNull
-    private Long userId;
+public class PrivilegeChangeReq {
     @NotNull
     private Long roleId;
+    @NotNull
+    private Long privilegeId;
 }

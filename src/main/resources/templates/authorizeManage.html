@@ -4,186 +4,23 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/default_layout}">
 <head>
-    <title>Authority Management</title>
+    <title>Admin</title>
 </head>
 <!-- Content -->
-<main layout:fragment="content" class="container">
-    <br>
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card bg-light rounded">
-                <div class="card-body">
-                    <h4>User List</h4>
-                    <ul id="userList" class="list-group">
-                        <!-- Dynamically loaded users will go here -->
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card bg-light rounded">
-                <div class="card-body">
-                    <h4>Assigned Roles</h4>
-                    <ul id="assignedRoles" class="list-group">
-                        <!-- Dynamically loaded assigned roles will go here -->
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-light rounded">
-                <div class="card-body">
-                    <h4>Unassigned Roles</h4>
-                    <ul id="unassignedRoles" class="list-group">
-                        <!-- Dynamically loaded unassigned roles will go here -->
-                    </ul>
+<div layout:fragment="content">
+    <div class="container my-4">
+        <div class="card bg-light rounded">
+            <div class="card-body">
+                <div class="text-center">
+                    <!-- Your main content here -->
+                    <h2>관리자 페이지 입니다.</h2>
+                    <br>
+                    <p>원하는 서비스를 선택해 주세요.</p>
+                    <button type="button" class="btn btn-secondary mx-1" onclick="location.href='/authorize/user/role/manage'">사용자 역할 관리</button>
+                    <button type="button" class="btn btn-secondary mx-1" onclick="location.href='/authorize/role/privilege/manage'">역할 권한 관리</button>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script th:inline="javascript">
-        // Example roles
-        const assignedRoles = [];
-        const unassignedRoles = [];
-        const users = [];
-        // Function to initialize the roles in their respective lists
-        function initRoles() {
-            assignedRoles.forEach(role => {
-                $('#assignedRoles').append(`<li class="list-group-item" onclick="toggleRole(this)">${role}</li>`);
-            });
-            unassignedRoles.forEach(role => {
-                $('#unassignedRoles').append(`<li class="list-group-item" onclick="toggleRole(this)">${role}</li>`);
-            });
-        }
-
-        function initUsers() {
-            users.forEach(user => {
-                $('#userList').append(`<li class="list-group-item" onclick="selectUser(this)" data-user='${JSON.stringify(user)}'>${user.username +'('+ user.name+')'}</li>`);
-            });
-        }
-
-        // Function to select a user
-        async function selectUser(item) {
-            const user = JSON.parse($(item).attr('data-user'));
-
-            const json = await (await fetch('/authorize/user/role?id=' + user.id, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })).json()
-            const data = json.data;
-            const aRoll = data[0];
-            const uRoll = data[1];
-
-            // 다른 모든 항목에서 'selected' 클래스 제거
-            document.querySelectorAll('.list-group-item').forEach(function(el) {
-                el.classList.remove('selected');
-            });
-
-            // 클릭된 항목에 'selected' 클래스 추가
-            item.classList.add('selected');
-
-            // Clear the roles
-            assignedRoles.length = 0;
-            unassignedRoles.length = 0;
-
-            // Add the roles to the respective lists
-            aRoll.forEach(roleDto => {
-                console.log('aRoleDto: ' + roleDto.name)
-                assignedRoles.push(roleDto.name);
-            });
-            uRoll.forEach(roleDto => {
-                console.log('uRoleDto: ' + roleDto.name)
-                unassignedRoles.push(roleDto.name);
-            });
-
-            // Refresh the lists
-            $('#assignedRoles').empty();
-            $('#unassignedRoles').empty();
-            initRoles();
-        }
-
-        // Function to move roles between lists
-        function toggleRole(item) {
-            const parentID = $(item).parent().attr('id');
-            const role = $(item).text();
-            const user = JSON.parse($('.selected').attr('data-user'));
-
-            if (parentID === 'assignedRoles') {
-                console.log('unassigning role: ' + role
-                    + ' from user: ' + user.id)
-                fetch('/authorize/user/role', {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        userId: user.id,
-                        roleName: role
-                    })
-                }).then(res => res.json())
-                .then(res => {
-                    console.log(res);
-                    assignedRoles.splice(assignedRoles.indexOf(role), 1);
-                    unassignedRoles.push(role);
-
-                    $('#assignedRoles').empty();
-                    $('#unassignedRoles').empty();
-                    initRoles();
-                })
-                .catch(err => {
-                    alert('에러 발생!');
-                    console.log(err);
-                })
-            } else {
-                console.log('assigning role: ' + role
-                    + ' to user: ' + user.id)
-                fetch('/authorize/user/role', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        userId: user.id,
-                        roleName: role
-                    })
-                }).then(res => res.json())
-                .then(res => {
-                    console.log(res);
-                    unassignedRoles.splice(unassignedRoles.indexOf(role), 1);
-                    assignedRoles.push(role);
-
-                    $('#assignedRoles').empty();
-                    $('#unassignedRoles').empty();
-                    initRoles();
-                })
-                .catch(err => {
-                    alert('에러 발생!');
-                    console.log(err);
-                })
-            }
-        }
-
-        // Initialize roles on document ready
-        $(document).ready(function() {
-            [# th:each="user, stat : ${userList}"]
-                users.push([[${user}]]);
-                console.log([[${user}]]);
-            [/]
-            initRoles();
-            initUsers();
-        });
-    </script>
-
-    <style>
-        .selected {
-            background-color: #f0f0f0; /* 선택된 항목의 배경색 */
-        }
-    </style>
-
-</main>
+</div>
 </html>

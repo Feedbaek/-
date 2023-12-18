@@ -44,7 +44,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<ChargeHistory> gasStationHistories;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<RentalHistory> rentalHistories;
+    private List<RentCar> rentalHistories;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ReserveHistory> reserveHistories;
+    private List<ReserveTrack> reserveHistories;
 }

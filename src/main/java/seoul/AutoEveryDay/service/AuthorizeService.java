@@ -13,6 +13,8 @@ import seoul.AutoEveryDay.repository.PrivilegeRepository;
 import seoul.AutoEveryDay.repository.RoleRepository;
 import seoul.AutoEveryDay.repository.UserRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -22,36 +24,36 @@ public class AuthorizeService {
     private final PrivilegeRepository privilegeRepository;
     private final UserRepository userRepository;
 
-    public String grantRole(User u, String roleName) {
-        log.info("grantRole: " + u.getUsername() + ", " + roleName);
+    public String grantRole(User u, Long roleId) {
         User user = userRepository.findById(u.getId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
         );
-        Role role = roleRepository.findByName(roleName).orElseThrow(
+        Role role = roleRepository.findById(roleId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "역할을 찾을 수 없습니다.")
         );
+        log.info("grantRole: " + u.getUsername() + ", " + role.getName());
         try {
             role.getUsers().add(user);
             user.getRoles().add(role);
-            return roleName;
+            return role.getName();
         } catch (Exception e) {
             log.error("역할 부여 실패: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "역할 부여 실패");
         }
     }
 
-    public String revokeRole(User u, String roleName) {
-        log.info("revokeRole: " + u.getUsername() + ", " + roleName);
+    public String revokeRole(User u, Long roleId) {
         User user = userRepository.findById(u.getId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.")
         );
-        Role role = roleRepository.findByName(roleName).orElseThrow(
+        Role role = roleRepository.findById(roleId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "역할을 찾을 수 없습니다.")
         );
+        log.info("revokeRole: " + u.getUsername() + ", " + role.getName());
         try {
             role.getUsers().remove(user);
             user.getRoles().remove(role);
-            return roleName;
+            return role.getName();
         } catch (Exception e) {
             log.error("역할 회수 실패: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "역할 회수 실패");
@@ -90,12 +92,12 @@ public class AuthorizeService {
         return null;
     }
 
-    public String grantPrivilege(String roleName, String privilegeName) {
-        log.info("grantPrivilege: " + roleName + ", " + privilegeName);
-        Role role = roleRepository.findByName(roleName).orElseThrow(
+    public String grantPrivilege(Long roleId, Long privilegeId) {
+        log.info("grantPrivilege: " + roleId + ", " + privilegeId);
+        Role role = roleRepository.findById(roleId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "역할을 찾을 수 없습니다.")
         );
-        Privilege privilege = privilegeRepository.findByName(privilegeName).orElseThrow(
+        Privilege privilege = privilegeRepository.findById(privilegeId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "권한을 찾을 수 없습니다.")
         );
         try {
@@ -104,15 +106,15 @@ public class AuthorizeService {
             log.error("권한 부여 실패: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "권한 부여 실패");
         }
-        return privilegeName;
+        return privilege.getName();
     }
 
-    public String revokePrivilege(String roleName, String privilegeName) {
-        log.info("revokePrivilege: " + roleName + ", " + privilegeName);
-        Role role = roleRepository.findByName(roleName).orElseThrow(
+    public String revokePrivilege(Long roleId, Long privilegeId) {
+        log.info("revokePrivilege: " + roleId + ", " + privilegeId);
+        Role role = roleRepository.findById(roleId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "역할을 찾을 수 없습니다.")
         );
-        Privilege privilege = privilegeRepository.findByName(privilegeName).orElseThrow(
+        Privilege privilege = privilegeRepository.findById(privilegeId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "권한을 찾을 수 없습니다.")
         );
         try {
@@ -122,7 +124,7 @@ public class AuthorizeService {
             log.error("권한 회수 실패: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "권한 회수 실패");
         }
-        return privilegeName;
+        return privilege.getName();
     }
 
     public String createPrivilege(String privilegeName) {
@@ -151,5 +153,18 @@ public class AuthorizeService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "권한 삭제 실패");
         }
         return privilegeName;
+    }
+
+    public List<Privilege> findRolePrivileges(Long roleId) {
+        log.info("findRolePrivileges: " + roleId);
+        Role role = roleRepository.findById(roleId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "역할을 찾을 수 없습니다.")
+        );
+        return role.getPrivileges().stream().toList();
+    }
+
+    public List<Privilege> findAllPrivileges() {
+        log.info("findAllPrivileges");
+        return privilegeRepository.findAll();
     }
 }

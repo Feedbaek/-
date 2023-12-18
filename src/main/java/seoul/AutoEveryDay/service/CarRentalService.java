@@ -10,9 +10,9 @@ import seoul.AutoEveryDay.dto.CarAvailableDate;
 import seoul.AutoEveryDay.dto.CarDto;
 import seoul.AutoEveryDay.dto.RentCarDto;
 import seoul.AutoEveryDay.entity.Car;
-import seoul.AutoEveryDay.entity.RentalHistory;
+import seoul.AutoEveryDay.entity.RentCar;
 import seoul.AutoEveryDay.entity.User;
-import seoul.AutoEveryDay.repository.RentalHistoryRepository;
+import seoul.AutoEveryDay.repository.RentCarRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -35,14 +35,14 @@ public class CarRentalService {
     private final static String DATE_ERROR_MESSAGE_NOT_RESERVED = "예약되지 않은 차량입니다.";
 
 
-    private final RentalHistoryRepository rentalHistoryRepository;
+    private final RentCarRepository rentCarRepository;
 
     /**
      * <h3>차량 대여 날짜 검사.</h3>
      * */
     private void validatePickUpDateAndReturnDate(RentCarDto rentCarDto) {
         // 겹치는 차량 예약 내역이 있으면 ResponseStatusException 발생
-        if (rentalHistoryRepository.existsByCar_IdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual(
+        if (rentCarRepository.existsByCar_IdAndReturnDateGreaterThanEqualAndPickupDateLessThanEqual(
                 rentCarDto.getCarId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate())) {
             log.error(DATE_ERROR_MESSAGE_RESERVED);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_RESERVED);
@@ -78,14 +78,14 @@ public class CarRentalService {
         rentCarDto.setCarId(car.getId());
         validatePickUpDateAndReturnDate(rentCarDto);
 
-        RentalHistory rentalHistory = RentalHistory.builder()
+        RentCar rentCar = RentCar.builder()
                 .car(car)
                 .user(user)
                 .pickupDate(rentCarDto.getPickupDate())
                 .returnDate(rentCarDto.getReturnDate())
                 .build();
         try {
-            rentalHistoryRepository.save(rentalHistory);
+            rentCarRepository.save(rentCar);
         } catch (Exception e) {
             log.error("대여 기록 저장 실패", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "대여 기록 저장 실패");
@@ -99,24 +99,24 @@ public class CarRentalService {
      */
     public RentCarDto returnCar(RentCarDto rentCarDto, User user, Car car) {
         // 대여 기록이 없으면 ResponseStatusException 발생
-        RentalHistory rentalHistory = rentalHistoryRepository
+        RentCar rentCar = rentCarRepository
                 .findByUser_IdAndCarIdAndPickupDateAndReturnDate(user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_NOT_RESERVED));
-        if (rentalHistory.getReturnDate().isBefore(LocalDate.now())) {
+        if (rentCar.getReturnDate().isBefore(LocalDate.now())) {
             log.error(DATE_ERROR_MESSAGE_ALREADY_RETURNED);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_ALREADY_RETURNED);
         }
-        if (rentalHistory.getPickupDate().isAfter(LocalDate.now())) {
+        if (rentCar.getPickupDate().isAfter(LocalDate.now())) {
             log.error(DATE_ERROR_MESSAGE_NOT_RENTED);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_NOT_RENTED);
         }
 
-        rentalHistory.setReturnDate(LocalDate.now());
+        rentCar.setReturnDate(LocalDate.now());
         return RentCarDto.builder()
-                .id(rentalHistory.getId())
+                .id(rentCar.getId())
                 .carId(car.getId())
-                .pickupDate(rentalHistory.getPickupDate())
-                .returnDate(rentalHistory.getReturnDate())
+                .pickupDate(rentCar.getPickupDate())
+                .returnDate(rentCar.getReturnDate())
                 .build();
     }
 
@@ -124,15 +124,19 @@ public class CarRentalService {
      * <h3>차량 대여 내역.</h3>
      * 오늘 이후 날짜로 차량 예약 내역을 반환
      */
-    public Map<Long, List<RentalHistory>> getRentalHistory(List<CarDto> carDtoList) {
-        Map<Long, List<RentalHistory>> rentalHistoryMap = new HashMap<>();
+    public Map<Long, List<RentCar>> getRentalHistory(List<CarDto> carDtoList) {
+        Map<Long, List<RentCar>> rentalHistoryMap = new HashMap<>();
 
         carDtoList.forEach(carDto -> {
             Long id = carDto.getId();
-            rentalHistoryMap.put(id, rentalHistoryRepository.findByCar_IdAndReturnDateGreaterThanEqual(id, LocalDate.now()));
+            rentalHistoryMap.put(id, rentCarRepository.findByCar_IdAndReturnDateGreaterThanEqual(id, LocalDate.now()));
         });
 
         return rentalHistoryMap;
+    }
+
+    public List<RentCar> getRentalHistory(User user) {
+        return rentCarRepository.findByUser_Id(user.getId());
     }
 
     /**
@@ -141,27 +145,27 @@ public class CarRentalService {
      */
     public RentCarDto deleteRental(RentCarDto rentCarDto, User user, Car car) {
         // 대여 기록이 없으면 ResponseStatusException 발생
-        RentalHistory rentalHistory = rentalHistoryRepository
+        RentCar rentCar = rentCarRepository
                 .findByUser_IdAndCarIdAndPickupDateAndReturnDate(user.getId(), car.getId(), rentCarDto.getPickupDate(), rentCarDto.getReturnDate()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, DATE_ERROR_MESSAGE_NOT_RESERVED));
 
         try {
-            rentalHistoryRepository.delete(rentalHistory);
+            rentCarRepository.delete(rentCar);
         } catch (Exception e) {
             log.error("대여 기록 삭제 실패", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "대여 기록 삭제 실패");
         }
         return RentCarDto.builder()
-                .id(rentalHistory.getId())
+                .id(rentCar.getId())
                 .carId(car.getId())
-                .pickupDate(rentalHistory.getPickupDate())
-                .returnDate(rentalHistory.getReturnDate())
+                .pickupDate(rentCar.getPickupDate())
+                .returnDate(rentCar.getReturnDate())
                 .build();
     }
 
     public List<List<CarAvailableDate>> getAvailableDate(Car car) {
         // 오늘 이후 대여 날짜를 가져옴
-        List<RentalHistory> unavailableDate = rentalHistoryRepository.findByCar_IdAndReturnDateGreaterThanEqual(
+        List<RentCar> unavailableDate = rentCarRepository.findByCar_IdAndReturnDateGreaterThanEqual(
                 car.getId(), LocalDate.now());
         List<List<CarAvailableDate>> availableDate = new ArrayList<>();
 
@@ -184,9 +188,9 @@ public class CarRentalService {
                 }
 
                 // 대여 기록이 있는 날짜를 제거
-                for (RentalHistory rentalHistory : unavailableDate) {
-                    if ((date.isEqual(rentalHistory.getPickupDate()) || date.isAfter(rentalHistory.getPickupDate()))
-                            && (date.isEqual(rentalHistory.getReturnDate()) || date.isBefore(rentalHistory.getReturnDate()))) {
+                for (RentCar rentCar : unavailableDate) {
+                    if ((date.isEqual(rentCar.getPickupDate()) || date.isAfter(rentCar.getPickupDate()))
+                            && (date.isEqual(rentCar.getReturnDate()) || date.isBefore(rentCar.getReturnDate()))) {
                         carAvailableDate.setAvailable(false);
                         break;
                     }
@@ -196,5 +200,42 @@ public class CarRentalService {
         }
 
         return availableDate;
+    }
+
+    public List<RentCarDto> getRentalHistoryDto(User user) {
+        List<RentCar> rentCarList = rentCarRepository.findByUser_Id(user.getId());
+        List<RentCarDto> rentCarDtoList = new ArrayList<>();
+
+        rentCarList.forEach(rentalHistory -> {
+            rentCarDtoList.add(RentCarDto.builder()
+                    .id(rentalHistory.getId())
+                    .userId(rentalHistory.getUser().getId())
+                    .carId(rentalHistory.getCar().getId())
+                    .pickupDate(rentalHistory.getPickupDate())
+                    .returnDate(rentalHistory.getReturnDate())
+                    .build());
+        });
+
+        return rentCarDtoList;
+    }
+
+    public List<List<String>> getRentalHistoryList(User user) {
+        List<RentCar> rentCarList = rentCarRepository.findByUser_Id(user.getId());
+        List<List<String>> listList = new ArrayList<>();
+
+        for (RentCar rentCar : rentCarList) {
+            List<String> list = new ArrayList<>();
+
+            list.add(rentCar.getId().toString());
+            list.add(rentCar.getCar().getNumber());
+            list.add(rentCar.getCar().getCarModel().getName());
+            list.add(rentCar.getPickupDate().toString());
+            list.add(rentCar.getReturnDate().toString());
+            list.add(rentCar.getReturnDate().isBefore(LocalDate.now()) ? "반납 완료" : "대여 중");
+
+            listList.add(list);
+        }
+
+        return listList;
     }
 }

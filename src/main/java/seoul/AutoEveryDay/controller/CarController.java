@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import seoul.AutoEveryDay.dto.*;
 import seoul.AutoEveryDay.entity.Car;
+import seoul.AutoEveryDay.entity.RentCar;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.CarManageService;
 import seoul.AutoEveryDay.service.CarRentalService;
@@ -15,14 +16,11 @@ import seoul.AutoEveryDay.service.LoginService;
 import seoul.AutoEveryDay.utils.Converter;
 
 import java.time.LocalDate;
-import java.time.format.TextStyle;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @Controller
+@PreAuthorize(value = "hasAnyAuthority('READ')")
 @RequestMapping("/car")
-@PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
 @RequiredArgsConstructor
 public class CarController {
     private final LoginService loginService;
@@ -31,16 +29,18 @@ public class CarController {
     private final Converter converter;
 
     /* 차량 대여 */
+    @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
     @GetMapping("/rental")  // 차량 대여 페이지
     public String rentalGet(Model model) {
         return "modelSelect";
     }
 
+    @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
     @GetMapping("/rental/{carModel}")  // 차량 대여 페이지
     public String rentalGet(Model model,
                             @PathVariable(value = "carModel", required = false) Long carModelId,
                             @RequestParam(value = "q", required = false) String carNumber) {
-        List<CarDto> carDtoList = carManageService.searchCar(carModelId, carNumber);
+        List<CarDto> carDtoList = carManageService.searchCarDto(carModelId, carNumber);
         String[] carInfo = {"차량 번호", "차종", "상태", "메모", "대여/반납"};
         List<List<String>> listList = converter.convertCarDtoList(carDtoList);
         model.addAttribute("carList", listList);
@@ -49,6 +49,7 @@ public class CarController {
         return "carRental";
     }
 
+    @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
     @GetMapping("/rental/{carModel}/{carId}") // 차량 대여 날짜 선택 페이지
     public String rentalGet(@PathVariable("carId") Long carId, Model model) {
         Car car = carManageService.getCar(carId);
@@ -66,8 +67,21 @@ public class CarController {
         return "carRentalDate";
     }
 
+    @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
+    @GetMapping("/rental/history") // 차량 대여 내역 페이지
+    public String rentalHistoryGet(Model model) {
+        User user = loginService.getLoginUser();
+        String[] rentalHistoryTitles = {"차량 번호", "차종", "대여일", "반납일", "상태", "취소"};
+
+        List<List<String>> rentalHistoryList = carRentalService.getRentalHistoryList(user);
+        model.addAttribute("rentalHistoryTitles", rentalHistoryTitles);
+        model.addAttribute("rentalHistoryList", rentalHistoryList);
+        return "carRentalHistory";
+    }
+
 
     @ResponseBody
+    @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
     @PostMapping("/rental") // 차량 대여 신청
     public JsonBody rentalPost(@Validated @RequestBody RentCarDto rentCarDto) {
         User user = loginService.getLoginUser();
@@ -79,6 +93,7 @@ public class CarController {
     }
 
     @ResponseBody
+    @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
     @PutMapping("/rental")  // 차량 반납
     public JsonBody rentalPut(@Validated @RequestBody RentCarDto rentCarDto) {
         User user = loginService.getLoginUser();
@@ -90,6 +105,7 @@ public class CarController {
     }
 
     @ResponseBody
+    @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
     @DeleteMapping("/rental")   // 차량 대여 취소
     public JsonBody rentalDelete(@Validated @RequestBody RentCarDto rentCarDto) {
         User user = loginService.getLoginUser();
@@ -101,11 +117,9 @@ public class CarController {
     }
 
     /* 차량 관리 */
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/manage")  // 차량 관리 페이지
+    @GetMapping("/manage")  // 차량 페이지
     public String getCar(Model model, @RequestParam(value = "q", required = false) String carNumber) {
-        List<CarDto> carDtoList = carManageService.searchCar(carNumber);
+        List<CarDto> carDtoList = carManageService.searchCarDto(carNumber);
         String[] carInfo = {"차량 번호", "차종", "상태", "메모", "수정/삭제"};
         List<List<String>> listList = converter.convertCarDtoList(carDtoList);
         model.addAttribute("carList", listList);
