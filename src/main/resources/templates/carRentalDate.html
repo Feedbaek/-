@@ -6,6 +6,12 @@
 <head>
     <title>차량 대여</title>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const dateArr = [[${dateArr}]];
+        /*]]>*/
+        console.log(dateArr);
+    </script>
     <style>
         .fc .fc-button {
             padding: 0.25rem 0.5rem;
@@ -25,6 +31,11 @@
 
         .fc .fc-toolbar-chunk:first-child, .fc .fc-toolbar-chunk:last-child {
             flex: 0 0 auto;
+        }
+
+        .fc-nonbusiness {
+            background-color: #ddd; /* 비활성화된 날짜의 배경색 */
+            pointer-events: none; /* 마우스 이벤트 비활성화 */
         }
     </style>
 </head>
@@ -46,6 +57,22 @@
         document.addEventListener('DOMContentLoaded', function () {
             const calendarEl = document.getElementById('calendar');
             let selectedStartDate = null;
+            const disabledDates = [];
+            let currentMonth = new Date().getMonth();
+
+            dateArr.flat().forEach((dateObj, index, arr) => {
+                if (index > 0 && dateObj.day < arr[index - 1].day) {
+                    currentMonth++;
+                    currentMonth = currentMonth > 12 ? 1 : currentMonth;
+                }
+                // 선택 불가 셀만 배열에 저장
+                if (!dateObj.available) {
+                    let date = new Date();
+                    date.setMonth(currentMonth);
+                    date.setDate(dateObj.day);
+                    disabledDates.push(formatDate(date));
+                }
+            });
 
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 locale: 'ko',
@@ -57,6 +84,7 @@
                     center: 'title',
                     end: 'prev,next'
                 },
+                //최대 3주까지 선택 가능
                 selectAllow: function (selectInfo) {
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
@@ -67,12 +95,31 @@
                     start: new Date(),
                     end: new Date().setDate(new Date().getDate() + 21)
                 },
+                dayCellDidMount: function (arg) {
+                    // 비활성화 날짜 클릭 이벤트 제거
+                    if (disabledDates.includes(formatDate(arg.date))) {
+                        arg.el.addEventListener('click', function (e) {
+                            e.preventDefault();
+                        });
+                        // 비활성화된 날짜 회색으로 표시
+                        arg.el.classList.add('fc-nonbusiness');
+                    }
+                },
                 dateClick: function (info) {
-                    let clickedDate = info.date;
+                    let clickedDate = info.dateStr;
+                    // 비활성화 된 날짜 클릭 불가
+                    if (disabledDates.includes(clickedDate)) {
+                        selectedStartDate = null;
+                        clickedDate = null;
+                        return;
+                    }
+                    clickedDate = info.date;
+                    // 시작 셀 선택
                     if (!selectedStartDate) {
                         selectedStartDate = clickedDate;
                         calendar.select(clickedDate);
                     } else {
+                        // 종료 셀 선택
                         let inclusiveEndDate = clickedDate;
                         if (inclusiveEndDate < selectedStartDate) {
                             let temp = selectedStartDate;
@@ -85,6 +132,7 @@
 
                         selectDateRange(formatDate(selectedStartDate), formatDate(inclusiveEndDate));
                         selectedStartDate = null;
+                        clickedDate = null;
                     }
                 }
             });

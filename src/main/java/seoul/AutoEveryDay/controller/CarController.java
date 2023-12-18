@@ -58,10 +58,10 @@ public class CarController {
         List<String> dayOfWeek = converter.getDayOfWeek(now);
 
         model.addAttribute("dateArr", dateArr);
-        model.addAttribute("dayOfWeek", dayOfWeek);
-        model.addAttribute("year", now.getYear());
-        model.addAttribute("month", now.getMonthValue());
-        model.addAttribute("today", now.getDayOfMonth());
+//        model.addAttribute("dayOfWeek", dayOfWeek);
+//        model.addAttribute("year", now.getYear());
+//        model.addAttribute("month", now.getMonthValue());
+//        model.addAttribute("today", now.getDayOfMonth());
         model.addAttribute("carId", carId);
         return "carRentalDate";
     }
@@ -116,7 +116,7 @@ public class CarController {
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/manage") // 새로운 차량 등록
-    public JsonBody newCar(@Validated @RequestBody CarDto carDto) {
+    public JsonBody newCar(@Validated CarDto carDto) {
         return JsonBody.builder()
                 .message("차량 등록 성공")
                 .data(carManageService.createCar(carDto))
@@ -125,7 +125,7 @@ public class CarController {
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/manage")  // 차량 정보 수정
-    public JsonBody editCar(@Validated @ModelAttribute CarDto carDto) {
+    public JsonBody editCar(@Validated CarDto carDto) {
         return JsonBody.builder()
                 .message("차량 정보 수정 성공")
                 .data(carManageService.updateCar(carDto))

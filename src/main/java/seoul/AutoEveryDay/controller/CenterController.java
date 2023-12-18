@@ -92,10 +92,10 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
     @ResponseBody
     @PreAuthorize(value = "hasAuthority('ADMIN')")
     @DeleteMapping("/track/manage")  // 테스트 트랙 삭제
-    public JsonBody manageDelete(@RequestParam Long id) {
+    public JsonBody manageDelete(@RequestParam("id") Long trackId) {
         return JsonBody.builder()
                 .message("테스트 트랙 삭제 성공")
-                .data(trackService.deleteTestTrack(id))
+                .data(trackService.deleteTestTrack(trackId))
                 .build();
     }
 }
