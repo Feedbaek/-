@@ -9,18 +9,22 @@
 </head>
 <main layout:fragment="content" class="container mt-5">
     <h1 class="display-5">차량 보기</h1>
-    <div class="col text-right mt-5">
-        <!-- 검색 창 -->
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <form class="d-flex" action="/car/manage" method="get">
-                    <input class="form-control me-2" type="search" th:placeholder="${search}" aria-label="Search" name="q">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
+    <div class="row container">
+        <div class="col">
+            <!-- 검색 창 -->
+            <div class="row container justify-content-end">
+                <div class="col-md-8">
+                    <form class="d-flex" action="/car/manage" method="get">
+                        <input class="form-control me-2" type="search" th:placeholder="${search}" aria-label="Search" name="q">
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    </form>
+                </div>
             </div>
         </div>
-        <!-- 차량 등록 -->
-        <button sec:authorize="hasAuthority('ADMIN')" type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#addCarModal">차량 등록</button>
+        <div class="col-md-2 justify-content-end text-right">
+            <!-- 차량 등록 -->
+            <button sec:authorize="hasAuthority('ADMIN')" type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#addCarModal">차량 등록</button>
+        </div>
     </div>
     <!-- 카 테이블 프래그먼트 -->
     <div th:replace="~{fragments/table :: commonTable(${carListTitles}, ${carList}, 'manage')}"></div>

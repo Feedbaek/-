@@ -40,6 +40,16 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
         return "trackReserveDate";
     }
 
+    @GetMapping("/track/reserve/history")  // 테스트 트랙 예약 날짜 선택 페이지
+    public String reserveHistoryGet(Model model) {
+        User user = userService.getLoginUser();
+        String[] reserveHistoryTitles = {"트랙 이름", "예약 날짜", "상태", "예약 취소"};
+        List<List<String>> reserveHistoryList = trackService.getReserveHistory(user);
+        model.addAttribute("reserveHistoryTitles", reserveHistoryTitles);
+        model.addAttribute("reserveHistoryList", reserveHistoryList);
+        return "trackReserveHistory";
+    }
+
     @ResponseBody
     @PreAuthorize(value = "hasAuthority('TRACK_RESERVE')")
     @PostMapping("/track/reserve")  // 테스트 트랙 예약
@@ -52,12 +62,22 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
     }
     @ResponseBody
     @PreAuthorize(value = "hasAuthority('TRACK_RESERVE')")
-    @DeleteMapping("/track/reserve")  // 테스트 트랙 예약 취소
-    public JsonBody reserveDelete(@Validated @RequestParam ReserveTrackDto reserveTrackDto) {
-        User user = userService.getLoginUser();
+    @PostMapping("/track/reserve/cancel/{historyId}")  // 테스트 트랙 예약 취소
+    public JsonBody reserveCancelPost(@PathVariable("historyId") Long historyId) {
         return JsonBody.builder()
                 .message("예약 취소 성공")
-                .data(trackService.deleteReserveHistory(reserveTrackDto, user))
+                .data(trackService.cancelReserveHistory(historyId))
+                .build();
+    }
+
+
+    @ResponseBody
+    @PreAuthorize(value = "hasAuthority('TRACK_RESERVE')")
+    @DeleteMapping("/track/reserve/{historyId}")  // 테스트 트랙 예약 삭제
+    public JsonBody reserveDelete(@PathVariable("historyId") Long historyId) {
+        return JsonBody.builder()
+                .message("예약 취소 성공")
+                .data(trackService.deleteReserveHistory(historyId))
                 .build();
     }
 

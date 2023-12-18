@@ -19,9 +19,14 @@
             <!-- 차량 대여, 관리 테이블 헤더 -->
             <th th:each="header, iter : ${headers}" th:if="${(type == 'manage' || type == 'rental') && iter.index != 4}"
                 th:attr="data-index=${iter.index}" onclick="sortTable(this)" th:text="${header}"></th>
+
             <!-- 차량 대여 내역 테이블 헤더 -->
             <th th:each="header, iter : ${headers}" th:if="${type == 'rentalHistory'}"
                 th:attr="data-index=${iter.index}" onclick="sortTable(this)" th:text="${header}"></th>
+            <!-- 트랙 예약 내역 테이블 헤더 -->
+            <th th:each="header, iter : ${headers}" th:if="${type == 'reserveHistory'}"
+                th:attr="data-index=${iter.index}" onclick="sortTable(this)" th:text="${header}"></th>
+
             <!-- 액션 버튼 유무 -->
             <th th:if="${type == 'manage'}" sec:authorize="hasAuthority('ADMIN')" th:text="${headers[4]}"></th>
             <th th:if="${type == 'rental'}" sec:authorize="hasAuthority('CAR_RENTAL')" th:text="${headers[4]}"></th>
@@ -52,12 +57,20 @@
         <tr th:each="dataObj : ${dataList}" th:if="${type} == 'rentalHistory'">
             <td th:each="data, iter : ${dataObj}" th:if="${iter.index} != 0" th:text="${data}" class="align-middle py-4"></td>
             <td sec:authorize="hasAuthority('CAR_RENTAL')" class="align-middle">
-                <button th:if="${dataObj[5] == '대여 신청'}" type="button" class="btn btn-danger" th:attr="data-history-id=${dataObj[0]}" onclick="deleteRental(this)">취소</button>
-                <button th:if="${dataObj[5] == '대여 중'}" type="button" class="btn btn-info" th:attr="data-history-id=${dataObj[0]}" onclick="returnCar(this)">반납</button>
-                <button th:if="${dataObj[5] == '반납 완료'}" type="button" class="btn btn-secondary" disabled>반납 완료</button>
-                <button th:if="${dataObj[5] == '취소 완료'}" type="button" class="btn btn-secondary" disabled>취소 완료</button>
+                <button th:if="${dataObj[5] == '대여 신청'}" type="button" class="btn btn-outline-danger" th:attr="data-history-id=${dataObj[0]}" onclick="cancelRental(this)">취소</button>
+                <button th:if="${dataObj[5] == '대여 중'}" type="button" class="btn btn-outline-info" th:attr="data-history-id=${dataObj[0]}" onclick="returnCar(this)">반납</button>
+                <button th:if="${dataObj[5] == '반납 완료'}" type="button" class="btn btn-outline-secondary" disabled>반납 완료</button>
+                <button th:if="${dataObj[5] == '취소 완료'}" type="button" class="btn btn-outline-secondary" disabled>취소 완료</button>
             </td>
         </tr>
+        <!-- reserveHistory 테이블 -->
+        <tr th:each="dataObj : ${dataList}" th:if="${type} == 'reserveHistory'">
+            <td th:each="data, iter : ${dataObj}" th:if="${iter.index} != 0" th:text="${data}" class="align-middle py-4"></td>
+            <td sec:authorize="hasAuthority('TRACK_RESERVE')" class="align-middle">
+                <button th:if="${dataObj[3] == '예약 신청'}" type="button" class="btn btn-outline-danger" th:attr="data-history-id=${dataObj[0]}" onclick="cancelReserve(this)">취소</button>
+                <button th:if="${dataObj[3] == '예약 완료'}" type="button" class="btn btn-link text-secondary" disabled>예약 완료</button>
+                <button th:if="${dataObj[3] == '취소 완료'}" type="button" class="btn btn-link text-secondary" disabled>취소 완료</button>
+            </td>
         </tbody>
     </table>
 </div>

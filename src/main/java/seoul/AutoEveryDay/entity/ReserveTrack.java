@@ -27,4 +27,7 @@ public class ReserveTrack {
 
     @Column(name = "date", nullable = false)
     private LocalDate date;
+
+    @Column(name = "is_canceled", nullable = false)
+    private Boolean isCanceled;
 }

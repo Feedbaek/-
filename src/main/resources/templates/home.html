@@ -12,15 +12,17 @@
 <main layout:fragment="content">
     <div class="container my-4">
         <div class="card bg-light rounded">
-            <div class="card-body">
-                <div class="text-center">
-                    <!-- Your main content here -->
+            <div class="text-center">
+                <!-- Your main content here -->
+                <div class="container my-4">
                     <h1>주행시험장 관리 시스템</h1>
-                    <br>
-                    <p>원하는 서비스를 선택해 주세요.</p>
-                    <button sec:authorize="hasAuthority('CAR_RENTAL')" type="button" class="btn btn-primary mx-1" onclick="location.href='/car/rental'">차량 대여</button>
-                    <button type="button" class="btn btn-secondary mx-1" onclick="location.href='/car/manage'">차량 보기</button>
-                    <button sec:authorize="hasAuthority('TRACK_RESERVE')" type="button" class="btn btn-success mx-1" onclick="location.href='/center/track/reserve'">시험장 보기</button>
+                </div>
+                <p>원하는 서비스를 선택해 주세요.</p>
+                <br>
+                <div class="row justify-content-center">
+                    <div sec:authorize="hasAuthority('CAR_RENTAL')" class="mr-1 col-md-2 card-body btn btn-outline-info" onclick="location.href='/car/rental'">차량 대여</div>
+                    <div class="mx-1 col-md-2 card-body btn btn-outline-info" onclick="location.href='/car/manage'">차량 보기</div>
+                    <div sec:authorize="hasAuthority('TRACK_RESERVE')" class="ml-1 col-md-2 card-body btn btn-outline-info" onclick="location.href='/center/track/reserve'">시험장 보기</div>
                 </div>
             </div>
         </div>

@@ -4,7 +4,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/default_layout}">
 <head>
-    <title>대여 내역</title>
+    <title>예약 내역</title>
     <style>
         th:hover {
             background-color: rgba(197, 197, 197, 0.86); /* Light grey background on hover */
@@ -14,7 +14,7 @@
 </head>
 <!-- Content -->
 <main layout:fragment="content" class="container mt-4">
-    <h1 class="display-5">차량 대여 내역</h1>
+    <h1 class="display-5">트랙 예약 내역</h1>
     <!-- 여기에 carList 리스트 값을 리스트 형식으로 보여줌 -->
     <!-- 검색 창 -->
     <div class="container mt-3">
@@ -28,32 +28,32 @@
         </div>
     </div>
     <!-- 카 테이블 프래그먼트 -->
-    <div th:replace="~{fragments/table :: commonTable(${rentalHistoryTitles}, ${rentalHistoryList}, 'rentalHistory')}"></div>
+    <div th:replace="~{fragments/table :: commonTable(${reserveHistoryTitles}, ${reserveHistoryList}, 'reserveHistory')}"></div>
 
     <script>
-        function returnCar(element) {
-            const historyId = element.getAttribute('data-history-id');
-            fetch('/car/rental/return/' + historyId, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }).then(response => {
-                if (response.ok) {
-                    alert('반납 완료');
-                } else {
-                    alert('반납 실패');
-                }
-            }).catch(error => {
-                console.log(error);
-            }).finally(() => {
-                window.location.reload();
-            });
-        }
+        // function returnCar(element) {
+        //     const historyId = element.getAttribute('data-history-id');
+        //     fetch('/center/reserve/return/' + historyId, {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //     }).then(response => {
+        //         if (response.ok) {
+        //             alert('반납 완료');
+        //         } else {
+        //             alert('반납 실패');
+        //         }
+        //     }).catch(error => {
+        //         console.log(error);
+        //     }).finally(() => {
+        //         window.location.reload();
+        //     });
+        // }
 
-        function cancelRental(element) {
+        function cancelReserve(element) {
             const historyId = element.getAttribute('data-history-id');
-            fetch('/car/rental/cancel/' + historyId, {
+            fetch('/center/track/reserve/cancel/' + historyId, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

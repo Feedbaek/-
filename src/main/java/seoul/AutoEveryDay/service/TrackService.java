@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import seoul.AutoEveryDay.dto.AvailableDate;
 import seoul.AutoEveryDay.dto.TrackDto;
 import seoul.AutoEveryDay.dto.ReserveTrackDto;
 import seoul.AutoEveryDay.entity.Track;
@@ -27,11 +26,11 @@ public class TrackService {
     private final TrackRepository trackRepository;
     private final ReserveTrackRepository reserveTrackRepository;
 
-    private void validateReserveHistory(ReserveTrackDto testHistory, User user) {
+    private void validateReserveHistory(ReserveTrackDto testHistory) {
         if (testHistory.getDate().isBefore(LocalDate.now())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약은 오늘 이후로만 가능합니다.");
         }
-        if (reserveTrackRepository.findByTrack_IdAndDate(testHistory.getTrackId(), testHistory.getDate()).isPresent()) {
+        if (reserveTrackRepository.findByTrack_IdAndDateAndIsCanceled(testHistory.getTrackId(), testHistory.getDate(), false).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 예약된 날짜입니다.");
         }
     }
@@ -100,12 +99,13 @@ public class TrackService {
 
     // 여기부터 예약 관련
     public ReserveTrackDto createReserveHistory(ReserveTrackDto reserveTrackDto, User user) {
-        validateReserveHistory(reserveTrackDto, user);
+        validateReserveHistory(reserveTrackDto);
         Track track = getTrack(reserveTrackDto.getTrackId());
         ReserveTrack reserveTrack = ReserveTrack.builder()
                 .user(user)
                 .track(track)
                 .date(reserveTrackDto.getDate())
+                .isCanceled(false)
                 .build();
         try {
             reserveTrackRepository.save(reserveTrack);
@@ -132,6 +132,25 @@ public class TrackService {
         return reserveTrackDto;
     }
 
+    public ReserveTrackDto deleteReserveHistory(Long historyId) {
+        ReserveTrack reserveTrack = reserveTrackRepository.findById(historyId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "예약을 찾을 수 없습니다.")
+        );
+        ReserveTrackDto reserveTrackDto = ReserveTrackDto.builder()
+                .id(reserveTrack.getId())
+                .userId(reserveTrack.getUser().getId())
+                .trackId(reserveTrack.getTrack().getId())
+                .date(reserveTrack.getDate())
+                .build();
+        try {
+            reserveTrackRepository.delete(reserveTrack);
+        } catch (Exception e) {
+            log.error("예약 삭제 실패", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "예약 삭제 실패");
+        }
+        return reserveTrackDto;
+    }
+
     public Track getTestTrack(Long trackId) {
         return trackRepository.findById(trackId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "트랙을 찾을 수 없습니다.")
@@ -149,5 +168,45 @@ public class TrackService {
         });
 
         return unavailableDateList;
+    }
+
+    public List<List<String>> getReserveHistory(User user) {
+        List<ReserveTrack> reserveTrackList = reserveTrackRepository.findByUser_Id(user.getId());
+        List<List<String>> reserveHistoryList = new ArrayList<>();
+
+        reserveTrackList.forEach((reserveTrack) -> {
+            List<String> reserveHistory = new ArrayList<>();
+
+            reserveHistory.add(reserveTrack.getId().toString());
+            reserveHistory.add(reserveTrack.getTrack().getName());
+            reserveHistory.add(reserveTrack.getDate().toString());
+            if (reserveTrack.getIsCanceled()) {
+                reserveHistory.add("취소 완료");
+            } else if (reserveTrack.getDate().isBefore(LocalDate.now()) || reserveTrack.getDate().isEqual(LocalDate.now())) {
+                reserveHistory.add("예약 완료");
+            } else {
+                reserveHistory.add("예약 신청");
+            }
+
+            reserveHistoryList.add(reserveHistory);
+        });
+
+        return reserveHistoryList;
+    }
+
+    public ReserveTrackDto cancelReserveHistory(Long historyId) {
+        ReserveTrack reserveTrack = reserveTrackRepository.findById(historyId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "예약을 찾을 수 없습니다.")
+        );
+        if (reserveTrack.getIsCanceled()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 취소된 예약입니다.");
+        }
+        reserveTrack.setIsCanceled(true);
+        return ReserveTrackDto.builder()
+                .id(reserveTrack.getId())
+                .userId(reserveTrack.getUser().getId())
+                .trackId(reserveTrack.getTrack().getId())
+                .date(reserveTrack.getDate())
+                .build();
     }
 }
