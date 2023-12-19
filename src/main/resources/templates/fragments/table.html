@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      xmlns:th="http://www.thymeleaf.org">
+<html
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+        xmlns:th="http://www.thymeleaf.org"
+>
 <head>
     <style>
         th:hover {
@@ -11,68 +13,267 @@
     </style>
 </head>
 <body>
-<div th:fragment="commonTable(headers, dataList, type)" class="rounded-lg shadow mt-2"
-     style="overflow: hidden;">
+<div
+        th:fragment="commonTable(headers, dataList, type)"
+        class="rounded-lg shadow mt-2"
+        style="overflow: hidden"
+>
     <table class="table table-hover table-borderless text-center">
         <thead class="bg-info text-white">
         <tr>
             <!-- 차량 대여, 관리 테이블 헤더 -->
-            <th th:each="header, iter : ${headers}" th:if="${(type == 'manage' || type == 'rental') && iter.index != 4}"
-                th:attr="data-index=${iter.index}" onclick="sortTable(this)" th:text="${header}"></th>
+            <th
+                    th:each="header, iter : ${headers}"
+                    th:if="${(type == 'manage' || type == 'rental') && iter.index != 4}"
+                    th:attr="data-index=${iter.index}"
+                    onclick="sortTable(this)"
+                    th:text="${header}"
+            ></th>
 
             <!-- 차량 대여 내역 테이블 헤더 -->
-            <th th:each="header, iter : ${headers}" th:if="${type == 'rentalHistory'}"
-                th:attr="data-index=${iter.index}" onclick="sortTable(this)" th:text="${header}"></th>
+            <th
+                    th:each="header, iter : ${headers}"
+                    th:if="${type == 'rentalHistory'}"
+                    th:attr="data-index=${iter.index}"
+                    onclick="sortTable(this)"
+                    th:text="${header}"
+            ></th>
             <!-- 트랙 예약 내역 테이블 헤더 -->
-            <th th:each="header, iter : ${headers}" th:if="${type == 'reserveHistory'}"
-                th:attr="data-index=${iter.index}" onclick="sortTable(this)" th:text="${header}"></th>
+            <th
+                    th:each="header, iter : ${headers}"
+                    th:if="${type == 'reserveHistory'}"
+                    th:attr="data-index=${iter.index}"
+                    onclick="sortTable(this)"
+                    th:text="${header}"
+            ></th>
+            <!-- 차량 모델 관리 테이블 헤더-->
+            <th
+                    th:if="${type == 'modelManage'}"
+                    th:each="header, iter : ${headers}"
+                    th:attr="data-index=${iter.index}"
+                    onclick="sortTable(this)"
+                    th:text="${header}"
+            ></th>
 
             <!-- 액션 버튼 유무 -->
-            <th th:if="${type == 'manage'}" sec:authorize="hasAuthority('ADMIN')" th:text="${headers[4]}"></th>
-            <th th:if="${type == 'rental'}" sec:authorize="hasAuthority('CAR_RENTAL')" th:text="${headers[4]}"></th>
+            <th
+                    th:if="${type == 'manage'}"
+                    sec:authorize="hasAuthority('ADMIN')"
+                    th:text="${headers[4]}"
+            ></th>
+            <th
+                    th:if="${type == 'rental'}"
+                    sec:authorize="hasAuthority('CAR_RENTAL')"
+                    th:text="${headers[4]}"
+            ></th>
         </tr>
         </thead>
         <tbody>
         <!-- manage 테이블 -->
         <tr th:each="dataObj : ${dataList}" th:if="${type} == 'manage'">
-            <td th:each="data, iter : ${dataObj}" th:if="${iter.index} != 0" th:text="${data}" class="align-middle py-4"></td>
+            <td
+                    th:each="data, iter : ${dataObj}"
+                    th:if="${iter.index != 0 && iter.index != 5}"
+                    th:text="${data}"
+                    class="align-middle py-4"
+            ></td>
             <td sec:authorize="hasAuthority('ADMIN')" class="align-middle">
-                <button type="button" class="btn btn-info btn-sm"
-                        th:attr="data-target='#editCarModal-' + ${dataObj[0]}" data-toggle="modal">수정
+                <button
+                        type="button"
+                        class="btn btn-info btn-sm"
+                        th:attr="data-target='#editCarModal-' + ${dataObj[0]}"
+                        data-toggle="modal"
+                >
+                    수정
                 </button>
-                <button type="button" class="btn btn-secondary btn-sm"
-                        th:attr="data-car-number=${dataObj[1]}" onclick="deleteCar(this)">삭제
+                <button
+                        type="button"
+                        class="btn btn-secondary btn-sm"
+                        th:attr="data-car-number=${dataObj[1]}"
+                        onclick="deleteCar(this)"
+                >
+                    삭제
                 </button>
             </td>
         </tr>
         <!-- rental 테이블 -->
         <tr th:each="dataObj : ${dataList}" th:if="${type} == 'rental'">
-            <td th:each="data, iter : ${dataObj}" th:if="${iter.index} != 0" th:text="${data}" class="align-middle py-4"></td>
+            <td th:each="data, iter : ${dataObj}"
+                th:if="${iter.index != 0 && iter.index != 5}"
+                th:text="${data}"
+                th:attr="data-model-image=${dataObj[5]}"
+                class="align-middle py-4"
+                onclick="openRentalModal(this.parentNode, this)"></td>
             <td sec:authorize="hasAuthority('CAR_RENTAL')" class="align-middle">
-                <button type="button" class="btn btn-info" th:attr="data-car-id=${dataObj[0]}" onclick="rentCar(this)">대여
+                <button
+                        type="button"
+                        class="btn btn-info"
+                        th:attr="data-car-id=${dataObj[0]}"
+                        onclick="rentCar(this); event.stopPropagation();"
+                >
+                    대여
                 </button>
             </td>
         </tr>
+
         <!-- rentalHistory 테이블 -->
-        <tr th:each="dataObj : ${dataList}" th:if="${type} == 'rentalHistory'">
-            <td th:each="data, iter : ${dataObj}" th:if="${iter.index} != 0" th:text="${data}" class="align-middle py-4"></td>
+        <tr
+                th:each="dataObj : ${dataList}"
+                th:if="${type} == 'rentalHistory'"
+        >
+            <td
+                    th:each="data, iter : ${dataObj}"
+                    th:if="${iter.index} != 0"
+                    th:text="${data}"
+                    class="align-middle py-4"
+            ></td>
             <td sec:authorize="hasAuthority('CAR_RENTAL')" class="align-middle">
-                <button th:if="${dataObj[5] == '대여 신청'}" type="button" class="btn btn-outline-danger" th:attr="data-history-id=${dataObj[0]}" onclick="cancelRental(this)">취소</button>
-                <button th:if="${dataObj[5] == '대여 중'}" type="button" class="btn btn-outline-info" th:attr="data-history-id=${dataObj[0]}" onclick="returnCar(this)">반납</button>
-                <button th:if="${dataObj[5] == '반납 완료'}" type="button" class="btn btn-outline-secondary" disabled>반납 완료</button>
-                <button th:if="${dataObj[5] == '취소 완료'}" type="button" class="btn btn-outline-secondary" disabled>취소 완료</button>
+                <button
+                        th:if="${dataObj[5] == '대여 신청'}"
+                        type="button"
+                        class="btn btn-outline-danger"
+                        th:attr="data-history-id=${dataObj[0]}"
+                        onclick="cancelRental(this)"
+                >
+                    취소
+                </button>
+                <button
+                        th:if="${dataObj[5] == '대여 중'}"
+                        type="button"
+                        class="btn btn-outline-info"
+                        th:attr="data-history-id=${dataObj[0]}"
+                        onclick="returnCar(this)"
+                >
+                    반납
+                </button>
+                <button
+                        th:if="${dataObj[5] == '반납 완료'}"
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        disabled
+                >
+                    반납 완료
+                </button>
+                <button
+                        th:if="${dataObj[5] == '취소 완료'}"
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        disabled
+                >
+                    취소 완료
+                </button>
             </td>
         </tr>
         <!-- reserveHistory 테이블 -->
-        <tr th:each="dataObj : ${dataList}" th:if="${type} == 'reserveHistory'">
-            <td th:each="data, iter : ${dataObj}" th:if="${iter.index} != 0" th:text="${data}" class="align-middle py-4"></td>
-            <td sec:authorize="hasAuthority('TRACK_RESERVE')" class="align-middle">
-                <button th:if="${dataObj[3] == '예약 신청'}" type="button" class="btn btn-outline-danger" th:attr="data-history-id=${dataObj[0]}" onclick="cancelReserve(this)">취소</button>
-                <button th:if="${dataObj[3] == '예약 완료'}" type="button" class="btn btn-link text-secondary" disabled>예약 완료</button>
-                <button th:if="${dataObj[3] == '취소 완료'}" type="button" class="btn btn-link text-secondary" disabled>취소 완료</button>
+        <tr
+                th:each="dataObj : ${dataList}"
+                th:if="${type} == 'reserveHistory'"
+        >
+            <td
+                    th:each="data, iter : ${dataObj}"
+                    th:if="${iter.index} != 0"
+                    th:text="${data}"
+                    class="align-middle py-4"
+            ></td>
+            <td
+                    sec:authorize="hasAuthority('TRACK_RESERVE')"
+                    class="align-middle"
+            >
+                <button
+                        th:if="${dataObj[3] == '예약 신청'}"
+                        type="button"
+                        class="btn btn-outline-danger"
+                        th:attr="data-history-id=${dataObj[0]}"
+                        onclick="cancelReserve(this)"
+                >
+                    취소
+                </button>
+                <button
+                        th:if="${dataObj[3] == '예약 완료'}"
+                        type="button"
+                        class="btn btn-link text-secondary"
+                        disabled
+                >
+                    예약 완료
+                </button>
+                <button
+                        th:if="${dataObj[3] == '취소 완료'}"
+                        type="button"
+                        class="btn btn-link text-secondary"
+                        disabled
+                >
+                    취소 완료
+                </button>
+            </td>
+        </tr>
+
+        <!-- modelManage 테이블 -->
+        <tr th:each="dataObj : ${dataList}" th:if="${type} == 'modelManage'">
+            <td
+                    th:each="data, iter : ${dataObj}"
+                    th:if="${iter.index} != 0"
+                    th:text="${data}"
+                    class="align-middle py-4"
+            ></td>
+            <td sec:authorize="hasAuthority('ADMIN')" class="align-middle">
+                <button
+                        type="button"
+                        class="btn btn-info btn-sm"
+                        th:attr="data-target='#editCarModal-' + ${dataObj[0]}"
+                        data-toggle="modal"
+                >
+                    수정
+                </button>
+                <button
+                        type="button"
+                        class="btn btn-secondary btn-sm"
+                        th:attr="data-model-id=${dataObj[0]}"
+                        onclick="deleteModel(this)"
+                >
+                    삭제
+                </button>
             </td>
         </tbody>
     </table>
+    <!--상세 모달-->
+    <div class="modal fade" id="rentalModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">차량 상세정보</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body px-5 pt-5 pb-4">
+                    <div id="rentalData" class="container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function openRentalModal(row, cell) {
+            // 모달에 데이터 세팅
+            const modalData = document.getElementById('rentalData');
+            // 여긴 나중에 데이터 수정되면 엘레먼트 참조로 수정
+            const imgUrl = cell.getAttribute('data-model-image');
+            modalData.innerHTML = '<img src="' + imgUrl + '" alt="차량 이미지" width="100%" height="100%" class="mb-5"/>';
+            const modalTitle = ['차량 번호', '차량 종류', '차량 상태', '메모'];
+            let i = 0;
+            for (; i < row.cells.length - 1; i++) {
+                modalData.innerHTML +=
+                    '<div class="mb-4">' +
+                    '<div class="d-inline-block">' +
+                    '<span class="h6 border border-info rounded-pill px-3 py-1">' + modalTitle[i] + '</span>' +
+                    '<span class="pl-4 h6">' + row.cells[i].innerHTML + '</span>'+
+                    '</div>' +
+                    '</div>';
+            }
+            modalData.innerHTML += '<div class="row justify-content-center mt-5">' +  row.cells[i].innerHTML + '</div>';
+
+            $('#rentalModal').modal('show');
+        }
+    </script>
 </div>
 </body>
 </html>

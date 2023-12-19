@@ -19,4 +19,6 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     List<Car> findByCarModel_IdAndNumberContaining(Long carModelId, String number);
 
     List<Car> findByCarModel_Id(Long carModel);
+
+    boolean existsByCarModel_Id(Long id);
 }

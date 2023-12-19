@@ -6,11 +6,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import seoul.AutoEveryDay.dto.DriveHistoryDto;
 import seoul.AutoEveryDay.dto.JsonBody;
 import seoul.AutoEveryDay.dto.TrackDto;
 import seoul.AutoEveryDay.dto.ReserveTrackDto;
 import seoul.AutoEveryDay.entity.Track;
 import seoul.AutoEveryDay.entity.User;
+import seoul.AutoEveryDay.service.DriveService;
 import seoul.AutoEveryDay.service.LoginService;
 import seoul.AutoEveryDay.service.TrackService;
 
@@ -23,6 +25,7 @@ import java.util.List;
 public class CenterController { // 테스트 트랙 관련 컨트롤러
     private final TrackService trackService;
     private final LoginService userService;
+    private final DriveService driveService;
 
     // 예약 관련 컨트롤러
     @GetMapping("/track/reserve")  // 테스트 트랙 예약 페이지
@@ -89,16 +92,6 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
         return "trackManage";
     }
 
-//    @ResponseBody
-//    @PreAuthorize(value = "hasAuthority('ADMIN')")
-//    @GetMapping("/manage")  // 테스트 트랙 상세 조회
-//    public JsonBody trackGet(@RequestParam String name) {
-//        return JsonBody.builder()
-//                .message("테스트 트랙 조회 성공")
-//                .data(testTrackService.getTestTrack(name))
-//                .build();
-//    }
-
     @ResponseBody
     @PreAuthorize(value = "hasAuthority('ADMIN')")
     @PostMapping("/track/manage")  // 테스트 트랙 등록
@@ -126,6 +119,15 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
         return JsonBody.builder()
                 .message("테스트 트랙 삭제 성공")
                 .data(trackService.deleteTestTrack(trackId))
+                .build();
+    }
+
+    @ResponseBody
+    @PostMapping("/drive/history")  // 주행 기록 등록
+    public JsonBody driveHistoryPost(@Validated @RequestBody DriveHistoryDto driveHistoryDto) {
+        return JsonBody.builder()
+                .message("주행 기록 등록 성공")
+                .data(driveService.addDriveHistory(driveHistoryDto))
                 .build();
     }
 }

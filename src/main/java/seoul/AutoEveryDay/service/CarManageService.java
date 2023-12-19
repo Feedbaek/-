@@ -5,14 +5,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import seoul.AutoEveryDay.dto.CarDto;
+import seoul.AutoEveryDay.dto.CarModelReq;
+import seoul.AutoEveryDay.dto.CarModelRes;
+import seoul.AutoEveryDay.dto.ModelImageChangeReq;
 import seoul.AutoEveryDay.entity.Car;
 import seoul.AutoEveryDay.entity.CarModel;
 import seoul.AutoEveryDay.repository.CarModelRepository;
 import seoul.AutoEveryDay.repository.CarRepository;
 import seoul.AutoEveryDay.repository.RentCarRepository;
+import seoul.AutoEveryDay.utils.Converter;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +32,7 @@ public class CarManageService {
     private final CarRepository carRepository;
     private final CarModelRepository carModelRepository;
     private final RentCarRepository rentCarRepository;
+    private final Converter converter;
 
     /** <h3>차량 등록.</h3>
      * 이미 존재하는 차량 번호면 ResponseStatusException 발생 */
@@ -64,6 +72,7 @@ public class CarManageService {
                 .model(car.getCarModel().getName())
                 .status(car.getStatus())
                 .comment(car.getComment())
+                .image(car.getCarModel().getImage())
                 .build();
     }
     public Car getCar(Long id) {
@@ -83,6 +92,7 @@ public class CarManageService {
                     .model(car.getCarModel().getName())
                     .status(car.getStatus())
                     .comment(car.getComment())
+                    .image(car.getCarModel().getImage())
                     .build());
         });
 
@@ -106,6 +116,7 @@ public class CarManageService {
                         .model(car.getCarModel().getName())
                         .status(car.getStatus())
                         .comment(car.getComment())
+                        .image(car.getCarModel().getImage())
                         .build());
             });
         }
@@ -128,6 +139,7 @@ public class CarManageService {
                     .model(car.getCarModel().getName())
                     .status(car.getStatus())
                     .comment(car.getComment())
+                    .image(car.getCarModel().getImage())
                     .build());
         });
 
@@ -148,6 +160,7 @@ public class CarManageService {
                 .model(car.getCarModel().getName())
                 .status(car.getStatus())
                 .comment(car.getComment())
+                .image(car.getCarModel().getImage())
                 .build();
     }
 
@@ -173,6 +186,7 @@ public class CarManageService {
                 .model(car.getCarModel().getName())
                 .status(car.getStatus())
                 .comment(car.getComment())
+                .image(car.getCarModel().getImage())
                 .build();
     }
 
@@ -185,5 +199,117 @@ public class CarManageService {
         });
 
         return carModelNameList;
+    }
+
+    public List<CarModelRes> getAllCarModelDto() {
+        List<CarModel> carModelList = carModelRepository.findAllByOrderById();
+        List<CarModelRes> carModelResList = new ArrayList<>();
+
+        carModelList.forEach(carModel -> {
+            carModelResList.add(CarModelRes.builder()
+                    .id(carModel.getId())
+                    .name(carModel.getName())
+                    .image(carModel.getImage())
+                    .build());
+        });
+
+        return carModelResList;
+    }
+
+    public boolean isJPEG(MultipartFile file) {
+        String contentType = file.getContentType();
+        return contentType != null && contentType.equals("image/jpeg");
+    }
+
+    public boolean isActualJPEG(MultipartFile file) {
+        if (!isJPEG(file)) {
+            return false;
+        }
+        try (InputStream inputStream = file.getInputStream()) {
+            byte[] firstTwoBytes = new byte[2];
+            byte[] lastTwoBytes = new byte[2];
+
+            inputStream.read(firstTwoBytes);
+
+            if (firstTwoBytes[0] == (byte) 0xFF && firstTwoBytes[1] == (byte) 0xD8) {
+                inputStream.skip(file.getSize() - 4);
+                inputStream.read(lastTwoBytes);
+                return lastTwoBytes[0] == (byte) 0xFF && lastTwoBytes[1] == (byte) 0xD9;
+            }
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "올바르지 않은 이미지 파일입니다.");
+        }
+        return false;
+    }
+
+    public CarModelRes createCarModel(CarModelReq carModelReq) {
+        if (carModelRepository.existsByName(carModelReq.getName())) {
+            log.error("이미 존재하는 차량 모델입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 차량 모델입니다.");
+        }
+        if (!isActualJPEG(carModelReq.getImage())) {
+            log.error("올바르지 않은 이미지 파일입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "올바르지 않은 이미지 파일입니다.");
+        }
+
+        CarModel carModel = CarModel.builder()
+                .name(carModelReq.getName())
+                .build();
+        try {
+            carModelRepository.save(carModel);
+            String imageUrl = converter.convertImgToUrl(carModelReq.getImage(), "/car", carModel.getId() + ".jpeg");
+            carModel.setImage(imageUrl);
+        } catch (Exception e) {
+            log.error("차량 모델 저장 실패", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "차량 모델 저장 실패");
+        }
+        return CarModelRes.builder()
+                .id(carModel.getId())
+                .name(carModel.getName())
+                .image(carModel.getImage())
+                .build();
+    }
+
+    /**
+     * <h3>차량 모델 정보 수정. 이미지 수정</h3>
+     * */
+    public CarModelRes updateCarModel(ModelImageChangeReq carModelReq) {
+        CarModel carModel = carModelRepository.findById(carModelReq.getId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 모델입니다."));
+
+        if (!isActualJPEG(carModelReq.getImage())) {
+            log.error("올바르지 않은 이미지 파일입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "올바르지 않은 이미지 파일입니다.");
+        }
+
+        String imageUrl = converter.convertImgToUrl(carModelReq.getImage(), "/car", carModel.getId() + ".jpeg");
+        carModel.setImage(imageUrl);
+
+        return CarModelRes.builder()
+                .id(carModel.getId())
+                .name(carModel.getName())
+                .image(carModel.getImage())
+                .build();
+    }
+
+    public CarModelRes deleteCarModel(Long id) {
+        CarModel carModel = carModelRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 모델입니다."));
+        if (carRepository.existsByCarModel_Id(id)) {
+            log.error("차량 모델에 속한 차량이 존재합니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "차량 모델에 속한 차량이 존재합니다.");
+        }
+        try {
+            carModelRepository.delete(carModel);
+        } catch (Exception e) {
+            log.error("차량 모델 삭제 실패", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "차량 모델 삭제 실패");
+        }
+
+        return CarModelRes.builder()
+                .id(carModel.getId())
+                .name(carModel.getName())
+                .image(carModel.getImage())
+                .build();
     }
 }

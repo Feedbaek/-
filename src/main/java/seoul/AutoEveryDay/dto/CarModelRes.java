@@ -1,21 +1,19 @@
 package seoul.AutoEveryDay.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class CarDto {
+@AllArgsConstructor
+public class CarModelRes {
+    @NotNull
     private Long id;
     @NotBlank
-    private String number;
+    private String name;
     @NotBlank
-    private String model;
-    private String status;
-    private String comment;
     private String image;
 }
-

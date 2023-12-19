@@ -32,11 +32,8 @@ public class CarController {
     @GetMapping("/rental")  // 차량 모델 선택 페이지
     public String rentalGet(Model model) {
         List<String> carModelList = carManageService.getAllCarModelNames();
-        for (String carModel : carModelList) {
-            System.out.println(carModel);
-        }
         model.addAttribute("carModelList", carModelList);
-        return "modelSelect";
+        return "car/carModelSelect";
     }
 
     @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
@@ -50,7 +47,7 @@ public class CarController {
         model.addAttribute("carList", listList);
         model.addAttribute("carListTitles", carInfo);
         model.addAttribute("search", carNumber);
-        return "carRental";
+        return "car/carRental";
     }
 
     @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
@@ -64,7 +61,7 @@ public class CarController {
 
         model.addAttribute("dateArr", dateArr);
         model.addAttribute("carId", carId);
-        return "carRentalDate";
+        return "car/carRentalDate";
     }
 
     @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
@@ -76,7 +73,7 @@ public class CarController {
         List<List<String>> rentalHistoryList = carRentalService.getRentalHistoryList(user);
         model.addAttribute("rentalHistoryTitles", rentalHistoryTitles);
         model.addAttribute("rentalHistoryList", rentalHistoryList);
-        return "carRentalHistory";
+        return "car/carRentalHistory";
     }
 
 
@@ -132,7 +129,7 @@ public class CarController {
         model.addAttribute("carList", listList);
         model.addAttribute("carListTitles", carInfo);
         model.addAttribute("search", carNumber);
-        return "carManage";
+        return "car/carManage";
     }
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -159,6 +156,48 @@ public class CarController {
         return JsonBody.builder()
                 .message("차량 삭제 성공")
                 .data(carManageService.deleteCar(number))
+                .build();
+    }
+
+    /* 차량 모델 관리 */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/model/manage")  // 차량 모델 페이지
+    public String getModel(Model model) {
+        List<CarModelRes> carModelResList = carManageService.getAllCarModelDto();
+        List<List<String>> carModelList = converter.convertCarModelDtoList(carModelResList);
+        String[] carModelInfo = {"차종", "이미지 파일", "수정/삭제"};
+        model.addAttribute("carModelList", carModelList);
+        model.addAttribute("carModelListTitles", carModelInfo);
+        return "car/carModelManage";
+    }
+
+    @ResponseBody
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/model/manage") // 새로운 차량 모델 등록
+    public JsonBody newModel(@Validated CarModelReq carModelReq) {
+        return JsonBody.builder()
+                .message("차량 모델 등록 성공")
+                .data(carManageService.createCarModel(carModelReq))
+                .build();
+    }
+
+    @ResponseBody
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/model/manage")  // 차량 모델 정보 수정
+    public JsonBody editModel(@Validated ModelImageChangeReq carModelReq) {
+        return JsonBody.builder()
+                .message("차량 모델 정보 수정 성공")
+                .data(carManageService.updateCarModel(carModelReq))
+                .build();
+    }
+
+    @ResponseBody
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("/model/manage/{id}")   // 차량 모델 삭제
+    public JsonBody deleteModel(@PathVariable("id") Long id) {
+        return JsonBody.builder()
+                .message("차량 모델 삭제 성공")
+                .data(carManageService.deleteCarModel(id))
                 .build();
     }
 }

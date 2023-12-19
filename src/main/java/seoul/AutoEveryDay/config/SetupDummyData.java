@@ -30,6 +30,7 @@ public class SetupDummyData {
         { // 아반떼 10대
             CarModel carModel = CarModel.builder()
                     .name("아반떼")
+                    .image("/image/car/1.jpeg")
                     .build();
             List<Car> cars = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
@@ -47,6 +48,7 @@ public class SetupDummyData {
         { // 쏘나타 10대
             CarModel carModel = CarModel.builder()
                     .name("쏘나타")
+                    .image("/image/car/2.jpeg")
                     .build();
             List<Car> cars = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
@@ -64,6 +66,7 @@ public class SetupDummyData {
         { // 스포티지 10대
             CarModel carModel = CarModel.builder()
                     .name("스포티지")
+                    .image("/image/car/3.jpeg")
                     .build();
             List<Car> cars = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
@@ -81,6 +84,7 @@ public class SetupDummyData {
         { // 그랜저 10대
             CarModel carModel = CarModel.builder()
                     .name("그랜저")
+                    .image("/image/car/4.jpeg")
                     .build();
             List<Car> cars = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
@@ -98,6 +102,7 @@ public class SetupDummyData {
         { // 제네시스 10대
             CarModel carModel = CarModel.builder()
                     .name("제네시스")
+                    .image("/image/car/5.jpeg")
                     .build();
             List<Car> cars = new ArrayList<>();
             for (int i = 0; i < 10; i++) {

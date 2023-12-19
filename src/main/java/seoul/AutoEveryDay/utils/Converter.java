@@ -1,18 +1,27 @@
 package seoul.AutoEveryDay.utils;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import seoul.AutoEveryDay.dto.*;
 import seoul.AutoEveryDay.entity.Privilege;
-import seoul.AutoEveryDay.entity.RentCar;
 import seoul.AutoEveryDay.entity.Role;
 import seoul.AutoEveryDay.entity.User;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -55,6 +64,8 @@ public class Converter {
             list.add(carDto.getModel());
             list.add(carDto.getStatus());
             list.add(carDto.getComment());
+            list.add(carDto.getImage());
+
             listList.add(list);
         }
 
@@ -80,5 +91,36 @@ public class Converter {
         return privilegeList.stream()
                 .map(this::convertToPrivilegeDto)
                 .toList();
+    }
+
+    public List<List<String>> convertCarModelDtoList(List<CarModelRes> carModelResList) {
+        List<List<String>> listList = new ArrayList<>();
+
+        for (CarModelRes carModelRes : carModelResList) {
+            List<String> list = new ArrayList<>();
+
+            list.add(carModelRes.getId().toString());
+            list.add(carModelRes.getName());
+            list.add(carModelRes.getImage());
+
+            listList.add(list);
+        }
+
+        return listList;
+    }
+
+    public String convertImgToUrl(MultipartFile file, String path, String fileName) {
+        // 프로젝트 내부 경로로 저장 경로 설정
+        String uploadDir = "src/main/resources/static/image" + path;
+        Path fullPath = Paths.get(uploadDir).resolve(fileName);
+
+        // 파일 저장
+        try (InputStream inputStream = file.getInputStream()) {
+            Files.copy(inputStream, fullPath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            System.out.println("컨버터 이미지 저장 실패");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 저장 실패");
+        }
+        return "/image" + path + "/" + fileName;
     }
 }

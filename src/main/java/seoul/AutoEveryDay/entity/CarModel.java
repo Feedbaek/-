@@ -20,6 +20,9 @@ public class CarModel {
     @Column(name = "name", nullable = false, unique = true)
     String name;
 
+    @Column(name = "image")
+    String image;
+
     @OneToMany(mappedBy = "carModel", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Car> cars;
 }

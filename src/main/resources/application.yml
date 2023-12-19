@@ -35,6 +35,11 @@ spring:
     resources:
       static-locations: classpath:/static/
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 #브라우저 요청에 대해 서버 오류시 기본으로 노출할 페이지를 사용할지 여부
 server:
   error:
