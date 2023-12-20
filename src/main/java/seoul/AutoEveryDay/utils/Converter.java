@@ -5,7 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import seoul.AutoEveryDay.dto.*;
+import seoul.AutoEveryDay.dto.car.CarDto;
+import seoul.AutoEveryDay.dto.car.CarModelRes;
+import seoul.AutoEveryDay.dto.user.PrivilegeDto;
+import seoul.AutoEveryDay.dto.user.RoleDto;
+import seoul.AutoEveryDay.dto.user.UserDto;
 import seoul.AutoEveryDay.entity.Privilege;
 import seoul.AutoEveryDay.entity.Role;
 import seoul.AutoEveryDay.entity.User;
@@ -21,7 +25,6 @@ import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -107,6 +110,32 @@ public class Converter {
         }
 
         return listList;
+    }
+
+    private boolean isJPEG(MultipartFile file) {
+        String contentType = file.getContentType();
+        return contentType != null && contentType.equals("image/jpeg");
+    }
+
+    public boolean isActualJPEG(MultipartFile file) {
+        if (!isJPEG(file)) {
+            return false;
+        }
+        try (InputStream inputStream = file.getInputStream()) {
+            byte[] firstTwoBytes = new byte[2];
+            byte[] lastTwoBytes = new byte[2];
+
+            inputStream.read(firstTwoBytes);
+
+            if (firstTwoBytes[0] == (byte) 0xFF && firstTwoBytes[1] == (byte) 0xD8) {
+                inputStream.skip(file.getSize() - 4);
+                inputStream.read(lastTwoBytes);
+                return lastTwoBytes[0] == (byte) 0xFF && lastTwoBytes[1] == (byte) 0xD9;
+            }
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "올바르지 않은 이미지 파일입니다.");
+        }
+        return false;
     }
 
     public String convertImgToUrl(MultipartFile file, String path, String fileName) {

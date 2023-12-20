@@ -16,7 +16,7 @@ public interface RentCarRepository extends JpaRepository<RentCar, Long> {
     List<RentCar> findByCar_IdAndReturnDateGreaterThanEqualAndIsReturned(Long carId, LocalDate pickUpDate, Boolean isReturned);
     Optional<RentCar> findByUser_IdAndCarIdAndPickupDateAndReturnDate(Long userId, Long carId, LocalDate pickUpDate, LocalDate returnDate);
 
-    boolean existsByCar_IdAndPickupDateGreaterThanEqual(Long carId, LocalDate pickUpDate);
+    boolean existsByCar_IdAndPickupDateGreaterThanEqualAndIsReturned(Long carId, LocalDate pickUpDate, Boolean isReturned);
 
     List<RentCar> findByUser_Id(Long id);
 }

@@ -126,6 +126,7 @@ public class SetupDummyData {
             trackRepository.save(Track.builder()
                     .name("트랙" + ch)
                     .description("테스트 트랙 설명" + i)
+                    .image("/image/track/" + (i + 1) + ".jpeg")
                     .build());
         }
     }

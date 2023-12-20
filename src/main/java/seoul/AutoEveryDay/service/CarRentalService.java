@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import seoul.AutoEveryDay.dto.AvailableDate;
-import seoul.AutoEveryDay.dto.CarDto;
-import seoul.AutoEveryDay.dto.RentCarDto;
+import seoul.AutoEveryDay.dto.car.CarDto;
+import seoul.AutoEveryDay.dto.car.RentCarDto;
 import seoul.AutoEveryDay.entity.Car;
 import seoul.AutoEveryDay.entity.RentCar;
 import seoul.AutoEveryDay.entity.User;
@@ -293,6 +293,7 @@ public class CarRentalService {
             } else {
                 list.add("대여 중");
             }
+            list.add(rentCar.getCar().getCarModel().getImage());
 
             listList.add(list);
         }

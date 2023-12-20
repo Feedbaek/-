@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import seoul.AutoEveryDay.dto.*;
+import seoul.AutoEveryDay.dto.car.*;
 import seoul.AutoEveryDay.entity.Car;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.CarManageService;
@@ -42,7 +43,7 @@ public class CarController {
                             @PathVariable(value = "carModel", required = false) Long carModelId,
                             @RequestParam(value = "q", required = false) String carNumber) {
         List<CarDto> carDtoList = carManageService.searchCarDto(carModelId, carNumber);
-        String[] carInfo = {"차량 번호", "차종", "상태", "메모", "대여/반납"};
+        String[] carInfo = {"차량 번호", "차종", "상태", "메모", "대여"};
         List<List<String>> listList = converter.convertCarDtoList(carDtoList);
         model.addAttribute("carList", listList);
         model.addAttribute("carListTitles", carInfo);

@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import seoul.AutoEveryDay.dto.DriveHistoryDto;
-import seoul.AutoEveryDay.dto.TrackDto;
 import seoul.AutoEveryDay.entity.Car;
 import seoul.AutoEveryDay.entity.DriveHistory;
 import seoul.AutoEveryDay.entity.Track;

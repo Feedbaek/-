@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
-import seoul.AutoEveryDay.dto.UserDto;
+import seoul.AutoEveryDay.dto.user.UserDto;
 import seoul.AutoEveryDay.service.LoginService;
 
 import static seoul.AutoEveryDay.service.LoginService.isAuthenticated;

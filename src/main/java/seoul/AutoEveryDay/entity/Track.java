@@ -23,7 +23,7 @@ public class Track {
     String description;
 
     @Column(name = "image")
-    String imagePath;
+    String image;
 
     @OneToMany(mappedBy = "track", cascade = CascadeType.ALL)
     private List<ReserveTrack> reserveHistories;

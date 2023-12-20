@@ -6,17 +6,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import seoul.AutoEveryDay.dto.DriveHistoryDto;
-import seoul.AutoEveryDay.dto.JsonBody;
-import seoul.AutoEveryDay.dto.TrackDto;
-import seoul.AutoEveryDay.dto.ReserveTrackDto;
+import seoul.AutoEveryDay.dto.*;
+import seoul.AutoEveryDay.dto.track.ReserveTrackDto;
+import seoul.AutoEveryDay.dto.track.TrackReq;
 import seoul.AutoEveryDay.entity.Track;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.service.DriveService;
 import seoul.AutoEveryDay.service.LoginService;
 import seoul.AutoEveryDay.service.TrackService;
 
-import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -31,7 +29,7 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
     @GetMapping("/track/reserve")  // 테스트 트랙 예약 페이지
     public String reserveGet(Model model) {
         model.addAttribute("trackList", trackService.getAllTestTrack());
-        return "trackSelect";
+        return "track/trackSelect";
     }
 
     @GetMapping("/track/reserve/{trackId}")  // 테스트 트랙 예약 날짜 선택 페이지
@@ -40,17 +38,17 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
         List<String> unavailableDateList = trackService.getUnavailableDateList(track);
         model.addAttribute("dateArr", unavailableDateList);
         model.addAttribute("trackId", trackId);
-        return "trackReserveDate";
+        return "track/trackReserveDate";
     }
 
     @GetMapping("/track/reserve/history")  // 테스트 트랙 예약 날짜 선택 페이지
     public String reserveHistoryGet(Model model) {
         User user = userService.getLoginUser();
-        String[] reserveHistoryTitles = {"트랙 이름", "예약 날짜", "상태", "예약 취소"};
+        String[] reserveHistoryTitles = {"트랙 이름", "예약 날짜", "상태", "취소"};
         List<List<String>> reserveHistoryList = trackService.getReserveHistory(user);
         model.addAttribute("reserveHistoryTitles", reserveHistoryTitles);
         model.addAttribute("reserveHistoryList", reserveHistoryList);
-        return "trackReserveHistory";
+        return "track/trackReserveHistory";
     }
 
     @ResponseBody
@@ -89,26 +87,26 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
     @GetMapping("/track/manage")  // 테스트 트랙 관리 페이지
     public String allTrackGet(Model model) {
         model.addAttribute("testTrackList", trackService.getAllTestTrack());
-        return "trackManage";
+        return "track/trackManage";
     }
 
     @ResponseBody
     @PreAuthorize(value = "hasAuthority('ADMIN')")
     @PostMapping("/track/manage")  // 테스트 트랙 등록
-    public JsonBody managePost(@Validated TrackDto trackDto) {
+    public JsonBody managePost(@Validated TrackReq trackReq) {
         return JsonBody.builder()
                 .message("테스트 트랙 등록 성공")
-                .data(trackService.createTestTrack(trackDto))
+                .data(trackService.createTestTrack(trackReq))
                 .build();
     }
 
     @ResponseBody
     @PreAuthorize(value = "hasAuthority('ADMIN')")
     @PutMapping("/track/manage")  // 테스트 트랙 수정
-    public JsonBody manageEdit(@Validated TrackDto trackDto) {
+    public JsonBody manageEdit(@Validated TrackReq trackReq) {
         return JsonBody.builder()
                 .message("테스트 트랙 수정 성공")
-                .data(trackService.editTestTrack(trackDto))
+                .data(trackService.editTestTrack(trackReq))
                 .build();
     }
 

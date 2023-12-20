@@ -30,9 +30,6 @@ public class Car {
     @Column(name = "comment", columnDefinition = "TEXT")
     private String comment;
 
-    @Column(name = "image")
-    private String imagePath;
-
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
     private List<RentCar> rentalHistories;
 

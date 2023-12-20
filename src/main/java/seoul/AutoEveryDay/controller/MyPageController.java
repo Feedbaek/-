@@ -5,7 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import seoul.AutoEveryDay.dto.UserDto;
+import seoul.AutoEveryDay.dto.user.UserDto;
 import seoul.AutoEveryDay.service.LoginService;
 
 @Controller

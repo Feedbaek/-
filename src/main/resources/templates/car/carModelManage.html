@@ -23,7 +23,7 @@
         </div>
         <div class="col-md-2 justify-content-end text-right">
             <!-- 모델 등록 -->
-            <button sec:authorize="hasAuthority('ADMIN')" type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#addCarModal">새로운 모델 등록</button>
+            <button sec:authorize="hasAuthority('ADMIN')" type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#addCarModal">모델 등록</button>
         </div>
     </div>
     <!-- 카 테이블 프래그먼트 -->
@@ -104,45 +104,6 @@
                         console.error('Error:', error);
                         alert('An error occurred while deleting the model'); // 오류 발생 시 알림
                     });
-            }
-        }
-
-        // 오름차순으로 정렬
-        function sortTable(element) {
-            const n = element.getAttribute('data-index');
-            const table = document.getElementsByClassName('table')[0];
-            let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-            switching = true;
-            dir = "asc";
-            while (switching) {
-                switching = false;
-                rows = table.rows;
-                for (i = 1; i < (rows.length - 1); i++) {
-                    shouldSwitch = false;
-                    x = rows[i].getElementsByTagName("TD")[n];
-                    y = rows[i + 1].getElementsByTagName("TD")[n];
-                    if (dir === "asc") {
-                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                            shouldSwitch = true;
-                            break;
-                        }
-                    } else if (dir === "desc") {
-                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                            shouldSwitch = true;
-                            break;
-                        }
-                    }
-                }
-                if (shouldSwitch) {
-                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                    switching = true;
-                    switchcount++;
-                } else {
-                    if (switchcount === 0 && dir === "asc") {
-                        dir = "desc";
-                        switching = true;
-                    }
-                }
             }
         }
 

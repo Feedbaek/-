@@ -4,7 +4,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/default_layout}">
 <head>
-    <title>차량 대여</title>
+    <title>주유소 관리</title>
     <style>
         th:hover {
             background-color: rgba(197, 197, 197, 0.86); /* Light grey background on hover */
@@ -14,8 +14,8 @@
 </head>
 <!-- Content -->
 <main layout:fragment="content" class="container mt-4">
-    <h1 class="display-5">차량 대여하기</h1>
-    <!-- 여기에 carList 리스트 값을 리스트 형식으로 보여줌 -->
+    <h1 class="display-5">주유소 이용 내역</h1>
+    <!-- 여기에 chargeHistoryList 리스트 값을 리스트 형식으로 보여줌 -->
     <!-- 검색 창 -->
     <div class="container mt-3">
         <div class="row justify-content-center">
@@ -28,12 +28,25 @@
         </div>
     </div>
     <!-- 카 테이블 프래그먼트 -->
-    <div th:replace="~{fragments/table :: commonTable(${carListTitles}, ${carList}, 'rental')}"></div>
+    <div th:replace="~{fragments/table :: commonTable(${chargeHistoryTitles}, ${chargeHistoryList}, 'chargeHistory')}"></div>
 
     <script>
-        function rentCar(element) {
-            const carId = element.getAttribute('data-car-id');
-            window.location.href = window.location.pathname + '/' + carId;
+        function deleteHistory(element) {
+            const chargeHistoryId = element.getAttribute("data-chargeHistory-id");
+            if (confirm("정말 삭제하시겠습니까?")) {
+                fetch("/gasStation/history/" + chargeHistoryId, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json; charset=utf-8"
+                    }
+                }).then(() => {
+                    alert("삭제되었습니다.");
+                    window.location.reload();
+                }).catch((error) => {
+                    alert("삭제에 실패하였습니다.");
+                    console.log(error);
+                });
+            }
         }
     </script>
 </main>

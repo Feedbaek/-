@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -34,6 +35,6 @@ public class ChargeHistory {
     private Integer amount; // 리터 단위
 
     @CreatedDate
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "date", nullable = false)
+    private Instant date;
 }

@@ -88,7 +88,7 @@
                         </div>
                         <div class="form-group">
                             <label th:for="'carComment-' + ${car[0]}">메모 하기</label>
-                            <textarea class="form-control" th:id="'carComment-' + ${car[0]}" name="comment" th:value="${car[4]}"></textarea>
+                            <textarea class="form-control" th:id="'carComment-' + ${car[0]}" name="comment" th:text="${car[4]}"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -115,45 +115,6 @@
                         console.error('Error:', error);
                         alert('An error occurred while deleting the car'); // 오류 발생 시 알림
                     });
-            }
-        }
-
-        // 오름차순으로 정렬
-        function sortTable(element) {
-            const n = element.getAttribute('data-index');
-            const table = document.getElementsByClassName('table')[0];
-            let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-            switching = true;
-            dir = "asc";
-            while (switching) {
-                switching = false;
-                rows = table.rows;
-                for (i = 1; i < (rows.length - 1); i++) {
-                    shouldSwitch = false;
-                    x = rows[i].getElementsByTagName("TD")[n];
-                    y = rows[i + 1].getElementsByTagName("TD")[n];
-                    if (dir === "asc") {
-                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                            shouldSwitch = true;
-                            break;
-                        }
-                    } else if (dir === "desc") {
-                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                            shouldSwitch = true;
-                            break;
-                        }
-                    }
-                }
-                if (shouldSwitch) {
-                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                    switching = true;
-                    switchcount++;
-                } else {
-                    if (switchcount === 0 && dir === "asc") {
-                        dir = "desc";
-                        switching = true;
-                    }
-                }
             }
         }
 

@@ -1,17 +1,21 @@
-package seoul.AutoEveryDay.dto;
+package seoul.AutoEveryDay.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ModelImageChangeReq {
+public class UserDto {
     private Long id;
+    @NotBlank
+    private String username;
+    @NotBlank
+    private String password;
+    @NotBlank
     private String name;
     @NotBlank
-    private MultipartFile image;
+    private String userGroup;
 }

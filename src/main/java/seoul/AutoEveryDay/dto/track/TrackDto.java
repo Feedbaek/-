@@ -1,4 +1,4 @@
-package seoul.AutoEveryDay.dto;
+package seoul.AutoEveryDay.dto.track;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -14,4 +14,5 @@ public class TrackDto {
     private String name;
     @NotBlank
     private String description;
+    private String image;
 }

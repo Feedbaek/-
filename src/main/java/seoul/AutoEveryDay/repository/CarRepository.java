@@ -2,7 +2,6 @@ package seoul.AutoEveryDay.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import seoul.AutoEveryDay.dto.CarDto;
 import seoul.AutoEveryDay.entity.Car;
 
 import java.util.List;

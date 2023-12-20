@@ -15,6 +15,9 @@ import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.repository.ChargeSpotRepository;
 import seoul.AutoEveryDay.repository.GasStationHistoryRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @Slf4j(topic = "GasStationService")
 @Transactional
@@ -99,5 +102,46 @@ public class GasStationService {
         return ChargeSpotDto.builder()
                 .name(chargeSpot.getName())
                 .build();
+    }
+
+    public List<ChargeHistory> allChargeHistoryList() {
+        return gasStationHistoryRepository.findAll();
+    }
+
+    public List<List<String>> chargeHistoryData() {
+        List<ChargeHistory> chargeHistoryList = allChargeHistoryList();
+        List<List<String>> chargeHistoryData = new ArrayList<>();
+
+        for (ChargeHistory chargeHistory : chargeHistoryList) {
+            List<String> chargeHistoryRow = new ArrayList<>();
+
+            chargeHistoryRow.add(chargeHistory.getUser().getName());
+            chargeHistoryRow.add(chargeHistory.getUser().getUserGroup().getName());
+            chargeHistoryRow.add(chargeHistory.getCar().getNumber());
+            chargeHistoryRow.add(chargeHistory.getChargeSpot().getName());
+            chargeHistoryRow.add(chargeHistory.getAmount().toString());
+            chargeHistoryRow.add(chargeHistory.getDate().toString());
+
+            chargeHistoryData.add(chargeHistoryRow);
+        }
+
+        return chargeHistoryData;
+    }
+
+    public List<List<String>> chargeSpotData() {
+        List<ChargeSpot> chargeSpotList = chargeSpotRepository.findAll();
+        List<List<String>> chargeSpotData = new ArrayList<>();
+
+        for (ChargeSpot chargeSpot : chargeSpotList) {
+            List<String> chargeSpotRow = new ArrayList<>();
+
+            chargeSpotRow.add(chargeSpot.getId().toString());
+            chargeSpotRow.add(chargeSpot.getId().toString());
+            chargeSpotRow.add(chargeSpot.getName());
+
+            chargeSpotData.add(chargeSpotRow);
+        }
+
+        return chargeSpotData;
     }
 }

@@ -8,8 +8,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
-import seoul.AutoEveryDay.dto.CarDto;
-import seoul.AutoEveryDay.dto.RentCarDto;
+import seoul.AutoEveryDay.dto.car.CarDto;
+import seoul.AutoEveryDay.dto.car.RentCarDto;
 import seoul.AutoEveryDay.entity.*;
 import seoul.AutoEveryDay.repository.RentCarRepository;
 

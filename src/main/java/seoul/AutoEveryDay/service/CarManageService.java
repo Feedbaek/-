@@ -5,12 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import seoul.AutoEveryDay.dto.CarDto;
-import seoul.AutoEveryDay.dto.CarModelReq;
-import seoul.AutoEveryDay.dto.CarModelRes;
-import seoul.AutoEveryDay.dto.ModelImageChangeReq;
+import seoul.AutoEveryDay.dto.car.CarDto;
+import seoul.AutoEveryDay.dto.car.CarModelReq;
+import seoul.AutoEveryDay.dto.car.CarModelRes;
+import seoul.AutoEveryDay.dto.car.ModelImageChangeReq;
 import seoul.AutoEveryDay.entity.Car;
 import seoul.AutoEveryDay.entity.CarModel;
 import seoul.AutoEveryDay.repository.CarModelRepository;
@@ -18,8 +17,6 @@ import seoul.AutoEveryDay.repository.CarRepository;
 import seoul.AutoEveryDay.repository.RentCarRepository;
 import seoul.AutoEveryDay.utils.Converter;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -169,7 +166,7 @@ public class CarManageService {
     public CarDto deleteCar(String number) {
         Car car = carRepository.findByNumber(number).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 번호입니다."));
-        if (rentCarRepository.existsByCar_IdAndPickupDateGreaterThanEqual(car.getId(), LocalDate.now())) {
+        if (rentCarRepository.existsByCar_IdAndPickupDateGreaterThanEqualAndIsReturned(car.getId(), LocalDate.now(), false)) {
             log.error("대여 중인 차량은 삭제할 수 없습니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "대여 중인 차량은 삭제할 수 없습니다.");
         }
@@ -216,38 +213,12 @@ public class CarManageService {
         return carModelResList;
     }
 
-    public boolean isJPEG(MultipartFile file) {
-        String contentType = file.getContentType();
-        return contentType != null && contentType.equals("image/jpeg");
-    }
-
-    public boolean isActualJPEG(MultipartFile file) {
-        if (!isJPEG(file)) {
-            return false;
-        }
-        try (InputStream inputStream = file.getInputStream()) {
-            byte[] firstTwoBytes = new byte[2];
-            byte[] lastTwoBytes = new byte[2];
-
-            inputStream.read(firstTwoBytes);
-
-            if (firstTwoBytes[0] == (byte) 0xFF && firstTwoBytes[1] == (byte) 0xD8) {
-                inputStream.skip(file.getSize() - 4);
-                inputStream.read(lastTwoBytes);
-                return lastTwoBytes[0] == (byte) 0xFF && lastTwoBytes[1] == (byte) 0xD9;
-            }
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "올바르지 않은 이미지 파일입니다.");
-        }
-        return false;
-    }
-
     public CarModelRes createCarModel(CarModelReq carModelReq) {
         if (carModelRepository.existsByName(carModelReq.getName())) {
             log.error("이미 존재하는 차량 모델입니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 차량 모델입니다.");
         }
-        if (!isActualJPEG(carModelReq.getImage())) {
+        if (!converter.isActualJPEG(carModelReq.getImage())) {
             log.error("올바르지 않은 이미지 파일입니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "올바르지 않은 이미지 파일입니다.");
         }
@@ -277,7 +248,7 @@ public class CarManageService {
         CarModel carModel = carModelRepository.findById(carModelReq.getId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 모델입니다."));
 
-        if (!isActualJPEG(carModelReq.getImage())) {
+        if (!converter.isActualJPEG(carModelReq.getImage())) {
             log.error("올바르지 않은 이미지 파일입니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "올바르지 않은 이미지 파일입니다.");
         }

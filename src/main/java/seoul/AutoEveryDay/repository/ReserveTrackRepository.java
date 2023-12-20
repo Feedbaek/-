@@ -15,7 +15,7 @@ public interface ReserveTrackRepository extends JpaRepository<ReserveTrack, Long
 
     Optional<ReserveTrack> findByUser_IdAndTrack_IdAndDate(Long userId, Long trackId, LocalDate time);
 
-    boolean existsByTrack_Id(Long trackId);
+    boolean existsByTrack_IdAndDateGreaterThanEqualAndIsCanceled(Long trackId, LocalDate time, Boolean isCanceled);
 
     List<ReserveTrack> findByTrack_IdAndDateGreaterThanEqual(Long trackId, LocalDate date);
 

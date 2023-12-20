@@ -1,4 +1,4 @@
-package seoul.AutoEveryDay.dto;
+package seoul.AutoEveryDay.dto.track;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

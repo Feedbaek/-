@@ -6,13 +6,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import seoul.AutoEveryDay.dto.TrackDto;
-import seoul.AutoEveryDay.dto.ReserveTrackDto;
+import seoul.AutoEveryDay.dto.track.TrackDto;
+import seoul.AutoEveryDay.dto.track.ReserveTrackDto;
+import seoul.AutoEveryDay.dto.track.TrackReq;
 import seoul.AutoEveryDay.entity.Track;
 import seoul.AutoEveryDay.entity.ReserveTrack;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.repository.TrackRepository;
 import seoul.AutoEveryDay.repository.ReserveTrackRepository;
+import seoul.AutoEveryDay.utils.Converter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import java.util.List;
 public class TrackService {
     private final TrackRepository trackRepository;
     private final ReserveTrackRepository reserveTrackRepository;
+    private final Converter converter;
 
     private void validateReserveHistory(ReserveTrackDto testHistory) {
         if (testHistory.getDate().isBefore(LocalDate.now())) {
@@ -40,7 +43,7 @@ public class TrackService {
         );
     }
 
-    public TrackDto createTestTrack(TrackDto trackDto) {
+    public TrackDto createTestTrack(TrackDto trackDto) { // 테스트 코드용
         if (trackRepository.existsByName(trackDto.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 트랙 입니다.");
         }
@@ -57,7 +60,37 @@ public class TrackService {
         trackDto.setId(track.getId());
         return trackDto;
     }
-    public TrackDto editTestTrack(TrackDto trackDto) {
+
+    public TrackDto createTestTrack(TrackReq trackReq) {
+        if (trackRepository.existsByName(trackReq.getName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 트랙 입니다.");
+        }
+        if (!converter.isActualJPEG(trackReq.getImage())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미지 파일이 아닙니다.");
+        }
+        Track track = Track.builder()
+                .name(trackReq.getName())
+                .description(trackReq.getDescription())
+                .build();
+        try {
+            trackRepository.save(track);
+            String fileName = track.getId() + ".jpeg";
+            String path = "/image/track/";
+            String imageUrl = converter.convertImgToUrl(trackReq.getImage(), path, fileName);
+            track.setImage(imageUrl);
+        } catch (Exception e) {
+            log.error("테스트 센터 저장 실패", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "테스트 센터 저장 실패");
+        }
+        return TrackDto.builder()
+                .id(track.getId())
+                .name(track.getName())
+                .description(track.getDescription())
+                .image(track.getImage())
+                .build();
+    }
+
+    public TrackDto editTestTrack(TrackDto trackDto) {  // 테스트 코드용
         Track track = getTrack(trackDto.getId());
         trackRepository.findByName(trackDto.getName()).ifPresent(
                 (t) -> {
@@ -70,9 +103,37 @@ public class TrackService {
         track.setDescription(trackDto.getDescription());
         return trackDto;
     }
+
+    public TrackDto editTestTrack(TrackReq trackReq) {
+        Track track = getTrack(trackReq.getId());
+        if (!converter.isActualJPEG(trackReq.getImage())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미지 파일이 아닙니다.");
+        }
+
+        trackRepository.findByName(trackReq.getName()).ifPresent(
+                (t) -> {
+                    if (!t.getId().equals(track.getId())) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 트랙 입니다.");
+                    }
+                }
+        );
+        String imageUrl = converter.convertImgToUrl(trackReq.getImage(), "/image/track/", track.getId() + ".jpeg");
+
+        track.setName(trackReq.getName());
+        track.setDescription(trackReq.getDescription());
+        track.setImage(imageUrl);
+
+        return TrackDto.builder()
+                .id(track.getId())
+                .name(track.getName())
+                .description(track.getDescription())
+                .image(track.getImage())
+                .build();
+    }
+
     public TrackDto deleteTestTrack(Long id) {
         Track track = getTrack(id);
-        if (reserveTrackRepository.existsByTrack_Id(track.getId())) {
+        if (reserveTrackRepository.existsByTrack_IdAndDateGreaterThanEqualAndIsCanceled(track.getId(), LocalDate.now(), false)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "예약된 트랙은 삭제할 수 없습니다.");
         }
         try {
@@ -93,6 +154,7 @@ public class TrackService {
                         .id(t.getId())
                         .name(t.getName())
                         .description(t.getDescription())
+                        .image(t.getImage())
                         .build()
                 ).toList();
     }
@@ -187,6 +249,7 @@ public class TrackService {
             } else {
                 reserveHistory.add("예약 신청");
             }
+            reserveHistory.add(reserveTrack.getTrack().getImage());
 
             reserveHistoryList.add(reserveHistory);
         });

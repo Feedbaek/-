@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import seoul.AutoEveryDay.dto.UserDto;
+import seoul.AutoEveryDay.dto.user.UserDto;
 import seoul.AutoEveryDay.entity.Role;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.entity.UserGroup;

@@ -23,8 +23,12 @@
             </thead>
             <tbody>
             <tr th:each="testTrack : ${testTrackList}">
-                <td th:text="${testTrack.name}">Name</td>
-                <td th:text="${testTrack.description}">Description</td>
+                <td th:text="${testTrack.name}" class="align-middle py-4"
+                    th:attr="data-track-image=${testTrack.image}"
+                    onclick="openRentalModal(this.parentNode, this)">Name</td>
+                <td th:text="${testTrack.description}" class="align-middle py-4"
+                    th:attr="data-track-image=${testTrack.image}"
+                    onclick="openRentalModal(this.parentNode, this)">Description</td>
                 <td>
                     <button type="button" class="btn btn-outline-secondary btn-sm" th:attr="data-target='#trackModal-' + ${testTrack.id}" data-toggle="modal">수정</button>
                     <button th:data-track-id="${testTrack.id}" onclick="deleteTestTrack(this)" class="btn btn-outline-danger btn-sm">삭제</button>
@@ -54,11 +58,32 @@
                             <label for="trackDescription">트랙 설명</label>
                             <input type="text" class="form-control" id="trackDescription" name="description" required>
                         </div>
+                        <div class="form-group">
+                            <label for="image">이미지</label>
+                            <input type="file" class="form-control-file" id="image" name="image">
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-link text-secondary">등록</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!--상세 모달-->
+    <div class="modal fade" id="rentalModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">차량 상세정보</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body px-5 pt-5 pb-4">
+                    <div id="rentalData" class="container"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -79,11 +104,11 @@
 
                         <div class="form-group">
                             <label th:for="'trackName-' + ${testTrack.id}">트랙 이름</label>
-                            <input type="text" class="form-control" th:id="'trackName-' + ${testTrack.id}" name="name">
+                            <input type="text" class="form-control" th:id="'trackName-' + ${testTrack.id}" name="name" th:value="${testTrack.name}">
                         </div>
                         <div class="form-group">
                             <label th:for="'trackDescription-' + ${testTrack.id}">트랙 설명</label>
-                            <textarea class="form-control" th:id="'trackDescription-' + ${testTrack.id}" name="description"></textarea>
+                            <textarea class="form-control" th:id="'trackDescription-' + ${testTrack.id}" name="description" th:text="${testTrack.description}"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -93,8 +118,28 @@
             </div>
         </div>
     </div>
-
     <script>
+        function openRentalModal(row, cell) {
+            // 모달에 데이터 세팅
+            const modalData = document.getElementById('rentalData');
+            // 여긴 나중에 데이터 수정되면 엘레먼트 참조로 수정
+            const imgUrl = cell.getAttribute('data-track-image');
+            modalData.innerHTML = '<img src="' + imgUrl + '" alt="트랙 이미지" width="100%" height="100%" class="mb-5"/>';
+            const modalTitle = ['트랙명', '트랙 설명'];
+            let i = 0;
+            for (; i < row.cells.length - 1; i++) {
+                modalData.innerHTML +=
+                    '<div class="mb-4">' +
+                    '<div class="d-inline-block">' +
+                    '<span class="h6 border border-info rounded-pill px-3 py-1">' + modalTitle[i] + '</span>' +
+                    '<span class="pl-4 h6">' + row.cells[i].innerHTML + '</span>'+
+                    '</div>' +
+                    '</div>';
+            }
+            modalData.innerHTML += '<div class="row justify-content-center mt-5">' +  row.cells[i].innerHTML + '</div>';
+
+            $('#rentalModal').modal('show');
+        }
 
         // Add Track Form Submit
         document.getElementById('trackForm').addEventListener('submit', function(event) {
