@@ -18,6 +18,7 @@ import seoul.AutoEveryDay.service.TrackService;
 import java.util.List;
 
 @Controller
+@PreAuthorize(value = "hasAuthority('READ')")
 @RequiredArgsConstructor
 @RequestMapping("/center")
 public class CenterController { // 테스트 트랙 관련 컨트롤러
@@ -32,6 +33,7 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
         return "track/trackSelect";
     }
 
+    @PreAuthorize(value = "hasAuthority('TRACK_RESERVE')")
     @GetMapping("/track/reserve/{trackId}")  // 테스트 트랙 예약 날짜 선택 페이지
     public String reserveGet(@PathVariable("trackId") Long trackId, Model model) {
         Track track = trackService.getTestTrack(trackId);
@@ -41,6 +43,7 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
         return "track/trackReserveDate";
     }
 
+    @PreAuthorize(value = "hasAuthority('TRACK_RESERVE')")
     @GetMapping("/track/reserve/history")  // 테스트 트랙 예약 날짜 선택 페이지
     public String reserveHistoryGet(Model model) {
         User user = userService.getLoginUser();
@@ -120,6 +123,15 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
                 .build();
     }
 
+    // 주행 기록 관련 컨트롤러
+    @GetMapping("/drive/history")  // 주행 기록 페이지
+    public String driveHistoryGet(Model model) {
+        String[] driveHistoryTitles = {"운전자", "차량 번호", "차량 종류", "주행 날짜", "주행 거리", "주행 시간", "평균 속도", "최고 속도", "삭제"};
+        List<List<String>> driveHistoryList = driveService.getDriveHistoryList();
+        model.addAttribute("driveHistoryTitles", driveHistoryTitles);
+        model.addAttribute("driveHistoryList", driveHistoryList);
+        return "driveHistory";
+    }
     @ResponseBody
     @PostMapping("/drive/history")  // 주행 기록 등록
     public JsonBody driveHistoryPost(@Validated @RequestBody DriveHistoryDto driveHistoryDto) {
@@ -128,4 +140,15 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
                 .data(driveService.addDriveHistory(driveHistoryDto))
                 .build();
     }
+
+    @ResponseBody
+    @DeleteMapping("/drive/history/{id}")  // 주행 기록 삭제
+    public JsonBody driveHistoryDelete(@PathVariable("id") Long id) {
+        return JsonBody.builder()
+                .message("주행 기록 삭제 성공")
+                .data(driveService.deleteDriveHistory(id))
+                .build();
+    }
+
+
 }

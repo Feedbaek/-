@@ -1,6 +1,7 @@
 package seoul.AutoEveryDay.dto.car;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,6 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class ModelImageChangeReq {
     private Long id;
     private String name;
-    @NotBlank
+    @NotNull
     private MultipartFile image;
 }

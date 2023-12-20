@@ -46,7 +46,7 @@
                     th:if="${type == 'chargeSpot' && iter.index != 0}"
                     th:each="data, iter : ${dataObj}"
                     th:text="${data}"
-                    th:attr="data-model-image=${dataObj[2]}"
+                    onclick="openRentalModal(this.parentNode, this)"
                     class="align-middle py-4"
             ></td>
             <!-- 컬럼 4개 테이블 -->
@@ -77,7 +77,7 @@
                     onclick="openRentalModal(this.parentNode, this)"
                     class="align-middle py-4">
             ></td>
-            <!-- 컬럼 7개 테이블 -->
+            <!-- 컬럼 7개 테이블(이미지 포함) -->
             <td
                     th:if="${type == 'rentalHistory' && iter.index != 0 && iter.index != 6}"
                     th:each="data, iter : ${dataObj}"
@@ -86,7 +86,24 @@
                     onclick="openRentalModal(this.parentNode, this)"
                     class="align-middle py-4"
             ></td>
+            <!-- 컬럼 7개 테이블 -->
+            <td
+                    th:if="${type == 'chargeHistory' && iter.index != 0}"
+                    th:each="data, iter : ${dataObj}"
+                    th:text="${data}"
+                    onclick="openRentalModal(this.parentNode, this)"
+                    class="align-middle py-4"
+            ></td>
+            <!-- 컬럼 9개 테이블 -->
+            <td
+                    th:if="${type == 'driveHistory' && iter.index != 0}"
+                    th:each="data, iter : ${dataObj}"
+                    th:text="${data}"
+                    onclick="openRentalModal(this.parentNode, this)"
+                    class="align-middle py-4"
+            ></td>
 
+            <!-- ///////////////////////////////////// 아래는 버튼들 ////////////////////////////////////////// -->
 
             <!-- manage 테이블 -->
             <td th:if="${type} == 'manage'" sec:authorize="hasAuthority('ADMIN')" class="align-middle">
@@ -208,13 +225,13 @@
                 </button>
             </td>
 
-            <!-- chargeHistory 테이블 -->
-            <td th:if="${type} == 'chargeHistory'"
-                sec:authorize="hasAuthority('GAS_STATION')" class="align-middle">
+            <!-- History 테이블 -->
+            <td th:if="${type == 'chargeHistory' || type == 'driveHistory'}"
+                class="align-middle">
                 <button
                         type="button"
                         class="btn btn-outline-danger"
-                        th:attr="data-chargeHistory-id=${dataObj[0]}"
+                        th:attr="data-history-id=${dataObj[0]}"
                         onclick="deleteHistory(this)"
                 >
                     삭제
@@ -252,18 +269,20 @@
             </div>
         </div>
     </div>
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
         function openRentalModal(row, cell) {
             // 모달에 데이터 세팅
             const modalData = document.getElementById('rentalData');
             // 여긴 나중에 데이터 수정되면 엘레먼트 참조로 수정
             const imgUrl = cell.getAttribute('data-model-image');
             if (imgUrl) {
-                modalData.innerHTML = '<img src="' + imgUrl + '" alt="차량 이미지" width="100%" height="100%" class="mb-5"/>';
+                modalData.innerHTML = '<img src="' + imgUrl + '" alt="이미지" width="100%" height="100%" class="mb-5"/>';
             } else {
                 modalData.innerHTML = '';
             }
-            const modalTitle = ['차량 번호', '차량 종류', '차량 상태', '메모'];
+            const modalTitle = [[${headers}]];
+            console.log([[${headers}]]);
             let i = 0;
             for (; i < row.cells.length - 1; i++) {
                 modalData.innerHTML +=
@@ -317,7 +336,7 @@
                 }
             }
         }
-
+        /*]]>*/
     </script>
 </div>
 </body>

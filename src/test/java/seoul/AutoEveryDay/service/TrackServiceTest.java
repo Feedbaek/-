@@ -196,8 +196,7 @@ public class TrackServiceTest {
         Track track = makeTrack();
 
         given(trackRepository.findById(trackDto.getId())).willReturn(Optional.of(track));
-        given(reserveTrackRepository.existsByTrack_Id(track.getId())).willReturn(true);
-
+        given(reserveTrackRepository.existsByTrack_IdAndDateGreaterThanEqualAndIsCanceled(track.getId(), LocalDate.now(), false)).willReturn(true);
         // when
         Throwable thrown = catchThrowable(() -> trackService.deleteTestTrack(trackDto.getId()));
 

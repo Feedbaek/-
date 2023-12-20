@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Car {
+public class Car extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,4 +35,10 @@ public class Car {
 
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
     private List<ChargeHistory> gasStationHistories;
+
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    private List<DriveHistory> driveHistories;
+
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    private List<ChargeHistory> chargeHistories;
 }

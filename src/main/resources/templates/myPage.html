@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/default_layout}">
 <head>
     <title>My Page</title>
@@ -19,8 +20,8 @@
                     </div>
                     <br>
                     <p>원하는 서비스를 선택해 주세요.</p>
-                    <button type="button" class="btn btn-secondary mx-1" onclick="location.href='/car/rental/history'">차량 대여 내역</button>
-                    <button type="button" class="btn btn-secondary mx-1" onclick="location.href='/center/track/reserve/history'">시험장 예약 내역</button>
+                    <button sec:authorize="hasAuthority('CAR_RENTAL')" type="button" class="btn btn-secondary mx-1" onclick="location.href='/car/rental/history'">차량 대여 내역</button>
+                    <button sec:authorize="hasAuthority('TRACK_RESERVE')" type="button" class="btn btn-secondary mx-1" onclick="location.href='/center/track/reserve/history'">시험장 예약 내역</button>
                 </div>
             </div>
         </div>

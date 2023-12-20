@@ -148,6 +148,7 @@ public class Converter {
             Files.copy(inputStream, fullPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             System.out.println("컨버터 이미지 저장 실패");
+            System.out.println(path + "/" + fileName);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 저장 실패");
         }
         return "/image" + path + "/" + fileName;

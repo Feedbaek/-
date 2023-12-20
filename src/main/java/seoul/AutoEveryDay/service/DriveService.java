@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import seoul.AutoEveryDay.dto.DriveHistoryDto;
 import seoul.AutoEveryDay.entity.Car;
@@ -16,8 +17,13 @@ import seoul.AutoEveryDay.repository.TrackRepository;
 import seoul.AutoEveryDay.repository.UserRepository;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
+@Transactional
 @Slf4j(topic = "DriveService")
 @RequiredArgsConstructor
 public class DriveService {
@@ -41,6 +47,11 @@ public class DriveService {
                 .user(user)
                 .car(car)
                 .track(track)
+                .distance(driveHistoryDto.getDistance())
+                .time(driveHistoryDto.getTime())
+                .averageSpeed(driveHistoryDto.getAverageSpeed())
+                .maxSpeed(driveHistoryDto.getMaxSpeed())
+                .date(LocalDate.now())
                 .build();
         try {
             driveHistoryRepository.save(driveHistory);
@@ -49,7 +60,7 @@ public class DriveService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "주행 내역 저장 실패");
         }
         driveHistoryDto.setId(driveHistory.getId());
-        driveHistoryDto.setDate(Instant.now().toString());
+        driveHistoryDto.setDate(driveHistory.getDate().toString());
 
         return driveHistoryDto;
     }
@@ -63,7 +74,11 @@ public class DriveService {
                 .userId(driveHistory.getUser().getId())
                 .carId(driveHistory.getCar().getId())
                 .trackId(driveHistory.getTrack().getId())
-                .date(driveHistory.getDate().toString())
+                .distance(driveHistory.getDistance())
+                .time(driveHistory.getTime())
+                .averageSpeed(driveHistory.getAverageSpeed())
+                .maxSpeed(driveHistory.getMaxSpeed())
+                .date(driveHistory.getCreatedDate().toString())
                 .build();
     }
 
@@ -78,11 +93,37 @@ public class DriveService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "주행 내역 삭제 실패");
         }
         return DriveHistoryDto.builder()
-                .id(driveHistory.getId())
                 .userId(driveHistory.getUser().getId())
                 .carId(driveHistory.getCar().getId())
                 .trackId(driveHistory.getTrack().getId())
+                .distance(driveHistory.getDistance())
+                .time(driveHistory.getTime())
+                .averageSpeed(driveHistory.getAverageSpeed())
+                .maxSpeed(driveHistory.getMaxSpeed())
                 .date(driveHistory.getDate().toString())
                 .build();
+    }
+
+    public List<List<String>> getDriveHistoryList() {
+        List<List<String>> driveHistoryList = new ArrayList<>();
+        List<DriveHistory> driveHistories = driveHistoryRepository.findAll();
+
+        for (DriveHistory driveHistory : driveHistories) {
+            List<String> driveHistoryData = new ArrayList<>();
+
+            driveHistoryData.add(driveHistory.getId().toString());
+            driveHistoryData.add(driveHistory.getUser().getName());
+            driveHistoryData.add(driveHistory.getCar().getNumber());
+            driveHistoryData.add(driveHistory.getCar().getCarModel().getName());
+            driveHistoryData.add(driveHistory.getTrack().getName());
+            driveHistoryData.add(driveHistory.getDistance().toString() + "km");
+            driveHistoryData.add(driveHistory.getTime().toString() + "분");
+            driveHistoryData.add(driveHistory.getAverageSpeed().toString() + "km/h");
+            driveHistoryData.add(driveHistory.getMaxSpeed().toString() + "km/h");
+
+            driveHistoryList.add(driveHistoryData);
+        }
+
+        return driveHistoryList;
     }
 }

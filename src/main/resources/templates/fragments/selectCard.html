@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:th="http://www.thymeleaf.org">
 <body>
 
@@ -14,7 +15,7 @@
     <div th:if="${type == 'track'}" class="card-body d-flex flex-column justify-content-between">
         <h5 class="card-title" th:text="${data.name}"></h5>
         <p class="card-text" th:text="${data.description}"></p>
-        <a th:href="@{'/center/track/reserve/' + ${index}}" class="btn btn-outline-info">예약 하기</a>
+        <a sec:authorize="hasAuthority('TRACK_RESERVE')" th:href="@{'/center/track/reserve/' + ${index}}" class="btn btn-outline-info">예약 하기</a>
     </div>
 </div>
 

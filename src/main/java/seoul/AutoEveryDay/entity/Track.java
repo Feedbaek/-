@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Track {
+public class Track extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,4 +27,7 @@ public class Track {
 
     @OneToMany(mappedBy = "track", cascade = CascadeType.ALL)
     private List<ReserveTrack> reserveHistories;
+
+    @OneToMany(mappedBy = "track", cascade = CascadeType.ALL)
+    private List<DriveHistory> driveHistories;
 }

@@ -14,7 +14,7 @@
             <!-- 검색 창 -->
             <div class="row container justify-content-end">
                 <div class="col-md-8">
-                    <form class="d-flex" action="/model/manage" method="get">
+                    <form class="d-flex" action="" method="get">
                         <input class="form-control me-2" type="search" th:placeholder="${search}" aria-label="Search" name="q">
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </form>
@@ -68,11 +68,11 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form th:id="'carForm-' + ${model[0]}" th:action="@{/model/manage}" method="post">
+                <form th:id="'carForm-' + ${model[0]}" th:action="@{/car/model/manage}" method="post">
                     <div class="modal-body">
                         <div class="form-group">
                             <label th:for="'modelName-' + ${model[0]}">모델명</label>
-                            <div class="form-control" th:id="'modelName-' + ${model[0]}" th:value="${model[1]}">
+                            <div class="form-control" th:id="'modelName-' + ${model[0]}" th:text="${model[1]}" th:value="${model[1]}">
                         </div>
                         <!-- 이미지 업로드 -->
                         <div class="form-group">

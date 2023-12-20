@@ -2,10 +2,6 @@ package seoul.AutoEveryDay.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "charge_history")
@@ -14,7 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChargeHistory {
+public class ChargeHistory extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,8 +29,4 @@ public class ChargeHistory {
 
     @Column(name = "amount", nullable = false)
     private Integer amount; // 리터 단위
-
-    @CreatedDate
-    @Column(name = "date", nullable = false)
-    private Instant date;
 }

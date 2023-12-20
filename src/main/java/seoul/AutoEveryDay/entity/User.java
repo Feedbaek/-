@@ -13,7 +13,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -29,7 +29,7 @@ public class User {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_group_id")
+    @JoinColumn(name = "user_group_id", nullable = false)
     private UserGroup userGroup;
 
     @ManyToMany(cascade = CascadeType.MERGE)

@@ -13,8 +13,9 @@ import seoul.AutoEveryDay.entity.ChargeSpot;
 import seoul.AutoEveryDay.entity.ChargeHistory;
 import seoul.AutoEveryDay.entity.User;
 import seoul.AutoEveryDay.repository.ChargeSpotRepository;
-import seoul.AutoEveryDay.repository.GasStationHistoryRepository;
+import seoul.AutoEveryDay.repository.ChargeHistoryRepository;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,11 +24,11 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class GasStationService {
-    private final GasStationHistoryRepository gasStationHistoryRepository;
+    private final ChargeHistoryRepository chargeHistoryRepository;
     private final ChargeSpotRepository chargeSpotRepository;
 
     private ChargeHistory findChargeHistory(Long id) {
-        return gasStationHistoryRepository.findById(id).orElseThrow(
+        return chargeHistoryRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 주유소 이용 정보입니다.")
         );
     }
@@ -56,7 +57,7 @@ public class GasStationService {
                 .amount(chargeHistoryDto.getAmount())
                 .build();
         try {
-            gasStationHistoryRepository.save(chargeHistory);
+            chargeHistoryRepository.save(chargeHistory);
         } catch (Exception e) {
             log.error("주유소 이용 정보 저장 실패", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "주유소 이용 정보 저장 실패");
@@ -64,15 +65,19 @@ public class GasStationService {
         return chargeHistoryDto;
     }
 
-    public ChargeHistory deleteChargeHistory(Long id) {
+    public ChargeHistoryDto deleteChargeHistory(Long id) {
         ChargeHistory chargeHistory = findChargeHistory(id);
         try {
-            gasStationHistoryRepository.delete(chargeHistory);
+            chargeHistoryRepository.delete(chargeHistory);
         } catch (Exception e) {
             log.error("주유소 이용 정보 삭제 실패", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "주유소 이용 정보 삭제 실패");
         }
-        return chargeHistory;
+        return ChargeHistoryDto.builder()
+                .carId(chargeHistory.getCar().getId())
+                .chargeSpotId(chargeHistory.getChargeSpot().getId())
+                .amount(chargeHistory.getAmount())
+                .build();
     }
 
     public ChargeSpotDto addChargeSpot(ChargeSpotDto chargeSpotDto) {
@@ -104,8 +109,8 @@ public class GasStationService {
                 .build();
     }
 
-    public List<ChargeHistory> allChargeHistoryList() {
-        return gasStationHistoryRepository.findAll();
+    private List<ChargeHistory> allChargeHistoryList() {
+        return chargeHistoryRepository.findAll();
     }
 
     public List<List<String>> chargeHistoryData() {
@@ -115,12 +120,15 @@ public class GasStationService {
         for (ChargeHistory chargeHistory : chargeHistoryList) {
             List<String> chargeHistoryRow = new ArrayList<>();
 
+            chargeHistoryRow.add(chargeHistory.getId().toString());
             chargeHistoryRow.add(chargeHistory.getUser().getName());
             chargeHistoryRow.add(chargeHistory.getUser().getUserGroup().getName());
             chargeHistoryRow.add(chargeHistory.getCar().getNumber());
             chargeHistoryRow.add(chargeHistory.getChargeSpot().getName());
-            chargeHistoryRow.add(chargeHistory.getAmount().toString());
-            chargeHistoryRow.add(chargeHistory.getDate().toString());
+            chargeHistoryRow.add(chargeHistory.getAmount().toString() + "L");
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            chargeHistoryRow.add(chargeHistory.getCreatedDate().format(formatter));
 
             chargeHistoryData.add(chargeHistoryRow);
         }
