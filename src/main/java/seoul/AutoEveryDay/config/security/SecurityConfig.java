@@ -28,9 +28,10 @@ import static seoul.AutoEveryDay.enums.RoleEnum.*;
 public class SecurityConfig {
     private final String[] WHITE_LIST = {
             // swagger
-//            "/v3/api-docs/**",
-//            "/swagger-ui/**",
-//            "/swagger-resources/**",
+            "/v3/api-docs/**",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/swagger-resources/**",
             // index
             "/",
             // register

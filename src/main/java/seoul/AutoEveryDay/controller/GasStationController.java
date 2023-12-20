@@ -1,5 +1,6 @@
 package seoul.AutoEveryDay.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -44,8 +45,9 @@ public class GasStationController {
     }
 
     @ResponseBody
+    @Operation(summary = "주유소 이용 정보 추가")
     @PostMapping("/history")
-    public JsonBody gasStationPost(@Validated ChargeHistoryDto chargeHistoryDto) {
+    public JsonBody gasStationPost(@Validated @RequestBody ChargeHistoryDto chargeHistoryDto) {
         User user = loginService.getLoginUser();
         Car car = carManageService.getCar(chargeHistoryDto.getCarId());
         return JsonBody.builder()

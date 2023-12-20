@@ -1,5 +1,6 @@
 package seoul.AutoEveryDay.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -133,6 +134,7 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
         return "driveHistory";
     }
     @ResponseBody
+    @Operation(summary = "주행 기록 등록")
     @PostMapping("/drive/history")  // 주행 기록 등록
     public JsonBody driveHistoryPost(@Validated @RequestBody DriveHistoryDto driveHistoryDto) {
         return JsonBody.builder()

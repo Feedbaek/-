@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import seoul.AutoEveryDay.dto.LoginForm;
 import seoul.AutoEveryDay.dto.user.RoleDto;
 import seoul.AutoEveryDay.dto.user.UserDto;
 import seoul.AutoEveryDay.entity.Privilege;

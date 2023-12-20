@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModelImageChangeReq {
+    @NotNull
     private Long id;
     private String name;
     @NotNull

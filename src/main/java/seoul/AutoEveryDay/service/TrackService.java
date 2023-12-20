@@ -75,8 +75,7 @@ public class TrackService {
         try {
             trackRepository.save(track);
             String fileName = track.getId() + ".jpeg";
-            String path = "/image/track/";
-            String imageUrl = converter.convertImgToUrl(trackReq.getImage(), path, fileName);
+            String imageUrl = converter.convertImgToUrl(trackReq.getImage(), "/track", fileName);
             track.setImage(imageUrl);
         } catch (Exception e) {
             log.error("테스트 센터 저장 실패", e);
@@ -117,7 +116,7 @@ public class TrackService {
                     }
                 }
         );
-        String imageUrl = converter.convertImgToUrl(trackReq.getImage(), "/image/track/", track.getId() + ".jpeg");
+        String imageUrl = converter.convertImgToUrl(trackReq.getImage(), "/track", track.getId() + ".jpeg");
 
         track.setName(trackReq.getName());
         track.setDescription(trackReq.getDescription());
