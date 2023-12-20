@@ -33,42 +33,41 @@
     <script>
         function returnCar(element) {
             const historyId = element.getAttribute('data-history-id');
-            fetch('/car/rental/return/' + historyId, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }).then(response => {
-                if (response.ok) {
-                    alert('반납 완료');
-                } else {
-                    alert('반납 실패');
-                }
-            }).catch(error => {
-                console.log(error);
-            }).finally(() => {
-                window.location.reload();
-            });
+            if (confirm('반납 하시겠습니까?')) {
+                fetch('/car/rental/return/' + historyId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then(response => {
+                    if (!response.ok) {
+                        alert('반납 실패');
+                    }
+                }).catch(error => {
+                }).finally(() => {
+                    window.location.reload();
+                });
+            }
         }
 
         function cancelRental(element) {
             const historyId = element.getAttribute('data-history-id');
-            fetch('/car/rental/cancel/' + historyId, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }).then(response => {
-                if (response.ok) {
-                    alert('취소 완료');
-                } else {
-                    alert('취소 실패');
-                }
-            }).catch(error => {
-                console.log(error);
-            }).finally(() => {
-                window.location.reload();
-            });
+            if (confirm('취소 하시겠습니까?')) {
+                fetch('/car/rental/cancel/' + historyId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then(response => {
+                    if (!response.ok) {
+                        alert('취소 실패');
+                    }
+                }).catch(error => {
+                    alert('취소 실패')
+                }).finally(() => {
+                    window.location.reload();
+                });
+            }
         }
     </script>
 </main>

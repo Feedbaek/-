@@ -92,11 +92,9 @@
 
             // Add the roles to the respective lists
             aRoll.forEach(roleDto => {
-                console.log('aRoleDto: ' + roleDto.name)
                 assignedRoles.push(roleDto);
             });
             uRoll.forEach(roleDto => {
-                console.log('uRoleDto: ' + roleDto.name)
                 unassignedRoles.push(roleDto);
             });
 
@@ -113,8 +111,6 @@
             const user = JSON.parse($('.selected').attr('data-user'));
 
             if (parentID === 'assignedRoles') {
-                console.log('unassigning role: ' + role.name
-                    + ' from user: ' + user.name)
                 fetch('/authorize/user/role', {
                     method: 'DELETE',
                     headers: {
@@ -126,7 +122,6 @@
                     })
                 }).then(res => res.json())
                 .then(res => {
-                    console.log(res);
                     assignedRoles = assignedRoles.filter(r => r.id !== role.id);
                     unassignedRoles.push(role);
 
@@ -137,11 +132,8 @@
                 })
                 .catch(err => {
                     alert('에러 발생!');
-                    console.log(err);
                 })
             } else {
-                console.log('assigning role: ' + role.name
-                    + ' to user: ' + user.name)
                 fetch('/authorize/user/role', {
                     method: 'POST',
                     headers: {
@@ -153,7 +145,6 @@
                     })
                 }).then(res => res.json())
                 .then(res => {
-                    console.log(res);
                     unassignedRoles = unassignedRoles.filter(r => r.id !== role.id);
                     assignedRoles.push(role);
 
@@ -164,7 +155,6 @@
                 })
                 .catch(err => {
                     alert('에러 발생!');
-                    console.log(err);
                 })
             }
         }
@@ -173,7 +163,6 @@
         $(document).ready(function() {
             [# th:each="user, stat : ${userList}"]
                 users.push([[${user}]]);
-                console.log([[${user}]]);
             [/]
             initUsers();
         });

@@ -91,11 +91,9 @@
 
             // Add the privileges to the respective lists
             aPrivilege.forEach(PrivilegeDto => {
-                console.log('aPrivilegeDto: ' + PrivilegeDto.name)
                 assignedPrivileges.push(PrivilegeDto);
             });
             uPrivilege.forEach(PrivilegeDto => {
-                console.log('uPrivilegeDto: ' + PrivilegeDto.name)
                 unassignedPrivileges.push(PrivilegeDto);
             });
 
@@ -112,8 +110,6 @@
             const privilege = JSON.parse($(item).attr('data-privilege'));
 
             if (parentID === 'assignedPrivileges') {
-                console.log('unassigning privilege: ' + privilege.name
-                    + ' from role: ' + role.name)
                 fetch('/authorize/role/privilege', {
                     method: 'DELETE',
                     headers: {
@@ -125,7 +121,6 @@
                     })
                 }).then(res => res.json())
                     .then(res => {
-                        console.log(res);
                         assignedPrivileges = assignedPrivileges.filter(p => p.id !== privilege.id);
                         unassignedPrivileges.push(privilege);
 
@@ -136,11 +131,8 @@
                     })
                     .catch(err => {
                         alert('에러 발생!');
-                        console.log(err);
                     })
             } else {
-                console.log('assigning privilege: ' + privilege.name
-                    + ' to role: ' + role.name)
                 fetch('/authorize/role/privilege', {
                     method: 'POST',
                     headers: {
@@ -152,7 +144,6 @@
                     })
                 }).then(res => res.json())
                     .then(res => {
-                        console.log(res);
                         unassignedPrivileges = unassignedPrivileges.filter(p => p.id !== privilege.id);
                         assignedPrivileges.push(privilege);
 
@@ -163,7 +154,6 @@
                     })
                     .catch(err => {
                         alert('에러 발생!');
-                        console.log(err);
                     })
             }
         }
@@ -172,7 +162,6 @@
         $(document).ready(function() {
             [# th:each="role, stat : ${roleList}"]
                 roles.push([[${role}]]);
-                console.log([[${role}]]);
             [/]
             initRoles();
         });

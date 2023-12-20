@@ -137,6 +137,8 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
     @Operation(summary = "주행 기록 등록")
     @PostMapping("/drive/history")  // 주행 기록 등록
     public JsonBody driveHistoryPost(@Validated @RequestBody DriveHistoryDto driveHistoryDto) {
+        User user = userService.getLoginUser();
+        driveHistoryDto.setUserId(user.getId());
         return JsonBody.builder()
                 .message("주행 기록 등록 성공")
                 .data(driveService.addDriveHistory(driveHistoryDto))

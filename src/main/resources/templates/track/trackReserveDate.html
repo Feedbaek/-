@@ -10,7 +10,6 @@
         /*<![CDATA[*/
         const disabledDates = [[${dateArr}]];
         /*]]>*/
-        console.log(disabledDates);
     </script>
     <style>
         .fc .fc-button {
@@ -120,8 +119,6 @@
 
 
         function selectDateRange(date) {
-            console.log(date);
-
             fetch('/center/track/reserve', {
                 method: 'POST',
                 headers: {

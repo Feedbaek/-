@@ -33,22 +33,22 @@
     <script>
         function cancelReserve(element) {
             const historyId = element.getAttribute('data-history-id');
-            fetch('/center/track/reserve/cancel/' + historyId, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }).then(response => {
-                if (response.ok) {
-                    alert('취소 완료');
-                } else {
-                    alert('취소 실패');
-                }
-            }).catch(error => {
-                console.log(error);
-            }).finally(() => {
-                window.location.reload();
-            });
+            if (confirm('취소 하겠습니까?')) {
+                fetch('/center/track/reserve/cancel/' + historyId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then(response => {
+                    if (!response.ok) {
+                        alert('취소 실패');
+                    }
+                }).catch(error => {
+                    alert('취소 오류 발생')
+                }).finally(() => {
+                    window.location.reload();
+                });
+            }
         }
     </script>
 </main>

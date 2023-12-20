@@ -12,7 +12,6 @@ import lombok.*;
 @AllArgsConstructor
 public class DriveHistoryDto {
     private Long id;
-    @NotNull
     private Long userId;
     @NotNull
     private Long carId;
@@ -26,6 +25,5 @@ public class DriveHistoryDto {
     private Integer averageSpeed;
     @NotNull
     private Integer maxSpeed;
-    @NotBlank
     private String date;
 }

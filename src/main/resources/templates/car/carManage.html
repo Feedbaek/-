@@ -106,13 +106,13 @@
             const carNumber = element.getAttribute('data-car-number');
             if (confirm('정말로 차량을 삭제 하겠습니까?')) {
                 fetch(`/car/manage?number=${carNumber}`, { method: 'DELETE' })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message); // 서버 응답 메시지를 알림으로 표시
+                    .then(response => {
+                        if (!response.ok) {
+                            alert('삭제 실패');
+                        }
                         window.location.reload(); // 페이지 새로고침
                     })
                     .catch(error => {
-                        console.error('Error:', error);
                         alert('An error occurred while deleting the car'); // 오류 발생 시 알림
                     });
             }
@@ -128,13 +128,13 @@
                 method: 'POST',
                 body: formData
             })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);
-                    alert(data.message); // 서버 응답 메시지를 알림으로 표시
+                .then(response => {
+                    if (!response.ok) {
+                        alert('등록 실패');
+                    }
+                    // alert(data.message); // 서버 응답 메시지를 알림으로 표시
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     alert('An error occurred while processing the request'); // 오류 발생 시 알림
                 })
                 .finally(() => {
@@ -154,14 +154,14 @@
                     method: 'PUT',
                     body: formData
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Success:', data);
-                        alert(data.message); // 서버 응답 메시지를 알림으로 표시
+                    .then(response => {
+                        if (!response.ok) {
+                            alert('수정 실패');
+                        }
+                        // alert(data.message); // 서버 응답 메시지를 알림으로 표시
                     })
                     .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred while processing the request'); // 오류 발생 시 알림
+                        alert('차량 수정에 실패하였습니다.'); // 오류 발생 시 알림
                     })
                     .finally(() => {
                         // 페이지 새로고침
