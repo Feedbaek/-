@@ -16,10 +16,10 @@
 ---
 
 ## 요구사항 정의서
-<img src="https://github.com/Feedbaek/CarDriveTestSystem/assets/71076926/d8f22e7e-cb00-4dcb-9a69-d18b31cd8da1" width="75%" height="75%"/>
+<img src="https://github.com/Feedbaek/CarDriveTestSystem/assets/71076926/8b3eb4ce-2e6a-4480-881d-f02f64faffea" width="100%" height="80%"/>
 
 ## 아키텍처 설계서
-<img src="https://github.com/Feedbaek/CarDriveTestSystem/assets/71076926/dca8ee0e-c1ac-4f02-bf71-21c86d3a44fe" width="100%" height="70%"/>
+<img src="https://github.com/Feedbaek/CarDriveTestSystem/assets/71076926/dca8ee0e-c1ac-4f02-bf71-21c86d3a44fe" width="100%" height="75%"/>
 
 ## 화면 설계서 [(Figma 보기)](https://www.figma.com/file/wdJgi0J95BUQb6N5X5ZbzS/%ED%98%84%EB%8C%80%EC%98%A4%ED%86%A0%EC%97%90%EB%B2%84?type=design&node-id=0%3A1&mode=design&t=JnVxVQGfAWjRKBk8-1)
 <img src="https://github.com/Feedbaek/CarDriveTestSystem/assets/71076926/5058500c-5fdd-4e4e-b90a-a9b3be7ef4eb" width="100%" height="85%"/>
