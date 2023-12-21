@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import seoul.AutoEveryDay.entity.ReserveTrack;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +21,6 @@ public interface ReserveTrackRepository extends JpaRepository<ReserveTrack, Long
     List<ReserveTrack> findByTrack_IdAndDateGreaterThanEqual(Long trackId, LocalDate date);
 
     List<ReserveTrack> findByUser_Id(Long userId);
+
+    List<ReserveTrack> findByUser_IdAndTrack_NameContaining(Long id, String search);
 }

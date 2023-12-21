@@ -45,11 +45,12 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
     }
 
     @PreAuthorize(value = "hasAuthority('TRACK_RESERVE')")
-    @GetMapping("/track/reserve/history")  // 테스트 트랙 예약 날짜 선택 페이지
-    public String reserveHistoryGet(Model model) {
+    @GetMapping("/track/reserve/history")  // 테스트 트랙 예약 내역 페이지
+    public String reserveHistoryGet(@RequestParam(value = "q", required = false) String search,
+                                    Model model) {
         User user = userService.getLoginUser();
         String[] reserveHistoryTitles = {"트랙 이름", "예약 날짜", "상태", "취소"};
-        List<List<String>> reserveHistoryList = trackService.getReserveHistory(user);
+        List<List<String>> reserveHistoryList = trackService.getReserveHistory(user, search);
         model.addAttribute("reserveHistoryTitles", reserveHistoryTitles);
         model.addAttribute("reserveHistoryList", reserveHistoryList);
         return "track/trackReserveHistory";
@@ -126,11 +127,13 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
 
     // 주행 기록 관련 컨트롤러
     @GetMapping("/drive/history")  // 주행 기록 페이지
-    public String driveHistoryGet(Model model) {
+    public String driveHistoryGet(@RequestParam(value = "q", required = false) String search,
+                                  Model model) {
         String[] driveHistoryTitles = {"운전자", "차량 번호", "차량 종류", "주행 날짜", "주행 거리", "주행 시간", "평균 속도", "최고 속도", "삭제"};
-        List<List<String>> driveHistoryList = driveService.getDriveHistoryList();
+        List<List<String>> driveHistoryList = driveService.getDriveHistoryList(search);
         model.addAttribute("driveHistoryTitles", driveHistoryTitles);
         model.addAttribute("driveHistoryList", driveHistoryList);
+        model.addAttribute("search", search);
         return "driveHistory";
     }
     @ResponseBody
@@ -146,6 +149,7 @@ public class CenterController { // 테스트 트랙 관련 컨트롤러
     }
 
     @ResponseBody
+    @PreAuthorize(value = "hasAuthority('ADMIN')")
     @DeleteMapping("/drive/history/{id}")  // 주행 기록 삭제
     public JsonBody driveHistoryDelete(@PathVariable("id") Long id) {
         return JsonBody.builder()

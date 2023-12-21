@@ -46,23 +46,31 @@ public class SetupAuthority implements
         // 기본 권한 생성
         Privilege readPrivilege
                 = createPrivilegeIfNotFound(READ_PRIVILEGE.getValue());
-        Privilege writePrivilege
-                = createPrivilegeIfNotFound(WRITE_PRIVILEGE.getValue());
-        Privilege deletePrivilege
-                = createPrivilegeIfNotFound(DELETE_PRIVILEGE.getValue());
+        Privilege carRentalPrivilege
+                = createPrivilegeIfNotFound(CAR_RENTAL_PRIVILEGE.getValue());
+        Privilege trackReservePrivilege
+                = createPrivilegeIfNotFound(TRACK_RESERVE_PRIVILEGE.getValue());
+        Privilege gasStationPrivilege
+                = createPrivilegeIfNotFound(GAS_STATION_PRIVILEGE.getValue());
 
         // 권한에 따른 역할 생성
         Set<Privilege> allPrivileges = Arrays.stream(PrivilegeEnum.values())
                 .map(PrivilegeEnum::getValue)
                 .map(this::createPrivilegeIfNotFound)
                 .collect(HashSet::new, HashSet::add, HashSet::addAll);
-        Set<Privilege> advancedUserPrivileges = new HashSet<>(Arrays.asList(readPrivilege, writePrivilege, deletePrivilege));
+        Set<Privilege> advancedUserPrivileges = new HashSet<>(Arrays.asList(readPrivilege, carRentalPrivilege, trackReservePrivilege, gasStationPrivilege));
         Set<Privilege> userPrivileges = Collections.singleton(readPrivilege);
+        Set<Privilege> carRentalPrivileges = new HashSet<>(Arrays.asList(readPrivilege, carRentalPrivilege));
+        Set<Privilege> trackReservePrivileges = new HashSet<>(Arrays.asList(readPrivilege, trackReservePrivilege));
+        Set<Privilege> gasStationPrivileges = new HashSet<>(Arrays.asList(readPrivilege, gasStationPrivilege));
 
         // 역할 생성
         Role adminRole = createRoleIfNotFound(ROLE_ADMIN.getValue(), allPrivileges);
         Role advancedRole = createRoleIfNotFound(ROLE_ADVANCED_USER.getValue(), advancedUserPrivileges);
         Role basicRole = createRoleIfNotFound(ROLE_USER.getValue(), userPrivileges);
+        Role carRentalRole = createRoleIfNotFound(ROLE_CAR_RENTAL.getValue(), carRentalPrivileges);
+        Role trackReserveRole = createRoleIfNotFound(ROLE_TRACK_RESERVE.getValue(), trackReservePrivileges);
+        Role gasStationRole = createRoleIfNotFound(ROLE_GAS_STATION.getValue(), gasStationPrivileges);
 
         // 그룹 생성
         List<UserGroup> allUserGroups = Arrays.stream(UserGroupEnum.values())
@@ -90,7 +98,7 @@ public class SetupAuthority implements
         autoEverUser.setUsername("user");
         autoEverUser.setPassword(passwordEncoder.encode("1234"));
         autoEverUser.setName("김민석");
-        autoEverUser.setRoles(Collections.singleton(basicRole));
+        autoEverUser.setRoles(Collections.singleton(advancedRole));
         autoEverUser.setUserGroup(autoEverGroup);
         userRepository.save(autoEverUser);
 

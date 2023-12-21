@@ -14,4 +14,6 @@ public interface CarModelRepository extends JpaRepository<CarModel, Long> {
     List<CarModel> findAllByOrderById();
 
     boolean existsByName(String name);
+
+    List<CarModel> findByNameContaining(String search);
 }

@@ -22,9 +22,11 @@
                          class="mx-2 col col-md-2 text-lg btn btn-outline-info py-3" onclick="location.href='/car/rental'">차량
                         대여
                     </div>
-                    <div class="mx-2 col-md-2 col btn btn-outline-info py-3" onclick="location.href='/car/manage'">차량 보기
+                    <div sec:authorize="hasAuthority('READ')"
+                        class="mx-2 col-md-2 col btn btn-outline-info py-3" onclick="location.href='/car/manage'">차량 보기
                     </div>
-                    <div class="mx-2 col-md-2 col btn btn-outline-info py-3"
+                    <div sec:authorize="hasAuthority('READ')"
+                         class="mx-2 col-md-2 col btn btn-outline-info py-3"
                          onclick="location.href='/center/track/reserve'">시험장 보기
                     </div>
                 </div>

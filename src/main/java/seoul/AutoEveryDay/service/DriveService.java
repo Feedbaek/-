@@ -104,9 +104,18 @@ public class DriveService {
                 .build();
     }
 
-    public List<List<String>> getDriveHistoryList() {
+    public List<List<String>> getDriveHistoryList(String search) {
         List<List<String>> driveHistoryList = new ArrayList<>();
-        List<DriveHistory> driveHistories = driveHistoryRepository.findAll();
+        List<DriveHistory> driveHistories;
+
+        if (search == null || search.isEmpty()) {
+            driveHistories = driveHistoryRepository.findAll();
+        } else {
+            driveHistories = driveHistoryRepository.findByUser_NameContaining(search);
+            driveHistories.addAll(driveHistoryRepository.findByCar_NumberContaining(search));
+            driveHistories.addAll(driveHistoryRepository.findByCar_CarModel_NameContaining(search));
+            driveHistories.addAll(driveHistoryRepository.findByTrack_NameContaining(search));
+        }
 
         for (DriveHistory driveHistory : driveHistories) {
             List<String> driveHistoryData = new ArrayList<>();

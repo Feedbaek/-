@@ -113,9 +113,17 @@ public class GasStationService {
         return chargeHistoryRepository.findAll();
     }
 
-    public List<List<String>> chargeHistoryData() {
-        List<ChargeHistory> chargeHistoryList = allChargeHistoryList();
+    public List<List<String>> chargeHistoryData(String search) {
+        List<ChargeHistory> chargeHistoryList;
         List<List<String>> chargeHistoryData = new ArrayList<>();
+        if (search == null || search.isEmpty()) {
+            chargeHistoryList = allChargeHistoryList();
+        } else {
+            chargeHistoryList = chargeHistoryRepository.findByUser_NameContaining(search);
+            chargeHistoryList.addAll(chargeHistoryRepository.findByUser_UserGroup_NameContaining(search));
+            chargeHistoryList.addAll(chargeHistoryRepository.findByCar_NumberContaining(search));
+            chargeHistoryList.addAll(chargeHistoryRepository.findByChargeSpot_NameContaining(search));
+        }
 
         for (ChargeHistory chargeHistory : chargeHistoryList) {
             List<String> chargeHistoryRow = new ArrayList<>();

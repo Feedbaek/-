@@ -27,8 +27,8 @@ public class GasStationController {
     private final CarManageService carManageService;
     private final GasStationService gasStationService;
     @GetMapping("/history")
-    public String gasStation(Model model) {
-        List<List<String>> chargeHistoryData = gasStationService.chargeHistoryData();
+    public String gasStation(@RequestParam(value = "q", required = false) String search, Model model) {
+        List<List<String>> chargeHistoryData = gasStationService.chargeHistoryData(search);
         String[] chargeHistoryTitles = {"사용자", "소속", "차량", "주유구", "주유량", "날짜", "삭제"};
         model.addAttribute("chargeHistoryTitles", chargeHistoryTitles);
         model.addAttribute("chargeHistoryList", chargeHistoryData);

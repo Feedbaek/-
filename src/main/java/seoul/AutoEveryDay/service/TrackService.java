@@ -231,8 +231,14 @@ public class TrackService {
         return unavailableDateList;
     }
 
-    public List<List<String>> getReserveHistory(User user) {
-        List<ReserveTrack> reserveTrackList = reserveTrackRepository.findByUser_Id(user.getId());
+    public List<List<String>> getReserveHistory(User user, String search) {
+        List<ReserveTrack> reserveTrackList = new ArrayList<>();
+        if (search == null || search.isEmpty()) {
+            reserveTrackList.addAll(reserveTrackRepository.findByUser_Id(user.getId()));
+        } else {
+            reserveTrackList.addAll(reserveTrackRepository.findByUser_IdAndTrack_NameContaining(user.getId(), search));
+        }
+
         List<List<String>> reserveHistoryList = new ArrayList<>();
 
         reserveTrackList.forEach((reserveTrack) -> {

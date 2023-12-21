@@ -270,9 +270,16 @@ public class CarRentalService {
         return rentCarDtoList;
     }
 
-    public List<List<String>> getRentalHistoryList(User user) {
-        List<RentCar> rentCarList = rentCarRepository.findByUser_Id(user.getId());
+    public List<List<String>> getRentalHistoryList(User user, String search) {
+        List<RentCar> rentCarList = new ArrayList<>();
         List<List<String>> listList = new ArrayList<>();
+
+        if (search == null || search.isEmpty()) {
+            rentCarList.addAll(rentCarRepository.findByUser_Id(user.getId()));
+        } else {
+            rentCarList.addAll(rentCarRepository.findByUser_IdAndCar_NumberContaining(user.getId(), search));
+            rentCarList.addAll(rentCarRepository.findByUser_IdAndCar_CarModel_NameContaining(user.getId(), search));
+        }
 
         for (RentCar rentCar : rentCarList) {
             List<String> list = new ArrayList<>();

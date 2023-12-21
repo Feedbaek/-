@@ -99,13 +99,17 @@ public class CarManageService {
     /** <h3>차량 검색.</h3>
      * 입력받은 번호 포함하는 차량 검색. 없으면 빈 리스트 반환
     * */
-    public List<CarDto> searchCarDto(String number) {
+    public List<CarDto> searchCarDto(String search) {
         List<CarDto> carDtoList = new ArrayList<>();
 
-        if (number == null || number.isEmpty()) {
+        if (search == null || search.isEmpty()) {
             return getAllCar();
         } else {
-            List<Car> carList = carRepository.findByNumberContaining(number);
+            List<Car> carList = new ArrayList<>();
+
+            carList.addAll(carRepository.findByNumberContaining(search));
+            carList.addAll(carRepository.findByCarModel_NameContaining(search));
+
             carList.forEach(car -> {
                 carDtoList.add(CarDto.builder()
                         .id(car.getId())
@@ -198,8 +202,13 @@ public class CarManageService {
         return carModelNameList;
     }
 
-    public List<CarModelRes> getAllCarModelDto() {
-        List<CarModel> carModelList = carModelRepository.findAllByOrderById();
+    public List<CarModelRes> getAllCarModelDto(String search) {
+        List<CarModel> carModelList;
+        if (search == null || search.isEmpty()) {
+            carModelList = carModelRepository.findAllByOrderById();
+        } else {
+            carModelList = carModelRepository.findByNameContaining(search);
+        }
         List<CarModelRes> carModelResList = new ArrayList<>();
 
         carModelList.forEach(carModel -> {

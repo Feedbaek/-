@@ -11,6 +11,9 @@ import seoul.AutoEveryDay.repository.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import static seoul.AutoEveryDay.enums.RoleEnum.ROLE_USER;
 
 @Component
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class SetupDummyData {
     private final ChargeSpotRepository chargeSpotRepository;
     private final ChargeHistoryRepository chargeHistoryRepository;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final UserGroupRepository userGroupRepository;
     private final DriveHistoryRepository driveHistoryRepository;
 
@@ -120,11 +124,16 @@ public class SetupDummyData {
 
 
         // 유저 더미 데이터 생성
-
+        // 현대오토에버 그룹 생성
         UserGroup userGroup = UserGroup.builder()
                 .name("현대오토에버")
                 .build();
         userGroupRepository.save(userGroup);
+        // 유저 역할 생성
+        Role role = Role.builder()
+                .name(ROLE_USER.getValue())
+                .build();
+        roleRepository.save(role);
 
         for (int i = 0; i < 10; i++) {
             User user = User.builder()
@@ -132,6 +141,7 @@ public class SetupDummyData {
                     .password(passwordEncoder.encode("1234"))
                     .name("참가자" + (i + 1))
                     .userGroup(userGroup)
+                    .roles(Set.of(role))
                     .build();
             userGroup.setUsers(List.of(user));
             userRepository.save(user);
@@ -148,7 +158,7 @@ public class SetupDummyData {
         }
 
         // 주유구 더미 데이터 생성
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             char ch = (char) ('A' + i);
             chargeSpotRepository.save(ChargeSpot.builder()
                     .name("주유구" + ch)
@@ -160,7 +170,7 @@ public class SetupDummyData {
             chargeHistoryRepository.save(ChargeHistory.builder()
                     .user(userRepository.findById((long) i+1).orElseThrow())
                     .car(carRepository.findById((long) i+1).orElseThrow())
-                    .chargeSpot(chargeSpotRepository.findById((long) i+1).orElseThrow())
+                    .chargeSpot(chargeSpotRepository.findById(((long) i % 5) + 1).orElseThrow())
                     .amount(10)
                     .build());
         }

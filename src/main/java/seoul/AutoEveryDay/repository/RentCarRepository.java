@@ -6,6 +6,7 @@ import seoul.AutoEveryDay.entity.RentCar;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -19,4 +20,8 @@ public interface RentCarRepository extends JpaRepository<RentCar, Long> {
     boolean existsByCar_IdAndPickupDateGreaterThanEqualAndIsReturned(Long carId, LocalDate pickUpDate, Boolean isReturned);
 
     List<RentCar> findByUser_Id(Long id);
+
+    List<RentCar> findByUser_IdAndCar_NumberContaining(Long id, String search);
+
+    List<RentCar> findByUser_IdAndCar_CarModel_NameContaining(Long id, String search);
 }
