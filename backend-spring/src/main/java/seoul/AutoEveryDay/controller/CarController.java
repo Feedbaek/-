@@ -32,7 +32,7 @@ public class CarController {
     @PreAuthorize(value = "hasAnyAuthority('CAR_RENTAL')")
     @GetMapping("/rental")  // 차량 모델 선택 페이지
     public String rentalGet(Model model) {
-        List<String> carModelList = carManageService.getAllCarModelNames();
+        List<List<String>> carModelList = carManageService.getAllCarModelNames();
         model.addAttribute("carModelList", carModelList);
         return "car/carModelSelect";
     }

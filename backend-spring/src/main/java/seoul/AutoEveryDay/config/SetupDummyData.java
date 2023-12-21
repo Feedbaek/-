@@ -150,9 +150,20 @@ public class SetupDummyData {
         // 트랙 더미 데이터 생성
         for (int i = 0; i < 5; i++) {
             char ch = (char) ('A' + i);
+            String description;
+            if (i == 0)
+                description = "기본적인 실내 트랙입니다.";
+            else if (i == 1)
+                description = "코너링이 많은 실내 트랙입니다.";
+            else if (i == 2)
+                description = "기본적인 실외 트랙입니다.";
+            else if (i == 3)
+                description = "신호와 장애물이 많은 실내 트랙입니다.";
+            else
+                description = "사막과 비슷한 환경의 실외 트랙입니다.";
             trackRepository.save(Track.builder()
                     .name("트랙" + ch)
-                    .description("테스트 트랙 설명" + (i + 1))
+                    .description(description)
                     .image("/image/track/" + (i + 1) + ".jpeg")
                     .build());
         }

@@ -191,12 +191,18 @@ public class CarManageService {
                 .build();
     }
 
-    public List<String> getAllCarModelNames() {
+    public List<List<String>> getAllCarModelNames() {
         List<CarModel> carModelList = carModelRepository.findAllByOrderById();
-        List<String> carModelNameList = new ArrayList<>();
+        List<List<String>> carModelNameList = new ArrayList<>();
 
         carModelList.forEach(carModel -> {
-            carModelNameList.add(carModel.getName());
+            List<String> model = new ArrayList<>();
+
+            model.add(carModel.getId().toString());
+            model.add(carModel.getName());
+            model.add(carModel.getImage());
+
+            carModelNameList.add(model);
         });
 
         return carModelNameList;
@@ -227,7 +233,12 @@ public class CarManageService {
             log.error("이미 존재하는 차량 모델입니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 차량 모델입니다.");
         }
-        if (!converter.isActualJPEG(carModelReq.getImage())) {
+        String ext;
+        if (converter.isJPEG(carModelReq.getImage())) {
+            ext = ".jpeg";
+        } else if (converter.isPNG(carModelReq.getImage())) {
+            ext = ".png";
+        } else {
             log.error("올바르지 않은 이미지 파일입니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "올바르지 않은 이미지 파일입니다.");
         }
@@ -237,7 +248,7 @@ public class CarManageService {
                 .build();
         try {
             carModelRepository.save(carModel);
-            String imageUrl = converter.convertImgToUrl(carModelReq.getImage(), "/car", carModel.getId() + ".jpeg");
+            String imageUrl = converter.convertImgToUrl(carModelReq.getImage(), "/car", carModel.getId() + ext);
             carModel.setImage(imageUrl);
         } catch (Exception e) {
             log.error("차량 모델 저장 실패", e);
@@ -257,12 +268,17 @@ public class CarManageService {
         CarModel carModel = carModelRepository.findById(carModelReq.getId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "존재하지 않는 차량 모델입니다."));
 
-        if (!converter.isActualJPEG(carModelReq.getImage())) {
+        String ext;
+        if (converter.isJPEG(carModelReq.getImage())) {
+            ext = ".jpeg";
+        } else if (converter.isPNG(carModelReq.getImage())) {
+            ext = ".png";
+        } else {
             log.error("올바르지 않은 이미지 파일입니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "올바르지 않은 이미지 파일입니다.");
         }
 
-        String imageUrl = converter.convertImgToUrl(carModelReq.getImage(), "/car", carModel.getId() + ".jpeg");
+        String imageUrl = converter.convertImgToUrl(carModelReq.getImage(), "/car", carModel.getId() + ext);
         carModel.setImage(imageUrl);
 
         return CarModelRes.builder()

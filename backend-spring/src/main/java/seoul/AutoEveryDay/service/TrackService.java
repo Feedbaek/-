@@ -65,16 +65,24 @@ public class TrackService {
         if (trackRepository.existsByName(trackReq.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 트랙 입니다.");
         }
-        if (!converter.isActualJPEG(trackReq.getImage())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미지 파일이 아닙니다.");
+
+        String ext;
+        if (converter.isJPEG(trackReq.getImage())) {
+            ext = ".jpeg";
+        } else if (converter.isPNG(trackReq.getImage())) {
+            ext = ".png";
+        } else {
+            log.error("올바르지 않은 이미지 파일입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "올바르지 않은 이미지 파일입니다.");
         }
+
         Track track = Track.builder()
                 .name(trackReq.getName())
                 .description(trackReq.getDescription())
                 .build();
         try {
             trackRepository.save(track);
-            String fileName = track.getId() + ".jpeg";
+            String fileName = track.getId() + ext;
             String imageUrl = converter.convertImgToUrl(trackReq.getImage(), "/track", fileName);
             track.setImage(imageUrl);
         } catch (Exception e) {
@@ -105,8 +113,14 @@ public class TrackService {
 
     public TrackDto editTestTrack(TrackReq trackReq) {
         Track track = getTrack(trackReq.getId());
-        if (!converter.isActualJPEG(trackReq.getImage())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미지 파일이 아닙니다.");
+        String ext;
+        if (converter.isJPEG(trackReq.getImage())) {
+            ext = ".jpeg";
+        } else if (converter.isPNG(trackReq.getImage())) {
+            ext = ".png";
+        } else {
+            log.error("올바르지 않은 이미지 파일입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "올바르지 않은 이미지 파일입니다.");
         }
 
         trackRepository.findByName(trackReq.getName()).ifPresent(
@@ -116,7 +130,7 @@ public class TrackService {
                     }
                 }
         );
-        String imageUrl = converter.convertImgToUrl(trackReq.getImage(), "/track", track.getId() + ".jpeg");
+        String imageUrl = converter.convertImgToUrl(trackReq.getImage(), "/track", track.getId() + ext);
 
         track.setName(trackReq.getName());
         track.setDescription(trackReq.getDescription());
