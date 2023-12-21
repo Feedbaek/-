@@ -248,7 +248,7 @@ public class CarManageService {
                 .build();
         try {
             carModelRepository.save(carModel);
-            String imageUrl = converter.convertImgToUrl(carModelReq.getImage(), "/car", carModel.getId() + ext);
+            String imageUrl = converter.convertImgToUrl(carModelReq.getImage(), "car", carModel.getId() + ext);
             carModel.setImage(imageUrl);
         } catch (Exception e) {
             log.error("차량 모델 저장 실패", e);
@@ -278,7 +278,7 @@ public class CarManageService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "올바르지 않은 이미지 파일입니다.");
         }
 
-        String imageUrl = converter.convertImgToUrl(carModelReq.getImage(), "/car", carModel.getId() + ext);
+        String imageUrl = converter.convertImgToUrl(carModelReq.getImage(), "car", carModel.getId() + ext);
         carModel.setImage(imageUrl);
 
         return CarModelRes.builder()

@@ -1,6 +1,7 @@
 package seoul.AutoEveryDay.utils;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,7 +30,11 @@ import java.util.Locale;
 @Component
 @RequiredArgsConstructor
 public class Converter {
+    @Value("${image.path}")
+    private String IMAGE_PATH;
+
     public UserDto convertToUserDto(User user) {
+
 
         return UserDto.builder()
                 .id(user.getId())
@@ -128,7 +133,7 @@ public class Converter {
 
     public String convertImgToUrl(MultipartFile file, String path, String fileName) {
         // 프로젝트 내부 경로로 저장 경로 설정
-        String uploadDir = "src/main/resources/image" + path;
+        String uploadDir = IMAGE_PATH + path;
         Path fullPath = Paths.get(uploadDir).resolve(fileName);
 
         // 파일 저장
@@ -139,6 +144,6 @@ public class Converter {
             System.out.println(path + "/" + fileName);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 저장 실패");
         }
-        return "/image" + path + "/" + fileName;
+        return "/image/" + path + "/" + fileName;
     }
 }

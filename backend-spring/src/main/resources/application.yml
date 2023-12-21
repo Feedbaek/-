@@ -46,3 +46,6 @@ server:
     whitelabel:
       enabled: false
 #    include-message: always
+
+image:
+    path: C:\\Users\\nicek\\springImages\\
