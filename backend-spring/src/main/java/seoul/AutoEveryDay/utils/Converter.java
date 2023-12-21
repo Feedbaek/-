@@ -140,7 +140,7 @@ public class Converter {
 
     public String convertImgToUrl(MultipartFile file, String path, String fileName) {
         // 프로젝트 내부 경로로 저장 경로 설정
-        String uploadDir = "src/main/resources/static/image" + path;
+        String uploadDir = "src/main/resources/image" + path;
         Path fullPath = Paths.get(uploadDir).resolve(fileName);
 
         // 파일 저장

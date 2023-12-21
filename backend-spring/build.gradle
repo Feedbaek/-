@@ -39,7 +39,7 @@ dependencies {
 	implementation group: 'nz.net.ultraq.thymeleaf', name: 'thymeleaf-layout-dialect', version: '3.2.1'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
-	compileOnly 'org.springframework.boot:spring-boot-devtools'
+//	compileOnly 'org.springframework.boot:spring-boot-devtools'
 
 	// https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
 	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.3.0'
