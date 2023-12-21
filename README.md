@@ -27,7 +27,7 @@
 ## 테이블 정의서 [(Excel 보기)](https://docs.google.com/spreadsheets/d/12O3ASra3wHeo_a4Pw_upd3c_dmL_4LXynhjuRUdUBeg/edit?usp=sharing)
 <img src="https://github.com/Feedbaek/CarDriveTestSystem/assets/71076926/ad451e4f-5e71-4d72-bd7b-1402cdd0e3c1" width="100%" height="80%"/>
 
-## 물리 ERD
+## 물리 ERD [(ERD 보기)](https://www.erdcloud.com/d/SZcAkZz2G6gTgzDa3)
 <img src="https://github.com/Feedbaek/CarDriveTestSystem/assets/71076926/4cbd7581-9673-42ab-a01a-bc41ce8690a2" width="90%" height="80%"/>
 
 
