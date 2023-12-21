@@ -25,7 +25,7 @@
 <img src="https://github.com/Feedbaek/CarDriveTestSystem/assets/71076926/5058500c-5fdd-4e4e-b90a-a9b3be7ef4eb" width="100%" height="85%"/>
 
 ## 테이블 정의서 [(Excel 보기)](https://docs.google.com/spreadsheets/d/12O3ASra3wHeo_a4Pw_upd3c_dmL_4LXynhjuRUdUBeg/edit?usp=sharing)
-<img src="https://github.com/Feedbaek/CarDriveTestSystem/assets/71076926/924b2252-1c05-4e8b-bbb5-2648953b8f7c" width="85%" height="85%"/>
+<img src="https://github.com/Feedbaek/CarDriveTestSystem/assets/71076926/ad451e4f-5e71-4d72-bd7b-1402cdd0e3c1" width="100%" height="80%"/>
 
 ## 물리 ERD
 <img src="https://github.com/Feedbaek/CarDriveTestSystem/assets/71076926/4cbd7581-9673-42ab-a01a-bc41ce8690a2" width="90%" height="80%"/>
