@@ -200,7 +200,7 @@ public class CarRentalServiceTest {
         Throwable thrown = catchThrowable(() -> carRentalService.returnCar(rentCarDto, user, car));
 
         // then
-        assertThat(thrown).isInstanceOf(ResponseStatusException.class).hasMessage("400 BAD_REQUEST \"대여 기록이 없습니다.\"");
+        assertThat(thrown).isInstanceOf(ResponseStatusException.class).hasMessage("400 BAD_REQUEST \"예약되지 않은 차량입니다.\"");
     }
 
     @Test
@@ -305,6 +305,6 @@ public class CarRentalServiceTest {
         Throwable thrown = catchThrowable(() -> carRentalService.deleteRental(rentCarDto, user, car));
 
         // then
-        assertThat(thrown).isInstanceOf(ResponseStatusException.class).hasMessage("400 BAD_REQUEST \"대여 기록이 없습니다.\"");
+        assertThat(thrown).isInstanceOf(ResponseStatusException.class).hasMessage("400 BAD_REQUEST \"예약되지 않은 차량입니다.\"");
     }
 }

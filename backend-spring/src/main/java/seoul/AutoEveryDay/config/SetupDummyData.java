@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static seoul.AutoEveryDay.enums.PrivilegeEnum.READ_PRIVILEGE;
 import static seoul.AutoEveryDay.enums.RoleEnum.ROLE_USER;
 
 @Component
@@ -27,6 +28,7 @@ public class SetupDummyData {
     private final RoleRepository roleRepository;
     private final UserGroupRepository userGroupRepository;
     private final DriveHistoryRepository driveHistoryRepository;
+    private final PrivilegeRepository privilegeRepository;
 
     private final PasswordEncoder passwordEncoder;
     @PostConstruct
@@ -129,9 +131,17 @@ public class SetupDummyData {
                 .name("현대오토에버")
                 .build();
         userGroupRepository.save(userGroup);
+
+        // 기본 권한 생성
+        Privilege readPrivilege = Privilege.builder()
+                .name(READ_PRIVILEGE.getValue())
+                .build();
+        privilegeRepository.save(readPrivilege);
+
         // 유저 역할 생성
         Role role = Role.builder()
                 .name(ROLE_USER.getValue())
+                .privileges(Set.of(readPrivilege))
                 .build();
         roleRepository.save(role);
 

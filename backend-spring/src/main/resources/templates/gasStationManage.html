@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/default_layout}">
 <head>
@@ -15,9 +16,37 @@
 <!-- Content -->
 <main layout:fragment="content" class="container mt-4">
     <h1 class="display-5">주유구 관리</h1>
-    <!-- 여기에 chargeSpotList 리스트 값을 리스트 형식으로 보여줌 -->
+    <div class="d-flex justify-content-end">
+        <!-- 주유구 등록 -->
+        <button sec:authorize="hasAuthority('ADMIN')" type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#spotModal">주유구 등록</button>
+    </div>
     <!-- 카 테이블 프래그먼트 -->
     <div th:replace="~{fragments/table :: commonTable(${chargeSpotTitles}, ${chargeSpotList}, 'chargeSpot')}"></div>
+
+    <!-- Add Spot Modal -->
+    <div class="modal fade" id="spotModal" tabindex="-1" role="dialog" aria-labelledby="addSpotModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTrackModalLabel">새로운 주유구</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="spotForm" action="" method="post">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="spotName">주유구 이름</label>
+                            <input type="text" class="form-control" id="spotName" name="name" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-link text-secondary">등록</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script>
         function deleteSpot(element) {
@@ -38,6 +67,31 @@
                 });
             }
         }
+
+        // Add Track Form Submit
+        document.getElementById('spotForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // 폼의 기본 제출 동작 방지
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: "POST",
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        alert('등록 실패');
+                    }
+                    // alert(data.message); // 서버 응답 메시지를 알림으로 표시
+                })
+                .catch(error => {
+                    alert('An error occurred while processing the request'); // 오류 발생 시 알림
+                })
+                .finally(() => {
+                    // 페이지 새로고침
+                    location.reload();
+                });
+        });
     </script>
 </main>
 </html>
